@@ -1,352 +1,224 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useEffect, useState, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { use } from 'react'
-import { SearchBar } from '@/components/SearchBar'
-import { FilterBar } from '@/components/FilterBar'
-import { useDebounce } from '@/hooks/useDebounce'
 
-interface PageProps {
-  params: Promise<{ id: string }>
-}
-
-export default function CollectionDetailPage({ params }: PageProps) {
-  const { id } = use(params)
-  const router = useRouter()
+// Dashboard content component that uses useSearchParams
+function DashboardContent() {
   const searchParams = useSearchParams()
-  const supabase = createClient()
-
-  // State
-  const [collection, setCollection] = useState<any>(null)
-  const [items, setItems] = useState<any[]>([])
-  const [categories, setCategories] = useState<any[]>([])
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<any>(null)
+  const [stats, setStats] = useState({
+    totalCollections: 0,
+    totalItems: 0,
+    totalValue: 0,
+    recentItems: [] as any[]
+  })
 
-  // Filter State (aus URL oder default)
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '')
-  const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '')
-  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'created_at:desc')
-  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '')
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '')
-
-  // Debounced search für Performance
-  const debouncedSearch = useDebounce(searchQuery, 300)
-
-  // URL aktualisieren bei Filter-Änderung
   useEffect(() => {
-    const params = new URLSearchParams()
-    if (debouncedSearch) params.set('q', debouncedSearch)
-    if (selectedCategory) params.set('category', selectedCategory)
-    if (selectedStatus) params.set('status', selectedStatus)
-    if (sortBy !== 'created_at:desc') params.set('sort', sortBy)
-    if (minPrice) params.set('minPrice', minPrice)
-    if (maxPrice) params.set('maxPrice', maxPrice)
+    checkUserAndLoadData()
+  }, [])
 
-    const queryString = params.toString()
-    router.replace(`/collections/${id}${queryString ? `?${queryString}` : ''}`, { scroll: false })
-  }, [debouncedSearch, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice, id, router])
+  async function checkUserAndLoadData() {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    
+    setUser(user)
+    await loadDashboardStats(user.id)
+    setLoading(false)
+  }
 
-  // Daten laden
-  useEffect(() => {
-    async function loadData() {
-      setLoading(true)
+  async function loadDashboardStats(userId: string) {
+    // Count collections
+    const { count: collectionsCount } = await supabase
+      .from('collections')
+      .select('*', { count: 'exact', head: true })
+      .eq('owner_id', userId)
 
-      // Collection laden
-      const { data: collectionData } = await supabase
-        .from('collections')
-        .select('*')
-        .eq('id', id)
-        .single()
+    // Count items and sum values
+    const { data: collections } = await supabase
+      .from('collections')
+      .select('id')
+      .eq('owner_id', userId)
 
-      if (collectionData) setCollection(collectionData)
+    let totalItems = 0
+    let totalValue = 0
+    let recentItems: any[] = []
 
-      // Kategorien laden
-      const { data: categoriesData } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('collection_id', id)
-        .order('sort_order')
-
-      if (categoriesData) setCategories(categoriesData)
-
-      // Items laden (mit Filtern)
-      let query = supabase
+    if (collections && collections.length > 0) {
+      const collectionIds = collections.map(c => c.id)
+      
+      // Count items
+      const { count: itemsCount } = await supabase
         .from('items')
-        .select('*, item_images(*)')
-        .eq('collection_id', id)
+        .select('*', { count: 'exact', head: true })
+        .in('collection_id', collectionIds)
+      
+      totalItems = itemsCount || 0
 
-      // Filter anwenden
-      if (selectedCategory) {
-        query = query.eq('category_id', selectedCategory)
-      }
-      if (selectedStatus) {
-        query = query.eq('status', selectedStatus)
-      }
-      if (minPrice) {
-        query = query.gte('purchase_price', parseFloat(minPrice))
-      }
-      if (maxPrice) {
-        query = query.lte('purchase_price', parseFloat(maxPrice))
+      // Sum values
+      const { data: itemsWithValue } = await supabase
+        .from('items')
+        .select('purchase_price')
+        .in('collection_id', collectionIds)
+        .not('purchase_price', 'is', null)
+
+      if (itemsWithValue) {
+        totalValue = itemsWithValue.reduce((sum, item) => sum + (item.purchase_price || 0), 0)
       }
 
-      // Sortierung
-      const [sortField, sortDir] = sortBy.split(':')
-      query = query.order(sortField, { ascending: sortDir === 'asc', nullsFirst: false })
+      // Recent items
+      const { data: recent } = await supabase
+        .from('items')
+        .select('*, collections(name)')
+        .in('collection_id', collectionIds)
+        .order('created_at', { ascending: false })
+        .limit(5)
 
-      const { data: itemsData } = await query
-
-      setItems(itemsData || [])
-      setLoading(false)
+      recentItems = recent || []
     }
 
-    loadData()
-  }, [id, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice])
-
-  // Client-seitige Suche (für schnellere UX)
-  const filteredItems = useMemo(() => {
-    if (!debouncedSearch) return items
-
-    const query = debouncedSearch.toLowerCase()
-    return items.filter(item =>
-      item.name?.toLowerCase().includes(query) ||
-      item.description?.toLowerCase().includes(query) ||
-      item.notes?.toLowerCase().includes(query) ||
-      item.barcode?.toLowerCase().includes(query)
-    )
-  }, [items, debouncedSearch])
-
-  // Statistiken
-  const stats = useMemo(() => {
-    const totalItems = filteredItems.length
-    const totalValue = filteredItems.reduce((sum, item) => sum + (item.purchase_price || 0), 0)
-    return { totalItems, totalValue }
-  }, [filteredItems])
-
-  if (loading && !collection) {
-    return <div className="p-8">Laden...</div>
+    setStats({
+      totalCollections: collectionsCount || 0,
+      totalItems,
+      totalValue,
+      recentItems
+    })
   }
 
-  if (!collection) {
-    return <div className="p-8">Sammlung nicht gefunden</div>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
   }
 
   return (
-    <div className="p-8">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex justify-between items-start mb-6">
-        <div>
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">📦 CollectR</h1>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">{user?.email}</span>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut()
+                router.push('/login')
+              }}
+              className="text-sm text-red-600 hover:text-red-800"
+            >
+              Abmelden
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="text-3xl font-bold text-blue-600">{stats.totalCollections}</div>
+            <div className="text-gray-600">Sammlungen</div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="text-3xl font-bold text-green-600">{stats.totalItems}</div>
+            <div className="text-gray-600">Artikel</div>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="text-3xl font-bold text-purple-600">
+              {stats.totalValue.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+            </div>
+            <div className="text-gray-600">Gesamtwert</div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex flex-wrap gap-4 mb-8">
           <Link
             href="/collections"
-            className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1 mb-2"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium"
           >
-            ← Alle Sammlungen
+            📁 Sammlungen verwalten
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900">{collection.name}</h1>
-          {collection.description && (
-            <p className="text-slate-500 mt-1">{collection.description}</p>
+          <Link
+            href="/collections/new"
+            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-medium"
+          >
+            ➕ Neue Sammlung
+          </Link>
+        </div>
+
+        {/* Recent Items */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-4">Kürzlich hinzugefügt</h2>
+          {stats.recentItems.length === 0 ? (
+            <p className="text-gray-500">Noch keine Artikel vorhanden.</p>
+          ) : (
+            <div className="space-y-3">
+              {stats.recentItems.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/collections/${item.collection_id}/items/${item.id}`}
+                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition"
+                >
+                  {item.images?.[0] ? (
+                    <img
+                      src={item.images[0]}
+                      alt={item.name}
+                      className="w-12 h-12 object-cover rounded"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                      📷
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <div className="font-medium">{item.name}</div>
+                    <div className="text-sm text-gray-500">
+                      {(item.collections as any)?.name}
+                    </div>
+                  </div>
+                  {item.purchase_price && (
+                    <div className="text-green-600 font-medium">
+                      {item.purchase_price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+                    </div>
+                  )}
+                </Link>
+              ))}
+            </div>
           )}
         </div>
-        <div className="flex gap-3">
-          <Link
-            href={`/collections/${id}/scan`}
-            className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors flex items-center gap-2"
-          >
-            <span>📷</span>
-            <span>Scannen</span>
-          </Link>
-          <Link
-            href={`/collections/${id}/categories`}
-            className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors"
-          >
-            Kategorien
-          </Link>
-          <Link
-            href={`/collections/${id}/items/new`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-          >
-            <span>+</span>
-            <span>Neues Item</span>
-          </Link>
-        </div>
-      </div>
-
-      {/* Stats Bar */}
-      <div className="flex gap-6 mb-6 p-4 bg-white rounded-xl border border-slate-200">
-        <div>
-          <span className="text-2xl font-bold">{stats.totalItems}</span>
-          <span className="text-slate-500 ml-2">Items</span>
-          {debouncedSearch && items.length !== filteredItems.length && (
-            <span className="text-slate-400 ml-1">(von {items.length})</span>
-          )}
-        </div>
-        <div className="border-l border-slate-200 pl-6">
-          <span className="text-2xl font-bold">{stats.totalValue.toFixed(2)}</span>
-          <span className="text-slate-500 ml-2">EUR Gesamtwert</span>
-        </div>
-        <div className="border-l border-slate-200 pl-6">
-          <span className="text-2xl font-bold">{categories.length}</span>
-          <span className="text-slate-500 ml-2">Kategorien</span>
-        </div>
-      </div>
-
-      {/* Suchleiste */}
-      <div className="mb-4">
-        <SearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Items durchsuchen (Name, Beschreibung, Barcode)..."
-        />
-      </div>
-
-      {/* Filter Bar */}
-      <div className="mb-6">
-        <FilterBar
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          selectedStatus={selectedStatus}
-          onStatusChange={setSelectedStatus}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          minPrice={minPrice}
-          maxPrice={maxPrice}
-          onPriceChange={(min, max) => {
-            setMinPrice(min)
-            setMaxPrice(max)
-          }}
-        />
-      </div>
-
-      {/* Items Grid */}
-      {loading ? (
-        <div className="text-center py-12 text-slate-500">Laden...</div>
-      ) : filteredItems.length === 0 ? (
-        <EmptyState
-          collectionId={id}
-          hasFilters={!!(debouncedSearch || selectedCategory || selectedStatus || minPrice || maxPrice)}
-          onClearFilters={() => {
-            setSearchQuery('')
-            setSelectedCategory('')
-            setSelectedStatus('')
-            setMinPrice('')
-            setMaxPrice('')
-          }}
-        />
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredItems.map((item) => (
-            <ItemCard key={item.id} item={item} collectionId={id} />
-          ))}
-        </div>
-      )}
+      </main>
     </div>
   )
 }
 
-function ItemCard({ item, collectionId }: { item: any; collectionId: string }) {
-  const primaryImage = item.item_images?.find((img: any) => img.is_primary)
-    ?? item.item_images?.[0]
-
+// Loading fallback component
+function DashboardLoading() {
   return (
-    <Link
-      href={`/collections/${collectionId}/items/${item.id}`}
-      className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all group"
-    >
-      {/* Image */}
-      <div className="aspect-square bg-slate-100 relative">
-        {primaryImage ? (
-          <img
-            src={primaryImage.thumbnail_url ?? primaryImage.original_url}
-            alt={item.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-4xl text-slate-300">
-            📷
-          </div>
-        )}
-        {item.status !== 'in_collection' && (
-          <span className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium ${
-            item.status === 'sold' ? 'bg-green-100 text-green-700' :
-            item.status === 'wishlist' ? 'bg-purple-100 text-purple-700' :
-            item.status === 'ordered' ? 'bg-blue-100 text-blue-700' :
-            'bg-slate-100 text-slate-700'
-          }`}>
-            {item.status === 'sold' ? 'Verkauft' :
-             item.status === 'wishlist' ? 'Wunschliste' :
-             item.status === 'ordered' ? 'Bestellt' : item.status}
-          </span>
-        )}
-        {item.barcode && (
-          <span className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 text-white text-xs rounded font-mono">
-            {item.barcode}
-          </span>
-        )}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Laden...</p>
       </div>
-
-      {/* Info */}
-      <div className="p-4">
-        <h3 className="font-medium group-hover:text-blue-600 transition-colors line-clamp-1">
-          {item.name}
-        </h3>
-        {item.purchase_price && (
-          <p className="text-slate-500 text-sm mt-1">
-            {item.purchase_price.toFixed(2)} {item.purchase_currency}
-          </p>
-        )}
-      </div>
-    </Link>
+    </div>
   )
 }
 
-function EmptyState({
-  collectionId,
-  hasFilters,
-  onClearFilters
-}: {
-  collectionId: string
-  hasFilters: boolean
-  onClearFilters: () => void
-}) {
-  if (hasFilters) {
-    return (
-      <div className="text-center py-16 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-        <span className="text-6xl">🔍</span>
-        <h3 className="text-xl font-semibold mt-4">Keine Items gefunden</h3>
-        <p className="text-slate-500 mt-2">Versuche andere Suchbegriffe oder Filter</p>
-        <button
-          onClick={onClearFilters}
-          className="inline-block mt-6 bg-slate-600 text-white px-6 py-3 rounded-lg hover:bg-slate-700 transition-colors"
-        >
-          Filter zurücksetzen
-        </button>
-      </div>
-    )
-  }
-
+// Main page component with Suspense boundary
+export default function HomePage() {
   return (
-    <div className="text-center py-16 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-      <span className="text-6xl">🏷️</span>
-      <h3 className="text-xl font-semibold mt-4">Noch keine Items</h3>
-      <p className="text-slate-500 mt-2">Füge dein erstes Item zu dieser Sammlung hinzu!</p>
-      <div className="flex gap-4 justify-center mt-6">
-        <Link
-          href={`/collections/${collectionId}/scan`}
-          className="bg-slate-600 text-white px-6 py-3 rounded-lg hover:bg-slate-700 transition-colors"
-        >
-          📷 Barcode scannen
-        </Link>
-        <Link
-          href={`/collections/${collectionId}/items/new`}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          + Manuell hinzufügen
-        </Link>
-      </div>
-    </div>
+    <Suspense fallback={<DashboardLoading />}>
+      <DashboardContent />
+    </Suspense>
   )
 }
