@@ -2,13 +2,14 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 // Dashboard content component that uses useSearchParams
 function DashboardContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [stats, setStats] = useState({
