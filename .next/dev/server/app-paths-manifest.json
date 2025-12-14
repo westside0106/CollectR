@@ -1,0 +1,11 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/collections/[id]/import/page": "app/collections/[id]/import/page.js",
+  "/collections/[id]/items/new/page": "app/collections/[id]/items/new/page.js",
+  "/collections/[id]/page": "app/collections/[id]/page.js",
+  "/collections/[id]/scan/page": "app/collections/[id]/scan/page.js",
+  "/collections/new/page": "app/collections/new/page.js",
+  "/collections/page": "app/collections/page.js",
+  "/login/page": "app/login/page.js",
+  "/page": "app/page.js"
+}
