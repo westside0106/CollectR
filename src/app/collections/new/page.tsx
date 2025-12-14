@@ -8,123 +8,115 @@ import Link from 'next/link'
 export default function NewCollectionPage() {
   const router = useRouter()
   const supabase = createClient()
-  
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
 
-  // User ID beim Laden holen
   useEffect(() => {
     async function getUser() {
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        setUserId(user.id)
-      } else {
-        // Nicht eingeloggt -> Login
+      if (!user) {
         router.push('/login')
+        return
       }
+      setUserId(user.id)
     }
     getUser()
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!userId) {
-      setError('Nicht eingeloggt')
-      return
-    }
+    if (!userId) return
     
     setLoading(true)
-    setError(null)
+    setError('')
 
-    const { data, error: insertError } = await supabase
+    const { data, error } = await supabase
       .from('collections')
       .insert({
         name,
-        description: description || null,
-        owner_id: userId,  // <-- WICHTIG: owner_id mitsenden!
+        description,
+        owner_id: userId
       })
       .select()
       .single()
 
-    if (insertError) {
-      setError(insertError.message)
+    if (error) {
+      setError(error.message)
       setLoading(false)
-      return
+    } else {
+      router.push(`/collections/${data.id}`)
     }
-
-    router.push(`/collections/${data.id}`)
   }
 
   return (
-    <div className="p-8 max-w-2xl">
-      <div className="mb-8">
-        <Link 
-          href="/collections"
-          className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1 mb-2"
-        >
-          ← Zurück zu Sammlungen
-        </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Neue Sammlung</h1>
-        <p className="text-slate-500 mt-1">Erstelle eine neue Sammlung für deine Items</p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
+          <Link href="/" className="text-2xl font-bold text-gray-900">📦 CollectR</Link>
+          <span className="text-gray-400">/</span>
+          <Link href="/collections" className="text-gray-600 hover:text-gray-900">Sammlungen</Link>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-600">Neu</span>
+        </div>
+      </header>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl p-8 shadow-sm border border-slate-200">
-        <div className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
-              Name *
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              placeholder="z.B. Hot Wheels Sammlung"
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-            />
-          </div>
+      <main className="max-w-2xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-6">Neue Sammlung erstellen</h1>
 
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
-              Beschreibung
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              placeholder="Optional: Beschreibe deine Sammlung..."
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
-            />
-          </div>
-
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
           {error && (
-            <div className="bg-red-50 text-red-600 p-4 rounded-lg">
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
               {error}
             </div>
           )}
 
-          <div className="flex gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name *
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="z.B. Hot Wheels Sammlung"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Beschreibung
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Optional: Beschreibe deine Sammlung..."
+            />
+          </div>
+
+          <div className="flex gap-4 pt-4">
             <button
               type="submit"
-              disabled={loading || !userId}
-              className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              disabled={loading || !name}
+              className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50"
             >
-              {loading ? 'Erstelle...' : 'Sammlung erstellen'}
+              {loading ? 'Wird erstellt...' : 'Sammlung erstellen'}
             </button>
             <Link
               href="/collections"
-              className="px-6 py-3 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors text-center"
+              className="px-6 py-3 border rounded-lg hover:bg-gray-50 transition"
             >
               Abbrechen
             </Link>
           </div>
-        </div>
-      </form>
+        </form>
+      </main>
     </div>
   )
 }

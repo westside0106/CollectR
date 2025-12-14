@@ -1,13 +1,11 @@
 'use client'
 
 import { useEffect, useState, Suspense } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
-// Dashboard content component that uses useSearchParams
 function DashboardContent() {
-  const searchParams = useSearchParams()
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
@@ -37,13 +35,11 @@ function DashboardContent() {
   }
 
   async function loadDashboardStats(userId: string) {
-    // Count collections
     const { count: collectionsCount } = await supabase
       .from('collections')
       .select('*', { count: 'exact', head: true })
       .eq('owner_id', userId)
 
-    // Count items and sum values
     const { data: collections } = await supabase
       .from('collections')
       .select('id')
@@ -56,7 +52,6 @@ function DashboardContent() {
     if (collections && collections.length > 0) {
       const collectionIds = collections.map(c => c.id)
       
-      // Count items
       const { count: itemsCount } = await supabase
         .from('items')
         .select('*', { count: 'exact', head: true })
@@ -64,7 +59,6 @@ function DashboardContent() {
       
       totalItems = itemsCount || 0
 
-      // Sum values
       const { data: itemsWithValue } = await supabase
         .from('items')
         .select('purchase_price')
@@ -75,7 +69,6 @@ function DashboardContent() {
         totalValue = itemsWithValue.reduce((sum, item) => sum + (item.purchase_price || 0), 0)
       }
 
-      // Recent items
       const { data: recent } = await supabase
         .from('items')
         .select('*, collections(name)')
@@ -104,7 +97,6 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">📦 CollectR</h1>
@@ -124,7 +116,6 @@ function DashboardContent() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="text-3xl font-bold text-blue-600">{stats.totalCollections}</div>
@@ -142,7 +133,6 @@ function DashboardContent() {
           </div>
         </div>
 
-        {/* Quick Actions */}
         <div className="flex flex-wrap gap-4 mb-8">
           <Link
             href="/collections"
@@ -158,7 +148,6 @@ function DashboardContent() {
           </Link>
         </div>
 
-        {/* Recent Items */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">Kürzlich hinzugefügt</h2>
           {stats.recentItems.length === 0 ? (
@@ -203,7 +192,6 @@ function DashboardContent() {
   )
 }
 
-// Loading fallback component
 function DashboardLoading() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -215,7 +203,6 @@ function DashboardLoading() {
   )
 }
 
-// Main page component with Suspense boundary
 export default function HomePage() {
   return (
     <Suspense fallback={<DashboardLoading />}>

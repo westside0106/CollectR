@@ -1,104 +1,101 @@
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
-export default async function CollectionsPage() {
-  const supabase = await createClient()
-  
-  const { data: collections, error } = await supabase
-    .from('collections')
-    .select(`
-      *,
-      items:items(count),
-      categories:categories(count)
-    `)
-    .order('updated_at', { ascending: false })
+export default function CollectionsPage() {
+  const router = useRouter()
+  const supabase = createClient()
+  const [collections, setCollections] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadCollections()
+  }, [])
+
+  async function loadCollections() {
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    const { data, error } = await supabase
+      .from('collections')
+      .select('*')
+      .eq('owner_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (data) {
+      setCollections(data)
+    }
+    setLoading(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
 
   return (
-    <div className="p-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Sammlungen</h1>
-          <p className="text-slate-500 mt-1">Alle deine Sammlungen im Überblick</p>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="text-2xl font-bold text-gray-900">📦 CollectR</Link>
+            <span className="text-gray-400">/</span>
+            <span className="text-gray-600">Sammlungen</span>
+          </div>
         </div>
-        <Link
-          href="/collections/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-        >
-          <span>+</span>
-          <span>Neue Sammlung</span>
-        </Link>
-      </div>
+      </header>
 
-      {error ? (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg">
-          Fehler: {error.message}
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Meine Sammlungen</h1>
+          <Link
+            href="/collections/new"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          >
+            ➕ Neue Sammlung
+          </Link>
         </div>
-      ) : !collections?.length ? (
-        <EmptyState />
-      ) : (
-        <div className="space-y-4">
-          {collections.map((collection) => (
-            <CollectionRow key={collection.id} collection={collection} />
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
 
-function CollectionRow({ collection }: { collection: any }) {
-  const itemCount = collection.items?.[0]?.count ?? 0
-  const categoryCount = collection.categories?.[0]?.count ?? 0
-  
-  return (
-    <Link
-      href={`/collections/${collection.id}`}
-      className="flex items-center gap-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-blue-300 transition-all"
-    >
-      {/* Icon/Cover */}
-      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-        <span className="text-2xl">📦</span>
-      </div>
-      
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-lg">{collection.name}</h3>
-        {collection.description && (
-          <p className="text-slate-500 text-sm truncate">{collection.description}</p>
+        {collections.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+            <div className="text-5xl mb-4">📭</div>
+            <h2 className="text-xl font-semibold mb-2">Noch keine Sammlungen</h2>
+            <p className="text-gray-600 mb-4">Erstelle deine erste Sammlung, um loszulegen!</p>
+            <Link
+              href="/collections/new"
+              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+            >
+              Sammlung erstellen
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {collections.map((collection) => (
+              <Link
+                key={collection.id}
+                href={`/collections/${collection.id}`}
+                className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition"
+              >
+                <div className="text-3xl mb-2">📁</div>
+                <h3 className="text-lg font-semibold">{collection.name}</h3>
+                {collection.description && (
+                  <p className="text-gray-600 text-sm mt-1 line-clamp-2">{collection.description}</p>
+                )}
+              </Link>
+            ))}
+          </div>
         )}
-      </div>
-      
-      {/* Stats */}
-      <div className="flex items-center gap-8 text-sm text-slate-500">
-        <div className="text-center">
-          <p className="text-2xl font-bold text-slate-900">{itemCount}</p>
-          <p>Items</p>
-        </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-slate-900">{categoryCount}</p>
-          <p>Kategorien</p>
-        </div>
-      </div>
-      
-      {/* Arrow */}
-      <span className="text-slate-400">→</span>
-    </Link>
-  )
-}
-
-function EmptyState() {
-  return (
-    <div className="text-center py-16 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-      <span className="text-6xl">📦</span>
-      <h3 className="text-xl font-semibold mt-4">Noch keine Sammlungen</h3>
-      <p className="text-slate-500 mt-2">Erstelle deine erste Sammlung!</p>
-      <Link
-        href="/collections/new"
-        className="inline-block mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-      >
-        + Erste Sammlung erstellen
-      </Link>
+      </main>
     </div>
   )
 }
