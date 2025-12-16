@@ -19,12 +19,18 @@ export function Sidebar() {
 
   return (
     <aside className="w-64 bg-slate-900 text-white flex flex-col">
-      {/* Logo */}
+      {/* Logo / Brand */}
       <div className="p-6 border-b border-slate-700">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl">📦</span>
+        <Link href="/" className="flex items-center gap-3">
+          <img
+            src="/brand/collectr-r.png"
+            alt="CollectR"
+            width={28}
+            height={28}
+            className="block"
+          />
           <div>
-            <h1 className="text-xl font-bold">CollectR</h1>
+            <h1 className="text-xl font-bold leading-none">CollectR</h1>
             <p className="text-xs text-slate-400">Deine Sammlungen</p>
           </div>
         </Link>
@@ -40,8 +46,8 @@ export function Sidebar() {
                 <Link
                   href={link.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive 
-                      ? 'bg-blue-600 text-white' 
+                    isActive
+                      ? 'bg-blue-600 text-white'
                       : 'text-slate-300 hover:bg-slate-800'
                   }`}
                 >
