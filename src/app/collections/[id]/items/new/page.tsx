@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { use } from 'react'
+import { ImageUpload } from '@/components/ImageUpload'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -31,6 +32,9 @@ export default function NewItemPage({ params }: PageProps) {
   const [barcode, setBarcode] = useState('')
   const [notes, setNotes] = useState('')
   const [attributeValues, setAttributeValues] = useState<Record<string, any>>({})
+  
+  // NEU: State für Bilder (vor dem Upload)
+  const [pendingImages, setPendingImages] = useState<{ url: string; file?: File }[]>([])
   
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -94,36 +98,69 @@ export default function NewItemPage({ params }: PageProps) {
     setLoading(true)
     setError(null)
 
-    const { data, error: insertError } = await supabase
-      .from('items')
-      .insert({
-        collection_id: collectionId,
-        category_id: categoryId || null,
-        name,
-        description: description || null,
-        status,
-        purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
-        purchase_date: purchaseDate || null,
-        purchase_location: purchaseLocation || null,
-        barcode: barcode || null,
-        notes: notes || null,
-        attributes: Object.keys(attributeValues).length > 0 ? attributeValues : null,
-        created_by: userId,  // <-- WICHTIG für RLS!
-      })
-      .select()
-      .single()
+    try {
+      // 1. Item erstellen
+      const { data, error: insertError } = await supabase
+        .from('items')
+        .insert({
+          collection_id: collectionId,
+          category_id: categoryId || null,
+          name,
+          description: description || null,
+          status,
+          purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
+          purchase_date: purchaseDate || null,
+          purchase_location: purchaseLocation || null,
+          barcode: barcode || null,
+          notes: notes || null,
+          attributes: Object.keys(attributeValues).length > 0 ? attributeValues : null,
+          created_by: userId,
+        })
+        .select()
+        .single()
 
-    if (insertError) {
-      setError(insertError.message)
+      if (insertError) {
+        setError(insertError.message)
+        setLoading(false)
+        return
+      }
+
+      // 2. NEU: Bilder hochladen falls vorhanden
+      if (pendingImages.length > 0 && data) {
+        for (let i = 0; i < pendingImages.length; i++) {
+          const img = pendingImages[i]
+          if (img.file) {
+            const fileName = `${data.id}/${Date.now()}-${img.file.name}`
+            
+            const { data: uploadData, error: uploadError } = await supabase.storage
+              .from('item-images')
+              .upload(fileName, img.file)
+
+            if (!uploadError && uploadData) {
+              const { data: urlData } = supabase.storage
+                .from('item-images')
+                .getPublicUrl(uploadData.path)
+
+              // In DB speichern
+              await supabase.from('item_images').insert({
+                item_id: data.id,
+                original_url: urlData.publicUrl,
+                is_primary: i === 0, // Erstes Bild ist Hauptbild
+              })
+            }
+          }
+        }
+      }
+
+      router.push(`/collections/${collectionId}/items/${data.id}`)
+    } catch (err: any) {
+      setError(err.message || 'Ein Fehler ist aufgetreten')
       setLoading(false)
-      return
     }
-
-    router.push(`/collections/${collectionId}/items/${data.id}`)
   }
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-4 sm:p-8 max-w-3xl">
       <div className="mb-8">
         <Link
           href={`/collections/${collectionId}`}
@@ -136,6 +173,13 @@ export default function NewItemPage({ params }: PageProps) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* NEU: Bilder-Upload Sektion */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+          <ImageUpload 
+            onImagesChange={(images) => setPendingImages(images)}
+          />
+        </div>
+
         {/* Basis-Infos */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
           <h2 className="font-semibold mb-4">Basis-Informationen</h2>
@@ -164,7 +208,7 @@ export default function NewItemPage({ params }: PageProps) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Kategorie</label>
                 <select
@@ -214,7 +258,7 @@ export default function NewItemPage({ params }: PageProps) {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
           <h2 className="font-semibold mb-4">Kauf-Informationen</h2>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Kaufpreis (€)</label>
               <input
@@ -237,7 +281,7 @@ export default function NewItemPage({ params }: PageProps) {
               />
             </div>
 
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <label className="block text-sm font-medium text-slate-700 mb-1">Gekauft bei</label>
               <input
                 type="text"
@@ -293,6 +337,9 @@ export default function NewItemPage({ params }: PageProps) {
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
                     >
                       <option value="">-- Auswählen --</option>
+                      {attr.options?.choices?.map((choice: string) => (
+                        <option key={choice} value={choice}>{choice}</option>
+                      ))}
                       {attr.attribute_options?.map((opt: any) => (
                         <option key={opt.id} value={opt.value}>{opt.display_value}</option>
                       ))}
@@ -317,6 +364,16 @@ export default function NewItemPage({ params }: PageProps) {
                       value={attributeValues[attr.name] || ''}
                       onChange={(e) => setAttributeValues({...attributeValues, [attr.name]: e.target.value})}
                       required={attr.required}
+                      className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  )}
+
+                  {attr.type === 'tags' && (
+                    <input
+                      type="text"
+                      value={Array.isArray(attributeValues[attr.name]) ? attributeValues[attr.name].join(', ') : attributeValues[attr.name] || ''}
+                      onChange={(e) => setAttributeValues({...attributeValues, [attr.name]: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})}
+                      placeholder="Komma-getrennt"
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
                     />
                   )}

@@ -46,6 +46,10 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [showNewAttribute, setShowNewAttribute] = useState(false)
   const [loading, setLoading] = useState(false)
+  
+  // NEU: Error und Success States
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   // Kategorien laden
   useEffect(() => {
@@ -53,13 +57,18 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
   }, [collectionId])
 
   async function loadCategories() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('categories')
       .select('*')
       .eq('collection_id', collectionId)
       .order('sort_order')
     
-    if (data) setCategories(data)
+    if (error) {
+      console.error('Error loading categories:', error)
+      setError(`Fehler beim Laden: ${error.message}`)
+    } else if (data) {
+      setCategories(data)
+    }
   }
 
   // Attribute laden wenn Kategorie gewählt
@@ -72,34 +81,62 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
   }, [selectedCategory])
 
   async function loadAttributes(categoryId: string) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('attribute_definitions')
       .select('*')
       .eq('category_id', categoryId)
       .order('sort_order')
     
-    if (data) setAttributes(data)
+    if (error) {
+      console.error('Error loading attributes:', error)
+    } else if (data) {
+      setAttributes(data)
+    }
   }
 
   async function createCategory(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
+    setError(null)
+    setSuccess(null)
     
     const formData = new FormData(e.currentTarget)
+    const name = formData.get('name') as string
+    const icon = formData.get('icon') as string || '📦'
     
-    const { error } = await supabase
+    console.log('Creating category:', { collection_id: collectionId, name, icon })
+    
+    const { data, error } = await supabase
       .from('categories')
       .insert({
         collection_id: collectionId,
-        name: formData.get('name') as string,
-        icon: formData.get('icon') as string || null,
+        name: name,
+        icon: icon,
         sort_order: categories.length,
       })
+      .select()
+      .single()
 
-    if (!error) {
+    console.log('Insert result:', { data, error })
+
+    if (error) {
+      console.error('Error creating category:', error)
+      setError(`Fehler: ${error.message}`)
+      
+      // Spezifische Fehlermeldungen
+      if (error.code === '42501') {
+        setError('Keine Berechtigung. Bitte prüfe die RLS Policies in Supabase.')
+      } else if (error.code === '23503') {
+        setError('Die Collection existiert nicht oder du hast keinen Zugriff.')
+      }
+    } else {
+      setSuccess('Kategorie erstellt!')
       await loadCategories()
       setShowNewCategory(false)
+      // Form zurücksetzen
+      e.currentTarget.reset()
     }
+    
     setLoading(false)
   }
 
@@ -107,6 +144,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
     e.preventDefault()
     if (!selectedCategory) return
     setLoading(true)
+    setError(null)
     
     const formData = new FormData(e.currentTarget)
     const type = formData.get('type') as string
@@ -123,7 +161,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
       if (max) options.max = parseInt(max as string)
     }
     
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('attribute_definitions')
       .insert({
         category_id: selectedCategory.id,
@@ -135,31 +173,59 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
         show_in_list: formData.get('show_in_list') === 'on',
         sort_order: attributes.length,
       })
+      .select()
 
-    if (!error) {
+    if (error) {
+      console.error('Error creating attribute:', error)
+      setError(`Fehler: ${error.message}`)
+    } else {
+      setSuccess('Attribut erstellt!')
       await loadAttributes(selectedCategory.id)
       setShowNewAttribute(false)
+      e.currentTarget.reset()
     }
+    
     setLoading(false)
   }
 
   async function deleteCategory(id: string) {
     if (!confirm('Kategorie wirklich löschen?')) return
     
-    await supabase.from('categories').delete().eq('id', id)
-    await loadCategories()
-    if (selectedCategory?.id === id) setSelectedCategory(null)
+    const { error } = await supabase.from('categories').delete().eq('id', id)
+    
+    if (error) {
+      setError(`Fehler beim Löschen: ${error.message}`)
+    } else {
+      await loadCategories()
+      if (selectedCategory?.id === id) setSelectedCategory(null)
+    }
   }
 
   async function deleteAttribute(id: string) {
     if (!confirm('Attribut wirklich löschen?')) return
     
-    await supabase.from('attribute_definitions').delete().eq('id', id)
-    if (selectedCategory) await loadAttributes(selectedCategory.id)
+    const { error } = await supabase.from('attribute_definitions').delete().eq('id', id)
+    
+    if (error) {
+      setError(`Fehler beim Löschen: ${error.message}`)
+    } else if (selectedCategory) {
+      await loadAttributes(selectedCategory.id)
+    }
   }
 
+  // Auto-hide messages after 5 seconds
+  useEffect(() => {
+    if (error || success) {
+      const timer = setTimeout(() => {
+        setError(null)
+        setSuccess(null)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [error, success])
+
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       {/* Header */}
       <div className="mb-8">
         <Link 
@@ -171,6 +237,20 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
         <h1 className="text-3xl font-bold text-slate-900">Kategorien verwalten</h1>
         <p className="text-slate-500 mt-1">Erstelle Kategorien und definiere ihre Attribute</p>
       </div>
+
+      {/* NEU: Error/Success Messages */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex justify-between items-center">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">✕</button>
+        </div>
+      )}
+      {success && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg flex justify-between items-center">
+          <span>{success}</span>
+          <button onClick={() => setSuccess(null)} className="text-green-500 hover:text-green-700">✕</button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Kategorien Liste */}
@@ -188,7 +268,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
           {showNewCategory && (
             <form onSubmit={createCategory} className="mb-4 p-4 bg-slate-50 rounded-lg">
               <div className="flex gap-2 mb-3">
-                <select name="icon" className="px-3 py-2 rounded border border-slate-300">
+                <select name="icon" className="px-3 py-2 rounded border border-slate-300" defaultValue="📦">
                   {EMOJI_OPTIONS.map(emoji => (
                     <option key={emoji} value={emoji}>{emoji}</option>
                   ))}
@@ -198,6 +278,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                   name="name"
                   placeholder="Kategorie-Name"
                   required
+                  minLength={1}
                   className="flex-1 px-3 py-2 rounded border border-slate-300"
                 />
               </div>
@@ -205,9 +286,9 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Erstellen
+                  {loading ? 'Erstelle...' : 'Erstellen'}
                 </button>
                 <button
                   type="button"
@@ -242,7 +323,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                   </div>
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteCategory(cat.id) }}
-                    className="text-slate-400 hover:text-red-500"
+                    className="text-slate-400 hover:text-red-500 p-1"
                   >
                     ✕
                   </button>
@@ -308,9 +389,9 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50"
                     >
-                      Erstellen
+                      {loading ? 'Erstelle...' : 'Erstellen'}
                     </button>
                     <button
                       type="button"
@@ -347,7 +428,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                       </div>
                       <button
                         onClick={() => deleteAttribute(attr.id)}
-                        className="text-slate-400 hover:text-red-500"
+                        className="text-slate-400 hover:text-red-500 p-1"
                       >
                         ✕
                       </button>
@@ -359,6 +440,16 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
           )}
         </section>
       </div>
+
+      {/* NEU: Debug Info (nur für Entwicklung) */}
+      <details className="mt-8 text-xs text-slate-400">
+        <summary className="cursor-pointer">Debug Info</summary>
+        <pre className="mt-2 p-2 bg-slate-100 rounded overflow-auto">
+          Collection ID: {collectionId}
+          {'\n'}Categories loaded: {categories.length}
+          {'\n'}Selected: {selectedCategory?.name || 'none'}
+        </pre>
+      </details>
     </div>
   )
 }
