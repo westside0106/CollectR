@@ -45,9 +45,12 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
   const [attributes, setAttributes] = useState<AttributeDefinition[]>([])
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [showNewAttribute, setShowNewAttribute] = useState(false)
-  const [loading, setLoading] = useState(false)
   
-  // NEU: Error und Success States
+  // Separate loading states für Category und Attribute
+  const [loadingCategory, setLoadingCategory] = useState(false)
+  const [loadingAttribute, setLoadingAttribute] = useState(false)
+  
+  // Error und Success States
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
 
@@ -57,17 +60,20 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
   }, [collectionId])
 
   async function loadCategories() {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('collection_id', collectionId)
-      .order('sort_order')
-    
-    if (error) {
-      console.error('Error loading categories:', error)
-      setError(`Fehler beim Laden: ${error.message}`)
-    } else if (data) {
-      setCategories(data)
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('collection_id', collectionId)
+        .order('sort_order')
+      
+      if (error) {
+        console.error('Error loading categories:', error)
+      } else if (data) {
+        setCategories(data)
+      }
+    } catch (err) {
+      console.error('Exception loading categories:', err)
     }
   }
 
@@ -81,22 +87,26 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
   }, [selectedCategory])
 
   async function loadAttributes(categoryId: string) {
-    const { data, error } = await supabase
-      .from('attribute_definitions')
-      .select('*')
-      .eq('category_id', categoryId)
-      .order('sort_order')
-    
-    if (error) {
-      console.error('Error loading attributes:', error)
-    } else if (data) {
-      setAttributes(data)
+    try {
+      const { data, error } = await supabase
+        .from('attribute_definitions')
+        .select('*')
+        .eq('category_id', categoryId)
+        .order('sort_order')
+      
+      if (error) {
+        console.error('Error loading attributes:', error)
+      } else if (data) {
+        setAttributes(data)
+      }
+    } catch (err) {
+      console.error('Exception loading attributes:', err)
     }
   }
 
   async function createCategory(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
+    setLoadingCategory(true)
     setError(null)
     setSuccess(null)
     
@@ -104,47 +114,49 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
     const name = formData.get('name') as string
     const icon = formData.get('icon') as string || '📦'
     
-    console.log('Creating category:', { collection_id: collectionId, name, icon })
-    
-    const { data, error } = await supabase
-      .from('categories')
-      .insert({
-        collection_id: collectionId,
-        name: name,
-        icon: icon,
-        sort_order: categories.length,
-      })
-      .select()
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .insert({
+          collection_id: collectionId,
+          name: name,
+          icon: icon,
+          sort_order: categories.length,
+        })
+        .select()
+        .single()
 
-    console.log('Insert result:', { data, error })
-
-    if (error) {
-      console.error('Error creating category:', error)
-      setError(`Fehler: ${error.message}`)
-      
-      // Spezifische Fehlermeldungen
-      if (error.code === '42501') {
-        setError('Keine Berechtigung. Bitte prüfe die RLS Policies in Supabase.')
-      } else if (error.code === '23503') {
-        setError('Die Collection existiert nicht oder du hast keinen Zugriff.')
+      if (error) {
+        console.error('Error creating category:', error)
+        setError(`Fehler: ${error.message}`)
+      } else {
+        setSuccess('Kategorie erstellt!')
+        setShowNewCategory(false)
+        // Reload in try/catch damit loading nicht hängen bleibt
+        try {
+          await loadCategories()
+        } catch (reloadErr) {
+          console.error('Reload error:', reloadErr)
+        }
+        // Form zurücksetzen
+        e.currentTarget.reset()
       }
-    } else {
-      setSuccess('Kategorie erstellt!')
-      await loadCategories()
-      setShowNewCategory(false)
-      // Form zurücksetzen
-      e.currentTarget.reset()
+    } catch (err: any) {
+      console.error('Exception creating category:', err)
+      setError(`Fehler: ${err.message || 'Unbekannter Fehler'}`)
+    } finally {
+      // WICHTIG: Loading IMMER zurücksetzen
+      setLoadingCategory(false)
     }
-    
-    setLoading(false)
   }
 
   async function createAttribute(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!selectedCategory) return
-    setLoading(true)
+    
+    setLoadingAttribute(true)
     setError(null)
+    setSuccess(null)
     
     const formData = new FormData(e.currentTarget)
     const type = formData.get('type') as string
@@ -161,55 +173,75 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
       if (max) options.max = parseInt(max as string)
     }
     
-    const { data, error } = await supabase
-      .from('attribute_definitions')
-      .insert({
-        category_id: selectedCategory.id,
-        name: (formData.get('name') as string).toLowerCase().replace(/\s+/g, '_'),
-        display_name: formData.get('name') as string,
-        type,
-        options,
-        required: formData.get('required') === 'on',
-        show_in_list: formData.get('show_in_list') === 'on',
-        sort_order: attributes.length,
-      })
-      .select()
+    try {
+      const { data, error } = await supabase
+        .from('attribute_definitions')
+        .insert({
+          category_id: selectedCategory.id,
+          name: (formData.get('name') as string).toLowerCase().replace(/\s+/g, '_'),
+          display_name: formData.get('name') as string,
+          type,
+          options,
+          required: formData.get('required') === 'on',
+          show_in_list: formData.get('show_in_list') === 'on',
+          sort_order: attributes.length,
+        })
+        .select()
 
-    if (error) {
-      console.error('Error creating attribute:', error)
-      setError(`Fehler: ${error.message}`)
-    } else {
-      setSuccess('Attribut erstellt!')
-      await loadAttributes(selectedCategory.id)
-      setShowNewAttribute(false)
-      e.currentTarget.reset()
+      if (error) {
+        console.error('Error creating attribute:', error)
+        setError(`Fehler: ${error.message}`)
+      } else {
+        setSuccess('Attribut erstellt!')
+        setShowNewAttribute(false)
+        // Reload in try/catch
+        try {
+          await loadAttributes(selectedCategory.id)
+        } catch (reloadErr) {
+          console.error('Reload error:', reloadErr)
+        }
+        // Form zurücksetzen
+        e.currentTarget.reset()
+      }
+    } catch (err: any) {
+      console.error('Exception creating attribute:', err)
+      setError(`Fehler: ${err.message || 'Unbekannter Fehler'}`)
+    } finally {
+      // WICHTIG: Loading IMMER zurücksetzen
+      setLoadingAttribute(false)
     }
-    
-    setLoading(false)
   }
 
   async function deleteCategory(id: string) {
     if (!confirm('Kategorie wirklich löschen?')) return
     
-    const { error } = await supabase.from('categories').delete().eq('id', id)
-    
-    if (error) {
-      setError(`Fehler beim Löschen: ${error.message}`)
-    } else {
-      await loadCategories()
-      if (selectedCategory?.id === id) setSelectedCategory(null)
+    try {
+      const { error } = await supabase.from('categories').delete().eq('id', id)
+      
+      if (error) {
+        setError(`Fehler beim Löschen: ${error.message}`)
+      } else {
+        await loadCategories()
+        if (selectedCategory?.id === id) setSelectedCategory(null)
+      }
+    } catch (err: any) {
+      setError(`Fehler: ${err.message}`)
     }
   }
 
   async function deleteAttribute(id: string) {
     if (!confirm('Attribut wirklich löschen?')) return
     
-    const { error } = await supabase.from('attribute_definitions').delete().eq('id', id)
-    
-    if (error) {
-      setError(`Fehler beim Löschen: ${error.message}`)
-    } else if (selectedCategory) {
-      await loadAttributes(selectedCategory.id)
+    try {
+      const { error } = await supabase.from('attribute_definitions').delete().eq('id', id)
+      
+      if (error) {
+        setError(`Fehler beim Löschen: ${error.message}`)
+      } else if (selectedCategory) {
+        await loadAttributes(selectedCategory.id)
+      }
+    } catch (err: any) {
+      setError(`Fehler: ${err.message}`)
     }
   }
 
@@ -238,7 +270,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
         <p className="text-slate-500 mt-1">Erstelle Kategorien und definiere ihre Attribute</p>
       </div>
 
-      {/* NEU: Error/Success Messages */}
+      {/* Error/Success Messages */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex justify-between items-center">
           <span>{error}</span>
@@ -285,10 +317,10 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loadingCategory}
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Erstelle...' : 'Erstellen'}
+                  {loadingCategory ? 'Erstelle...' : 'Erstellen'}
                 </button>
                 <button
                   type="button"
@@ -375,7 +407,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                     placeholder="Optionen für Auswahl (komma-getrennt)"
                     className="w-full px-3 py-2 rounded border border-slate-300"
                   />
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 flex-wrap">
                     <label className="flex items-center gap-2">
                       <input type="checkbox" name="required" className="rounded" />
                       <span className="text-sm">Pflichtfeld</span>
@@ -388,10 +420,10 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                   <div className="flex gap-2">
                     <button
                       type="submit"
-                      disabled={loading}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50"
+                      disabled={loadingAttribute}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {loading ? 'Erstelle...' : 'Erstellen'}
+                      {loadingAttribute ? 'Erstelle...' : 'Erstellen'}
                     </button>
                     <button
                       type="button"
@@ -441,13 +473,14 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
         </section>
       </div>
 
-      {/* NEU: Debug Info (nur für Entwicklung) */}
+      {/* Debug Info */}
       <details className="mt-8 text-xs text-slate-400">
         <summary className="cursor-pointer">Debug Info</summary>
         <pre className="mt-2 p-2 bg-slate-100 rounded overflow-auto">
           Collection ID: {collectionId}
           {'\n'}Categories loaded: {categories.length}
           {'\n'}Selected: {selectedCategory?.name || 'none'}
+          {'\n'}Attributes: {attributes.length}
         </pre>
       </details>
     </div>
