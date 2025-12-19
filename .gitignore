@@ -3,3 +3,18 @@
 .next
 .DS_Store
 .DS_Store
+# macOS
+.DS_Store
+
+# deps
+node_modules/
+
+# Next
+.next/
+out/
+
+# Vercel
+.vercel/
+
+# logs
+*.log
