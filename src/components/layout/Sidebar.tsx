@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { UserMenu } from '@/components/UserMenu'
 
@@ -41,7 +42,13 @@ export function Sidebar() {
       {/* Mobile Header Bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-slate-900 text-white h-14 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl">📦</span>
+          <Image
+            src="/icons/brand/collectr-r.png"
+            alt="CollectR"
+            width={32}
+            height={32}
+            className="rounded-lg"
+          />
           <span className="font-bold">CollectR</span>
         </Link>
         
@@ -81,10 +88,16 @@ export function Sidebar() {
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        {/* Logo - versteckt auf Mobile (haben ja den Header) */}
+        {/* Logo - Desktop */}
         <div className="hidden lg:block p-6 border-b border-slate-700">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">📦</span>
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="/icons/brand/collectr-r.png"
+              alt="CollectR"
+              width={40}
+              height={40}
+              className="rounded-lg"
+            />
             <div>
               <h1 className="text-xl font-bold">CollectR</h1>
               <p className="text-xs text-slate-400">Deine Sammlungen</p>
