@@ -1,15 +1,10 @@
-.next
-.next
-.next
-.DS_Store
-.DS_Store
 # macOS
 .DS_Store
 
 # deps
 node_modules/
 
-# Next
+# Next.js
 .next/
 out/
 
@@ -18,3 +13,7 @@ out/
 
 # logs
 *.log
+
+# env (optional)
+.env
+.env.*
