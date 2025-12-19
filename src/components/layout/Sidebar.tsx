@@ -32,9 +32,15 @@ export function Sidebar() {
     }
   }, [isOpen])
 
-  const links = [
+  const mainLinks = [
     { href: '/', label: 'Dashboard', icon: '📊' },
     { href: '/collections', label: 'Sammlungen', icon: '📦' },
+  ]
+
+  const toolLinks = [
+    { href: '/tools/currency', label: 'Währungsrechner', icon: '💱' },
+    { href: '/tools/market', label: 'Marktnews', icon: '📈' },
+    { href: '/tools/news', label: 'Sammler-News', icon: '📰' },
   ]
 
   return (
@@ -43,7 +49,7 @@ export function Sidebar() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-slate-900 text-white h-14 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="/icons/brand/collectr-r.png"
+            src="/icons/brand/collectr-hero.png"
             alt="CollectR"
             width={32}
             height={32}
@@ -92,10 +98,10 @@ export function Sidebar() {
         <div className="hidden lg:block p-6 border-b border-slate-700">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/icons/brand/collectr-r.png"
+              src="/icons/brand/collectr-hero.png"
               alt="CollectR"
-              width={40}
-              height={40}
+              width={44}
+              height={44}
               className="rounded-lg"
             />
             <div>
@@ -110,8 +116,9 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
-          <ul className="space-y-2">
-            {links.map(link => {
+          {/* Haupt-Navigation */}
+          <ul className="space-y-1">
+            {mainLinks.map(link => {
               const isActive = pathname === link.href
               return (
                 <li key={link.href}>
@@ -121,11 +128,40 @@ export function Sidebar() {
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       isActive 
                         ? 'bg-blue-600 text-white' 
-                        : 'text-slate-300 hover:bg-slate-800'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
-                    <span>{link.icon}</span>
-                    <span>{link.label}</span>
+                    <span className="text-lg">{link.icon}</span>
+                    <span className="font-medium">{link.label}</span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+
+          {/* Trennlinie */}
+          <div className="my-4 border-t border-slate-700" />
+
+          {/* Tools */}
+          <p className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Tools
+          </p>
+          <ul className="space-y-1">
+            {toolLinks.map(link => {
+              const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive 
+                        ? 'bg-blue-600 text-white' 
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    }`}
+                  >
+                    <span className="text-lg">{link.icon}</span>
+                    <span className="font-medium">{link.label}</span>
                   </Link>
                 </li>
               )
