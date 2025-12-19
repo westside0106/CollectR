@@ -1,6 +1,21 @@
 # macOS
 .DS_Store
 
+# Env
+.env
+.env.*
+.env.local
+
+# Node / Next
+node_modules/
+.next/
+.vercel/
+out/
+
+# Logs
+*.log# macOS
+.DS_Store
+
 # deps
 node_modules/
 
