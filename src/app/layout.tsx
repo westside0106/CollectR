@@ -14,12 +14,8 @@ export const metadata: Metadata = {
 
   // ✅ Icons zentral (Next generiert die <link>-Tags)
   icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon-16.png', sizes: '16x16', type: 'image/png' } // optional, nur wenn du es behalten willst
-    ],
     apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+      { url: '/apple-touch-icon.v2.png', sizes: '180x180', type: 'image/png' }
     ]
   },
 
