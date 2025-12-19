@@ -9,13 +9,16 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'CollectR - Deine Sammlungen',
-  description: 'Verwalte deine Sammlungen - Hot Wheels, Möbel, Antiquitäten und mehr',
+  description: 'Verwalte deine Sammlungen – Hot Wheels, Möbel, Antiquitäten und mehr',
   manifest: '/manifest.json',
 
-  // ✅ Icons zentral (Next generiert die <link>-Tags)
   icons: {
     apple: [
-      { url: '/apple-touch-icon.v2.png', sizes: '180x180', type: 'image/png' }
+      {
+        url: '/apple-touch-icon.v2.png',
+        sizes: '180x180',
+        type: 'image/png'
+      }
     ]
   },
 
@@ -33,7 +36,7 @@ export const metadata: Metadata = {
     type: 'website',
     siteName: 'CollectR',
     title: 'CollectR - Deine Sammlungen',
-    description: 'Verwalte deine Sammlungen - Hot Wheels, Möbel, Antiquitäten und mehr'
+    description: 'Verwalte deine Sammlungen – Hot Wheels, Möbel, Antiquitäten und mehr'
   }
 }
 
@@ -46,14 +49,20 @@ export const viewport: Viewport = {
   viewportFit: 'cover'
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="de">
       <body className={`${inter.className} bg-slate-100`}>
         <ServiceWorkerRegistration />
         <div className="flex min-h-screen min-h-[100dvh]">
           <Sidebar />
-          <main className="flex-1 overflow-auto pt-14 lg:pt-0">{children}</main>
+          <main className="flex-1 overflow-auto pt-14 lg:pt-0">
+            {children}
+          </main>
         </div>
         <InstallPrompt />
       </body>
