@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Your private digital collection archive.</b><br/>
-  Clean. Secure. Structured.
+  Clean • Secure • Structured
 </p>
 
 <p align="center">
@@ -20,37 +20,39 @@
 
 ## 🧭 Overview
 
-**CollectR** is a private, structured collection management app.  
-Think of it as your **personal digital museum archive** — built for collectors who value **order, provenance, and control**.
+**CollectR** is a private collection management app.  
+It is designed as a **personal digital archive** for collectors who care about:
 
-Use cases include:
-- 📦 Physical collections (artifacts, cameras, minerals, collectibles)
-- 🗂️ Digital archives
-- 🏛️ Provenance & inventory-style documentation
+- structure  
+- provenance  
+- clarity  
+- privacy  
+
+No noise. No tracking. No bloat.
 
 ---
 
-## ✨ Key Features
+## ✨ Features
 
-- 📁 Structured collections & items
-- 🏷️ Metadata-focused (category, notes, status, origin)
-- 🔐 Privacy-first (no tracking, no hidden APIs)
-- ⚡ Fast UI with modern Next.js App Router
-- 🧠 Strict TypeScript for reliability
-- 🧼 Clean repo & build hygiene
+- 📦 Structured collections & items
+- 🏷️ Metadata-first design
+- 🔐 Privacy-first (no telemetry)
+- ⚡ Fast UI with Next.js App Router
+- 🧠 Strict TypeScript
+- 🧼 Clean repository hygiene
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer        | Technology |
-|-------------|------------|
-| Framework   | Next.js (App Router) |
-| Language    | TypeScript (strict) |
-| Styling     | CSS / Tailwind-ready |
-| Linting     | ESLint (Next + TS) |
-| Hosting     | Vercel-compatible |
-| Runtime     | Node.js |
+| Layer | Technology |
+|-----|------------|
+| Framework | Next.js (App Router) |
+| Language | TypeScript (strict) |
+| Styling | CSS (Tailwind-ready) |
+| Linting | ESLint (Next + TS) |
+| Hosting | Vercel-compatible |
+| Runtime | Node.js |
 
 ---
 
@@ -58,89 +60,94 @@ Use cases include:
 
 ```txt
 CollectR/
-├─ app/               # App Router pages & layouts
-├─ components/        # Reusable UI components
-├─ public/            # Static assets (logo, icons)
-├─ styles/            # Global styles
+├─ app/                # App Router pages & layouts
+├─ components/         # Reusable UI components
+├─ public/             # Static assets (logo, screenshots)
+├─ styles/             # Global styles
 ├─ tsconfig.json
 ├─ eslint.config.mjs
 ├─ next.config.js
 └─ README.md
+```
 
-⸻⸻⸻
+---
 
 ## 🚀 Getting Started
 
-1️⃣ Install dependencies
+### 1️⃣ Install dependencies
+
 ```bash
 npm install
+```
 
-2️⃣ Run development server
+### 2️⃣ Run development server
+
 ```bash
 npm run dev
+```
 
 Open 👉 http://localhost:3000
 
-⸻
+---
 
-🔐 Environment & Security
-	•	No secrets are committed
-	•	.env*, .next/, node_modules/, .vercel/ are ignored
-	•	Designed for local-first & private deployments
+## 🔐 Environment & Security
 
-Example env file (not committed):
-```md
+- No secrets are committed
+- `.env*`, `.next/`, `node_modules/`, `.vercel/` are ignored
+- Designed for **local-first & private deployments**
+
+### Example env file (not committed)
+
 ```env
 # .env.example
 NEXT_PUBLIC_APP_NAME=CollectR
+```
 
-⸻
+---
 
-🧼 Repository Hygiene
+## 🧼 Repository Hygiene
 
-This repo intentionally excludes:
-	•	Build output (.next/, out/, build/)
-	•	Dependencies (node_modules/)
-	•	Environment variables
-	•	Logs & cache
+The repository intentionally excludes:
 
-This keeps:
-	•	✅ commits clean
-	•	✅ diffs readable
-	•	✅ deployments predictable
+- Build output (`.next/`, `out/`, `build/`)
+- Dependencies (`node_modules/`)
+- Environment variables
+- Logs & cache files
 
-⸻
+This ensures:
 
-🧠 Philosophy
+- clean commits
+- readable diffs
+- predictable deployments
 
-“CollectR feels like your personal digital museum archive.”
+---
 
-No bloat.
-No telemetry.
-No noise.
+## 🧠 Philosophy
 
-Just structure, clarity, and control.
+> “CollectR feels like your personal digital museum archive.”
 
-⸻
+Minimal.  
+Intentional.  
+Private.
 
-📌 Roadmap (optional)
-	•	Advanced item tagging
-	•	Import / export
-	•	Media attachments
-	•	Collection analytics
-	•	Offline-first mode
+---
 
-⸻
+## 🗺️ Roadmap
 
-📄 License
+- [ ] Advanced tagging
+- [ ] Import / export
+- [ ] Media attachments
+- [ ] Collection analytics
+- [ ] Offline-first support
+
+---
+
+## 📄 License
 
 Private project – all rights reserved.
-(Choose MIT / GPL later if needed.)
+
+---
 
 <p align="center">
   <sub>Built with care • Designed for collectors</sub>
 </p>
-```
-
-
-
