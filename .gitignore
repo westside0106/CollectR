@@ -1,3 +1,15 @@
+# safety
+node_modules
+.next
+out
+build
+.env
+.env.local
+.env.*.local
+.vercel
+.turbo
+*.log
+
 # macOS
 .DS_Store
 
