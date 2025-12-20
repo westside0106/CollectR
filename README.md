@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="public/logo.png" alt="CollectR Logo" width="160" />
+  <!-- Replace with your actual path, e.g. public/logo.svg or public/brand/collectr.svg -->
+  <img src="public/logo.svg" alt="CollectR Logo" width="200" />
 </p>
 
 <h1 align="center">CollectR</h1>
@@ -68,86 +69,3 @@ CollectR/
 ├─ eslint.config.mjs
 ├─ next.config.js
 └─ README.md
-```
-
----
-
-## 🚀 Getting Started
-
-### 1️⃣ Install dependencies
-
-```bash
-npm install
-```
-
-### 2️⃣ Run development server
-
-```bash
-npm run dev
-```
-
-Open 👉 http://localhost:3000
-
----
-
-## 🔐 Environment & Security
-
-- No secrets are committed
-- `.env*`, `.next/`, `node_modules/`, `.vercel/` are ignored
-- Designed for **local-first & private deployments**
-
-### Example env file (not committed)
-
-```env
-# .env.example
-NEXT_PUBLIC_APP_NAME=CollectR
-```
-
----
-
-## 🧼 Repository Hygiene
-
-The repository intentionally excludes:
-
-- Build output (`.next/`, `out/`, `build/`)
-- Dependencies (`node_modules/`)
-- Environment variables
-- Logs & cache files
-
-This ensures:
-
-- clean commits
-- readable diffs
-- predictable deployments
-
----
-
-## 🧠 Philosophy
-
-> “CollectR feels like your personal digital museum archive.”
-
-Minimal.  
-Intentional.  
-Private.
-
----
-
-## 🗺️ Roadmap
-
-- [ ] Advanced tagging
-- [ ] Import / export
-- [ ] Media attachments
-- [ ] Collection analytics
-- [ ] Offline-first support
-
----
-
-## 📄 License
-
-Private project – all rights reserved.
-
----
-
-<p align="center">
-  <sub>Built with care • Designed for collectors</sub>
-</p>
