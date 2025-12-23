@@ -248,7 +248,7 @@ export default function NewsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {articles.map((article, index) => (
+          {articles.map((article, index) => (<a
             
               key={index}
               href={article.url}
@@ -296,4 +296,3 @@ export default function NewsPage() {
       </div>
     </div>
   )
-}
