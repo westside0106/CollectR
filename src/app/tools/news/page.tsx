@@ -297,4 +297,3 @@ export default function NewsPage() {
     </div>
   )
 }
-}
