@@ -152,73 +152,17 @@ export async function searchNews(
  * Mock-Daten falls kein API Key vorhanden
  */
 function getMockNews(category: CollectionCategory): NewsArticle[] {
-  const mockArticles: Record<CollectionCategory, NewsArticle[]> = {
-    'hot-wheels': [
-      {
-        title: 'Neue Hot Wheels Legends Tour 2024 angekündigt',
-        description: 'Mattel kündigt die nächste Runde der Hot Wheels Legends Tour an...',
-        content: 'Mattel hat die Details zur Hot Wheels Legends Tour 2024 bekannt gegeben.',
-        url: 'https://hotwheels.fandom.com',
-        image: null,
-        publishedAt: new Date().toISOString(),
-        source: { name: 'Hot Wheels News', url: 'https://hotwheels.com' }
-      }
-    ],
-    'antiques': [
-      {
-        title: 'Rekordauktion für antike Möbel',
-        description: 'Bei einer Auktion in London wurden Rekordpreise erzielt...',
-        content: 'Seltene antike Möbel erzielen Höchstpreise.',
-        url: 'https://www.sothebys.com',
-        image: null,
-        publishedAt: new Date().toISOString(),
-        source: { name: "Sotheby's", url: 'https://sothebys.com' }
-      }
-    ],
-    'general': [
-      {
-        title: '💡 Aktiviere die News-Funktion!',
-        description: 'Registriere dich kostenlos auf gnews.io und erhalte Echtzeit-News zu deinen Sammelgebieten.',
-        content: 'Gehe zu https://gnews.io/register und hole dir deinen kostenlosen API Key.',
-        url: 'https://gnews.io/register',
-        image: null,
-        publishedAt: new Date().toISOString(),
-        source: { name: 'CollectR Setup', url: '' }
-      }
-    ]
+  const defaultArticle: NewsArticle = {
+    title: '💡 Aktiviere die News-Funktion!',
+    description: 'Registriere dich kostenlos auf gnews.io und erhalte Echtzeit-News zu deinen Sammelgebieten.',
+    content: 'Gehe zu https://gnews.io/register und hole dir deinen kostenlosen API Key.',
+    url: 'https://gnews.io/register',
+    image: null,
+    publishedAt: new Date().toISOString(),
+    source: { name: 'CollectR Setup', url: '' }
   }
-
-  return mockArticles[category] || mockArticles.general
+  return [defaultArticle]
 }
-
-/**
- * Formatiert das Datum eines Artikels
- */
-export function formatNewsDate(dateString: string, locale: string = 'de-DE'): string {
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat(locale, {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date)
-}
-
-/**
- * Gibt relative Zeit zurück (z.B. "vor 2 Stunden")
- */
-export function getRelativeTime(dateString: string): string {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMins < 1) return 'gerade eben'
-  if (diffMins < 60) return `vor ${diffMins} Min.`
-  if (diffHours < 24) return `vor ${diffHours} Std.`
   if (diffDays < 7) return `vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`
   return formatNewsDate(dateString)
 }
