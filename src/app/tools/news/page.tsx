@@ -10,7 +10,6 @@ import {
   COLLECTION_KEYWORDS
 } from '@/services/newsService'
 
-// Kategorie-Labels
 const CATEGORY_LABELS: Record<CollectionCategory, { label: string, icon: string }> = {
   'hot-wheels': { label: 'Hot Wheels', icon: '🚗' },
   'coins': { label: 'Münzen', icon: '🪙' },
@@ -31,19 +30,15 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
-  
-  // Einstellungen
   const [showSettings, setShowSettings] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<CollectionCategory[]>(['hot-wheels', 'general'])
   const [activeCategory, setActiveCategory] = useState<CollectionCategory>('hot-wheels')
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Hydration fix - erst nach Mount rendern
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  // Einstellungen laden (nur client-side)
   useEffect(() => {
     if (mounted && typeof window !== 'undefined') {
       try {
@@ -104,7 +99,6 @@ export default function NewsPage() {
       localStorage.setItem('news-categories', JSON.stringify(updated))
     }
     
-    // Falls aktive Kategorie entfernt wurde, wechsle zur ersten
     if (!updated.includes(activeCategory) && updated.length > 0) {
       setActiveCategory(updated[0])
     }
@@ -112,7 +106,6 @@ export default function NewsPage() {
 
   const allCategories = Object.keys(COLLECTION_KEYWORDS) as CollectionCategory[]
 
-  // Verhindere Hydration Mismatch
   if (!mounted) {
     return (
       <div className="p-4 sm:p-8 max-w-4xl mx-auto">
@@ -131,7 +124,6 @@ export default function NewsPage() {
 
   return (
     <div className="p-4 sm:p-8 max-w-4xl mx-auto">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">📰 Sammler-News</h1>
@@ -156,7 +148,6 @@ export default function NewsPage() {
         </div>
       </div>
 
-      {/* Einstellungen */}
       {showSettings && (
         <div className="mb-6 bg-white rounded-xl p-6 shadow-sm border border-slate-200">
           <h3 className="font-semibold text-slate-900 mb-4">⚙️ Meine Sammelgebiete</h3>
@@ -185,7 +176,6 @@ export default function NewsPage() {
         </div>
       )}
 
-      {/* Kategorie-Tabs */}
       {selectedCategories.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-6">
           {selectedCategories.map(cat => {
@@ -210,7 +200,6 @@ export default function NewsPage() {
         </div>
       )}
 
-      {/* Suche */}
       <form onSubmit={handleSearch} className="mb-6">
         <div className="flex gap-2">
           <input
@@ -230,14 +219,12 @@ export default function NewsPage() {
         </div>
       </form>
 
-      {/* Error */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl">
           {error}
         </div>
       )}
 
-      {/* News Liste */}
       {loading ? (
         <div className="space-y-4">
           {[...Array(5)].map((_, i) => (
@@ -301,7 +288,6 @@ export default function NewsPage() {
         </div>
       )}
 
-      {/* Info */}
       <div className="mt-6 p-4 bg-slate-50 rounded-xl text-sm text-slate-500">
         <p>
           News werden alle 15 Minuten aktualisiert. 

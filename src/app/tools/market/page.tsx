@@ -17,7 +17,6 @@ export default function MarketPage() {
   const [selectedView, setSelectedView] = useState<'all' | 'precious' | 'digital'>('all')
   const [mounted, setMounted] = useState(false)
 
-  // Hydration fix - erst nach Mount rendern
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -40,14 +39,11 @@ export default function MarketPage() {
   useEffect(() => {
     if (mounted) {
       loadMarketData()
-      
-      // Auto-refresh alle 5 Minuten
       const interval = setInterval(loadMarketData, 5 * 60 * 1000)
       return () => clearInterval(interval)
     }
   }, [mounted])
 
-  // Filter basierend auf View
   const filteredQuotes = quotes.filter(q => {
     if (selectedView === 'all') return true
     if (selectedView === 'precious') {
@@ -56,7 +52,6 @@ export default function MarketPage() {
     return !q.name.toLowerCase().includes('gold') && !q.name.toLowerCase().includes('silber')
   })
 
-  // Verhindere Hydration Mismatch
   if (!mounted) {
     return (
       <div className="p-4 sm:p-8 max-w-4xl mx-auto">
@@ -75,7 +70,6 @@ export default function MarketPage() {
 
   return (
     <div className="p-4 sm:p-8 max-w-4xl mx-auto">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">📈 Marktübersicht</h1>
@@ -98,7 +92,6 @@ export default function MarketPage() {
         </div>
       </div>
 
-      {/* View Selector */}
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setSelectedView('all')}
@@ -132,14 +125,12 @@ export default function MarketPage() {
         </button>
       </div>
 
-      {/* Error */}
       {error && (
         <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl">
           {error}
         </div>
       )}
 
-      {/* Kurse */}
       {loading && quotes.length === 0 ? (
         <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
           <div className="space-y-4">
@@ -208,7 +199,6 @@ export default function MarketPage() {
         </div>
       )}
 
-      {/* Info */}
       <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
         <p className="text-sm text-blue-900">
           <strong>Warum diese Werte?</strong>
