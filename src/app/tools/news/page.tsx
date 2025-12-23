@@ -30,6 +30,7 @@ export default function NewsPage() {
   const [articles, setArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
   
   // Einstellungen
   const [showSettings, setShowSettings] = useState(false)
@@ -37,17 +38,28 @@ export default function NewsPage() {
   const [activeCategory, setActiveCategory] = useState<CollectionCategory>('hot-wheels')
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Einstellungen laden
+  // Hydration fix - erst nach Mount rendern
   useEffect(() => {
-    const saved = localStorage.getItem('news-categories')
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      setSelectedCategories(parsed)
-      if (parsed.length > 0) {
-        setActiveCategory(parsed[0])
+    setMounted(true)
+  }, [])
+
+  // Einstellungen laden (nur client-side)
+  useEffect(() => {
+    if (mounted && typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('news-categories')
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          setSelectedCategories(parsed)
+          if (parsed.length > 0) {
+            setActiveCategory(parsed[0])
+          }
+        }
+      } catch (e) {
+        console.error('Error loading settings:', e)
       }
     }
-  }, [])
+  }, [mounted])
 
   async function loadNews() {
     setLoading(true)
@@ -64,15 +76,17 @@ export default function NewsPage() {
       
       setArticles(news)
     } catch (err) {
-      setError('Fehler beim Laden der News. Bitte prüfe deinen API-Key.')
+      setError('Fehler beim Laden der News')
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    loadNews()
-  }, [activeCategory])
+    if (mounted) {
+      loadNews()
+    }
+  }, [activeCategory, mounted])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -85,7 +99,10 @@ export default function NewsPage() {
       : [...selectedCategories, cat]
     
     setSelectedCategories(updated)
-    localStorage.setItem('news-categories', JSON.stringify(updated))
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('news-categories', JSON.stringify(updated))
+    }
     
     // Falls aktive Kategorie entfernt wurde, wechsle zur ersten
     if (!updated.includes(activeCategory) && updated.length > 0) {
@@ -94,6 +111,23 @@ export default function NewsPage() {
   }
 
   const allCategories = Object.keys(COLLECTION_KEYWORDS) as CollectionCategory[]
+
+  // Verhindere Hydration Mismatch
+  if (!mounted) {
+    return (
+      <div className="p-4 sm:p-8 max-w-4xl mx-auto">
+        <div className="animate-pulse">
+          <div className="h-10 bg-slate-200 rounded w-48 mb-4"></div>
+          <div className="h-6 bg-slate-200 rounded w-64 mb-8"></div>
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-24 bg-slate-200 rounded-xl"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="p-4 sm:p-8 max-w-4xl mx-auto">
@@ -228,7 +262,7 @@ export default function NewsPage() {
       ) : (
         <div className="space-y-4">
           {articles.map((article, index) => (
-            <a
+            
               key={index}
               href={article.url}
               target="_blank"
@@ -256,9 +290,9 @@ export default function NewsPage() {
                     </p>
                   )}
                   <div className="flex items-center gap-3 text-xs text-slate-400">
-                    <span className="font-medium">{article.source}</span>
+                    <span className="font-medium">{article.source.name}</span>
                     <span>•</span>
-                    <span>{getRelativeTime(article.published_at)}</span>
+                    <span>{getRelativeTime(article.publishedAt)}</span>
                   </div>
                 </div>
               </div>
@@ -271,7 +305,7 @@ export default function NewsPage() {
       <div className="mt-6 p-4 bg-slate-50 rounded-xl text-sm text-slate-500">
         <p>
           News werden alle 15 Minuten aktualisiert. 
-          Powered by mediastack API (Free Tier: 30 Min Verzögerung).
+          Powered by GNews.io API (Free Tier: 100 Requests/Tag).
         </p>
       </div>
     </div>
