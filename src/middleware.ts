@@ -27,28 +27,29 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  // WICHTIG: Session refresh
+  const { data: { user } } = await supabase.auth.getUser()
 
-  // Geschützte Routen - wenn nicht eingeloggt, redirect zu Login
-  const protectedPaths = ['/', '/collections']
-  const isProtectedPath = protectedPaths.some(path => 
-    request.nextUrl.pathname === path || 
+  // Geschützte Routen
+  const protectedRoutes = ['/', '/collections']
+  const isProtectedRoute = protectedRoutes.some(route => 
+    request.nextUrl.pathname === route || 
     request.nextUrl.pathname.startsWith('/collections/')
   )
-  
-  // Ausnahme: Tools-Bereich ist öffentlich
-  const isToolsPath = request.nextUrl.pathname.startsWith('/tools')
-  
-  if (isProtectedPath && !isToolsPath && !user) {
+
+  // Auth-Routen (Login, Register)
+  const authRoutes = ['/login', '/register']
+  const isAuthRoute = authRoutes.some(route => request.nextUrl.pathname === route)
+
+  // Nicht eingeloggt -> Login
+  if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Wenn eingeloggt und auf Login/Register -> redirect zu Dashboard
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
+  // Eingeloggt auf Auth-Seite -> Dashboard
+  if (isAuthRoute && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
     return NextResponse.redirect(url)
@@ -59,6 +60,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
