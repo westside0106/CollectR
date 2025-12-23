@@ -32,16 +32,29 @@ export default function RegisterPage() {
       return
     }
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          // Redirect URL für E-Mail Bestätigung
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        }
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+      } else if (data.user && !data.user.identities?.length) {
+        // User existiert bereits
+        setError('Ein Konto mit dieser E-Mail existiert bereits')
+        setLoading(false)
+      } else {
+        setSuccess(true)
+      }
+    } catch (err) {
+      setError('Ein unerwarteter Fehler ist aufgetreten')
       setLoading(false)
-    } else {
-      setSuccess(true)
     }
   }
 

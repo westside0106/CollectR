@@ -18,16 +18,24 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+      } else {
+        // WICHTIG: router.refresh() stellt sicher, dass die Session
+        // auf dem Server aktualisiert wird bevor wir navigieren
+        router.refresh()
+        router.push('/')
+      }
+    } catch (err) {
+      setError('Ein unerwarteter Fehler ist aufgetreten')
       setLoading(false)
-    } else {
-      router.push('/')
     }
   }
 

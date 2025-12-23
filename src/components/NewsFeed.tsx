@@ -66,30 +66,41 @@ export function NewsFeed({
         <button
           onClick={loadNews}
           disabled={loading}
-          className="text-sm text-blue-600 hover:text-blue-700 disabled:opacity-50"
+          className="text-sm hover:bg-slate-100 p-1 rounded disabled:opacity-50 transition"
+          title="Aktualisieren"
         >
-          🔄 Aktualisieren
+          🔄
         </button>
       </div>
 
       {/* Kategorie-Auswahl */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {categoryOptions.map(cat => (
-          <button
-            key={cat}
-            onClick={() => {
-              setSelectedCategory(cat)
-              setSearchQuery('')
-            }}
-            className={`px-3 py-1 text-sm rounded-full transition-colors ${
-              selectedCategory === cat && !searchQuery
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            {getCategoryLabel(cat)}
-          </button>
-        ))}
+        <button
+          onClick={() => {
+            setSelectedCategory('hot-wheels')
+            setSearchQuery('')
+          }}
+          className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+            selectedCategory === 'hot-wheels' && !searchQuery
+              ? 'bg-blue-600 text-white'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          }`}
+        >
+          🚗 Hot Wheels
+        </button>
+        <button
+          onClick={() => {
+            setSelectedCategory('antiques')
+            setSearchQuery('')
+          }}
+          className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+            selectedCategory === 'antiques' && !searchQuery
+              ? 'bg-blue-600 text-white'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          }`}
+        >
+          🏺 Allgemein
+        </button>
       </div>
 
       {/* Suche */}
@@ -106,12 +117,35 @@ export function NewsFeed({
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm transition"
             >
               Suchen
             </button>
           </div>
         </form>
+      )}
+
+      {/* Setup Hinweis wenn kein API Key */}
+      {!process.env.NEXT_PUBLIC_GNEWS_API_KEY && (
+        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-900 font-medium mb-2">
+            💡 News-Funktion aktivieren
+          </p>
+          <p className="text-xs text-yellow-800 mb-3">
+            Registriere dich kostenlos auf gnews.io und erhalte Echtzeit-News zu deinen Sammelgebieten.
+          </p>
+          <a
+            href="https://gnews.io/register"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-3 py-1.5 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition"
+          >
+            Kostenlosen API Key holen →
+          </a>
+          <p className="text-xs text-yellow-700 mt-2">
+            Nach Registrierung: Key in .env.local als NEXT_PUBLIC_GNEWS_API_KEY eintragen
+          </p>
+        </div>
       )}
 
       {/* Error */}
@@ -133,7 +167,7 @@ export function NewsFeed({
         </div>
       ) : articles.length === 0 ? (
         <p className="text-slate-500 text-center py-8">
-          Keine News gefunden
+          Keine News gefunden.
         </p>
       ) : (
         <div className="space-y-4">
@@ -143,7 +177,7 @@ export function NewsFeed({
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group"
+                className="group block"
               >
                 <div className="flex gap-4">
                   {article.image && (
@@ -166,9 +200,9 @@ export function NewsFeed({
                       </p>
                     )}
                     <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
-                      <span>{article.source}</span>
+                      <span>{article.source.name}</span>
                       <span>•</span>
-                      <span>{getRelativeTime(article.published_at)}</span>
+                      <span>{getRelativeTime(article.publishedAt)}</span>
                     </div>
                   </div>
                 </div>
@@ -178,28 +212,10 @@ export function NewsFeed({
         </div>
       )}
 
-      {/* API Hinweis */}
+      {/* API Info */}
       <p className="text-xs text-slate-400 mt-4 text-center">
-        Powered by mediastack
+        News werden alle 15 Minuten aktualisiert. Powered by {process.env.NEXT_PUBLIC_GNEWS_API_KEY ? 'GNews.io (Free Tier: 30 Min Verzögerung)' : 'Mock Data'}
       </p>
     </div>
   )
-}
-
-function getCategoryLabel(category: CollectionCategory): string {
-  const labels: Record<CollectionCategory, string> = {
-    'hot-wheels': '🚗 Hot Wheels',
-    'coins': '🪙 Münzen',
-    'stamps': '📮 Briefmarken',
-    'antiques': '🏺 Antiquitäten',
-    'watches': '⌚ Uhren',
-    'art': '🎨 Kunst',
-    'vinyl': '💿 Vinyl',
-    'comics': '📚 Comics',
-    'toys': '🧸 Spielzeug',
-    'jewelry': '💎 Schmuck',
-    'furniture': '🪑 Möbel',
-    'general': '📦 Allgemein',
-  }
-  return labels[category] || category
 }

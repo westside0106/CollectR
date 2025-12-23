@@ -1,210 +1,190 @@
 /**
  * Market Service für CollectR
  * 
- * Verwendet marketstack API für Börsenkurse
- * Nützlich für Investment-Sammlungen (Gold, Silber, etc.)
- * Free Tier: 100 Requests/Monat
+ * Verwendet CoinGecko API (komplett kostenlos, kein API-Key nötig!)
+ * Zeigt Edelmetalle & relevante Assets für Sammler
  * 
- * API Docs: https://marketstack.com/documentation
+ * API Docs: https://www.coingecko.com/en/api/documentation
  */
 
-export interface StockQuote {
+export interface AssetQuote {
+  id: string
   symbol: string
   name: string
   price: number
-  change: number
-  changePercent: number
-  high: number
-  low: number
+  change24h: number
+  changePercent24h: number
+  high24h: number
+  low24h: number
   volume: number
-  date: string
+  marketCap: number
+  image: string
+  lastUpdated: string
 }
 
-interface MarketstackResponse {
-  pagination: {
-    limit: number
-    offset: number
-    count: number
-    total: number
-  }
-  data: Array<{
-    open: number
-    high: number
-    low: number
-    close: number
-    volume: number
-    adj_high: number
-    adj_low: number
-    adj_close: number
-    adj_open: number
-    adj_volume: number
-    symbol: string
-    exchange: string
-    date: string
-  }>
-  error?: {
-    code: string
-    message: string
-  }
+interface CoinGeckoMarket {
+  id: string
+  symbol: string
+  name: string
+  image: string
+  current_price: number
+  market_cap: number
+  market_cap_rank: number
+  fully_diluted_valuation: number
+  total_volume: number
+  high_24h: number
+  low_24h: number
+  price_change_24h: number
+  price_change_percentage_24h: number
+  market_cap_change_24h: number
+  market_cap_change_percentage_24h: number
+  circulating_supply: number
+  total_supply: number
+  max_supply: number
+  ath: number
+  ath_change_percentage: number
+  ath_date: string
+  atl: number
+  atl_change_percentage: number
+  atl_date: string
+  roi: any
+  last_updated: string
 }
 
-// Relevante Symbole für Sammler
-export const COLLECTIBLE_RELATED_SYMBOLS = {
-  // Edelmetalle (wichtig für Münzsammler)
-  gold: 'GLD',      // SPDR Gold Trust ETF
-  silver: 'SLV',    // iShares Silver Trust
-  
-  // Auktionshäuser
-  sothebys: 'BID',  // Sotheby's (wenn verfügbar)
-  
-  // Luxusmarken (relevant für Uhren, Schmuck)
-  lvmh: 'MC.XPAR',  // LVMH
-  richemont: 'CFR.XSWX', // Richemont (Cartier, IWC)
-  
-  // Spielzeug/Sammlerstücke
-  hasbro: 'HAS',    // Hasbro
-  mattel: 'MAT',    // Mattel (Hot Wheels!)
-  funko: 'FNKO',    // Funko (Pop! Figuren)
-} as const
+// Relevante Assets für Sammler (Edelmetalle + Blockchain-Collectibles)
+export const COLLECTIBLE_ASSETS = [
+  'pax-gold',      // Gold (tokenisiert)
+  'tether-gold',   // Gold
+  'silver-token',  // Silber (tokenisiert)
+  'bitcoin',       // Digital Collectible
+  'ethereum',      // NFT Platform
+  'sandbox',       // Virtual Land/Collectibles
+  'decentraland',  // Virtual Land
+  'axie-infinity', // Gaming Collectibles
+] as const
 
-export type CollectibleSymbol = keyof typeof COLLECTIBLE_RELATED_SYMBOLS
+export type CollectibleAsset = typeof COLLECTIBLE_ASSETS[number]
 
 // Cache für Kurse (5 Minuten)
-const priceCache: Map<string, { data: StockQuote, timestamp: number }> = new Map()
+const priceCache: Map<string, { data: AssetQuote[], timestamp: number }> = new Map()
 const CACHE_DURATION = 5 * 60 * 1000 // 5 Minuten
 
 /**
- * Holt den aktuellen Kurs für ein Symbol
+ * Holt Marktdaten für Sammler-relevante Assets
  */
-export async function getStockPrice(symbol: string): Promise<StockQuote | null> {
+export async function getCollectibleMarketData(): Promise<AssetQuote[]> {
   // Cache prüfen
-  const cached = priceCache.get(symbol)
+  const cached = priceCache.get('collectibles')
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.data
   }
 
-  const apiKey = process.env.NEXT_PUBLIC_MARKETSTACK_API_KEY
-  
-  if (!apiKey) {
-    console.warn('MARKETSTACK_API_KEY nicht gesetzt')
-    return null
-  }
-
   try {
-    const url = `http://api.marketstack.com/v1/eod/latest?access_key=${apiKey}&symbols=${symbol}`
+    const ids = COLLECTIBLE_ASSETS.join(',')
+    const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`
     
     const response = await fetch(url, {
       next: { revalidate: 300 } // Next.js Cache: 5 Minuten
     })
 
-    const data: MarketstackResponse = await response.json()
-
-    if (data.error || !data.data || data.data.length === 0) {
-      console.error('Marketstack Error:', data.error)
-      return null
+    if (!response.ok) {
+      console.error('CoinGecko API Error:', response.status)
+      return []
     }
 
-    const quote = data.data[0]
-    const result: StockQuote = {
-      symbol: quote.symbol,
-      name: getSymbolName(quote.symbol),
-      price: quote.close,
-      change: quote.close - quote.open,
-      changePercent: ((quote.close - quote.open) / quote.open) * 100,
-      high: quote.high,
-      low: quote.low,
-      volume: quote.volume,
-      date: quote.date
-    }
+    const data: CoinGeckoMarket[] = await response.json()
+
+    const quotes: AssetQuote[] = data.map(asset => ({
+      id: asset.id,
+      symbol: asset.symbol.toUpperCase(),
+      name: getAssetDisplayName(asset.id),
+      price: asset.current_price,
+      change24h: asset.price_change_24h || 0,
+      changePercent24h: asset.price_change_percentage_24h || 0,
+      high24h: asset.high_24h || 0,
+      low24h: asset.low_24h || 0,
+      volume: asset.total_volume || 0,
+      marketCap: asset.market_cap || 0,
+      image: asset.image,
+      lastUpdated: asset.last_updated
+    }))
 
     // Cache aktualisieren
-    priceCache.set(symbol, {
-      data: result,
+    priceCache.set('collectibles', {
+      data: quotes,
       timestamp: Date.now()
     })
 
-    return result
+    return quotes
   } catch (error) {
-    console.error('Fehler beim Abrufen des Kurses:', error)
-    return null
+    console.error('Fehler beim Abrufen der Marktdaten:', error)
+    return []
   }
 }
 
 /**
- * Holt Kurse für mehrere Symbole
+ * Holt Daten für ein einzelnes Asset
  */
-export async function getMultipleStockPrices(symbols: string[]): Promise<StockQuote[]> {
-  const apiKey = process.env.NEXT_PUBLIC_MARKETSTACK_API_KEY
-  
-  if (!apiKey) {
-    console.warn('MARKETSTACK_API_KEY nicht gesetzt')
-    return []
-  }
-
+export async function getAssetPrice(assetId: string): Promise<AssetQuote | null> {
   try {
-    const symbolList = symbols.join(',')
-    const url = `http://api.marketstack.com/v1/eod/latest?access_key=${apiKey}&symbols=${symbolList}`
+    const url = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${assetId}`
     
     const response = await fetch(url, {
       next: { revalidate: 300 }
     })
 
-    const data: MarketstackResponse = await response.json()
+    if (!response.ok) return null
 
-    if (data.error || !data.data) {
-      console.error('Marketstack Error:', data.error)
-      return []
+    const data: CoinGeckoMarket[] = await response.json()
+    if (data.length === 0) return null
+
+    const asset = data[0]
+    return {
+      id: asset.id,
+      symbol: asset.symbol.toUpperCase(),
+      name: getAssetDisplayName(asset.id),
+      price: asset.current_price,
+      change24h: asset.price_change_24h || 0,
+      changePercent24h: asset.price_change_percentage_24h || 0,
+      high24h: asset.high_24h || 0,
+      low24h: asset.low_24h || 0,
+      volume: asset.total_volume || 0,
+      marketCap: asset.market_cap || 0,
+      image: asset.image,
+      lastUpdated: asset.last_updated
     }
-
-    return data.data.map(quote => ({
-      symbol: quote.symbol,
-      name: getSymbolName(quote.symbol),
-      price: quote.close,
-      change: quote.close - quote.open,
-      changePercent: ((quote.close - quote.open) / quote.open) * 100,
-      high: quote.high,
-      low: quote.low,
-      volume: quote.volume,
-      date: quote.date
-    }))
   } catch (error) {
-    console.error('Fehler beim Abrufen der Kurse:', error)
-    return []
+    console.error('Fehler beim Abrufen des Asset-Preises:', error)
+    return null
   }
 }
 
 /**
- * Holt relevante Marktdaten für Sammler
+ * Gibt den lesbaren Namen für ein Asset zurück
  */
-export async function getCollectibleMarketData(): Promise<StockQuote[]> {
-  const symbols = Object.values(COLLECTIBLE_RELATED_SYMBOLS)
-  return getMultipleStockPrices(symbols)
-}
-
-/**
- * Gibt den lesbaren Namen für ein Symbol zurück
- */
-function getSymbolName(symbol: string): string {
+function getAssetDisplayName(assetId: string): string {
   const names: Record<string, string> = {
-    'GLD': 'Gold (ETF)',
-    'SLV': 'Silber (ETF)',
-    'BID': "Sotheby's",
-    'MC.XPAR': 'LVMH',
-    'CFR.XSWX': 'Richemont',
-    'HAS': 'Hasbro',
-    'MAT': 'Mattel',
-    'FNKO': 'Funko',
+    'pax-gold': 'Gold (PAX)',
+    'tether-gold': 'Gold (XAUt)',
+    'silver-token': 'Silber Token',
+    'bitcoin': 'Bitcoin',
+    'ethereum': 'Ethereum',
+    'sandbox': 'The Sandbox',
+    'decentraland': 'Decentraland',
+    'axie-infinity': 'Axie Infinity',
   }
-  return names[symbol] || symbol
+  return names[assetId] || assetId
 }
 
 /**
  * Formatiert einen Preis
  */
-export function formatStockPrice(price: number, currency: string = 'USD'): string {
+export function formatPrice(price: number, currency: string = 'USD'): string {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
     currency: currency,
+    minimumFractionDigits: price < 1 ? 4 : 2,
+    maximumFractionDigits: price < 1 ? 4 : 2,
   }).format(price)
 }
 
@@ -220,4 +200,18 @@ export function formatChange(change: number, percent: number): {
     text: `${sign}${change.toFixed(2)} (${sign}${percent.toFixed(2)}%)`,
     color: change > 0 ? 'green' : change < 0 ? 'red' : 'gray'
   }
+}
+
+/**
+ * Formatiert Market Cap
+ */
+export function formatMarketCap(marketCap: number): string {
+  if (marketCap >= 1_000_000_000) {
+    return `${(marketCap / 1_000_000_000).toFixed(2)}B`
+  } else if (marketCap >= 1_000_000) {
+    return `${(marketCap / 1_000_000).toFixed(2)}M`
+  } else if (marketCap >= 1_000) {
+    return `${(marketCap / 1_000).toFixed(2)}K`
+  }
+  return marketCap.toFixed(2)
 }

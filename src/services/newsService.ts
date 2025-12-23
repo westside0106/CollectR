@@ -1,53 +1,56 @@
 /**
  * News Service für CollectR
  * 
- * Verwendet mediastack API für Sammler-News
- * Free Tier: 100 Requests/Monat, 30 Min Verzögerung
+ * Verwendet GNews.io API für Sammler-News
+ * Free Tier: 100 Requests/Tag (kein Credit Card nötig!)
  * 
- * API Docs: https://mediastack.com/documentation
+ * API Docs: https://gnews.io/docs/v4
+ * Sign up: https://gnews.io/register (gratis)
  */
 
 export interface NewsArticle {
-  author: string | null
   title: string
   description: string
+  content: string
   url: string
-  source: string
   image: string | null
-  category: string
-  language: string
-  country: string
-  published_at: string
+  publishedAt: string
+  source: {
+    name: string
+    url: string
+  }
 }
 
-interface MediastackResponse {
-  pagination: {
-    limit: number
-    offset: number
-    count: number
-    total: number
-  }
-  data: NewsArticle[]
-  error?: {
-    code: string
-    message: string
-  }
+interface GNewsResponse {
+  totalArticles: number
+  articles: Array<{
+    title: string
+    description: string
+    content: string
+    url: string
+    image: string | null
+    publishedAt: string
+    source: {
+      name: string
+      url: string
+    }
+  }>
 }
 
 // Sammler-relevante Suchbegriffe
 export const COLLECTION_KEYWORDS = {
-  'hot-wheels': 'Hot Wheels collectible diecast cars Mattel',
-  'coins': 'coin collecting numismatic rare coins',
-  'stamps': 'stamp collecting philately rare stamps',
-  'antiques': 'antiques auction vintage collectibles',
-  'watches': 'luxury watches Rolex Omega collectible timepiece',
-  'art': 'art auction Christie Sotheby painting',
-  'vinyl': 'vinyl records collecting rare albums',
-  'comics': 'comic books collectible Marvel DC rare',
-  'toys': 'vintage toys collectible action figures',
-  'jewelry': 'jewelry auction diamonds gems collectible',
-  'furniture': 'antique furniture vintage design collectible',
-  'general': 'collectibles auction rare vintage',
+  'hot-wheels': 'Hot Wheels collectible',
+  'antiques': 'antiques auction',
+  'art': 'art auction',
+  'coins': 'rare coins numismatic',
+  'stamps': 'stamp collecting',
+  'watches': 'luxury watches',
+  'toys': 'vintage toys',
+  'comics': 'comic books',
+  'vinyl': 'vinyl records',
+  'furniture': 'antique furniture',
+  'jewelry': 'jewelry auction',
+  'general': 'collectibles auction',
 } as const
 
 export type CollectionCategory = keyof typeof COLLECTION_KEYWORDS
@@ -58,11 +61,17 @@ const CACHE_DURATION = 15 * 60 * 1000 // 15 Minuten
 
 /**
  * Holt News zu einem Sammelgebiet
+ * 
+ * WICHTIG: Für die Nutzung brauchst du einen KOSTENLOSEN API Key von gnews.io
+ * 1. Gehe zu https://gnews.io/register
+ * 2. Registriere dich (kostenlos, keine CC)
+ * 3. Kopiere deinen API Key
+ * 4. Füge ihn in .env.local hinzu: NEXT_PUBLIC_GNEWS_API_KEY=dein_key
  */
 export async function getCollectionNews(
   category: CollectionCategory = 'general',
   limit: number = 10,
-  language: string = 'de,en'
+  language: string = 'en' // GNews unterstützt: de, en, es, fr, it, nl, pt, ru, zh
 ): Promise<NewsArticle[]> {
   const cacheKey = `${category}-${limit}-${language}`
   
@@ -72,38 +81,41 @@ export async function getCollectionNews(
     return cached.data
   }
 
-  const apiKey = process.env.NEXT_PUBLIC_MEDIASTACK_API_KEY
+  // API Key aus .env laden
+  const apiKey = process.env.NEXT_PUBLIC_GNEWS_API_KEY
   
   if (!apiKey) {
-    console.warn('MEDIASTACK_API_KEY nicht gesetzt')
-    return []
+    console.warn('⚠️ GNEWS_API_KEY nicht gesetzt!')
+    console.warn('Registriere dich kostenlos auf https://gnews.io/register')
+    console.warn('Füge dann deinen Key in .env.local hinzu: NEXT_PUBLIC_GNEWS_API_KEY=...')
+    return getMockNews(category) // Fallback auf Mock-Daten
   }
 
   try {
-    const keywords = encodeURIComponent(COLLECTION_KEYWORDS[category])
-    const url = `http://api.mediastack.com/v1/news?access_key=${apiKey}&keywords=${keywords}&languages=${language}&limit=${limit}&sort=published_desc`
+    const query = COLLECTION_KEYWORDS[category]
+    const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=${language}&max=${limit}&apikey=${apiKey}`
     
     const response = await fetch(url, {
       next: { revalidate: 900 } // Next.js Cache: 15 Minuten
     })
 
-    const data: MediastackResponse = await response.json()
-
-    if (data.error) {
-      console.error('Mediastack Error:', data.error)
-      return []
+    if (!response.ok) {
+      console.error('GNews API Error:', response.status)
+      return getMockNews(category)
     }
+
+    const data: GNewsResponse = await response.json()
 
     // Cache aktualisieren
     newsCache.set(cacheKey, {
-      data: data.data,
+      data: data.articles,
       timestamp: Date.now()
     })
 
-    return data.data
+    return data.articles
   } catch (error) {
     console.error('Fehler beim Abrufen der News:', error)
-    return []
+    return getMockNews(category)
   }
 }
 
@@ -114,30 +126,69 @@ export async function searchNews(
   keywords: string,
   limit: number = 10
 ): Promise<NewsArticle[]> {
-  const apiKey = process.env.NEXT_PUBLIC_MEDIASTACK_API_KEY
+  const apiKey = process.env.NEXT_PUBLIC_GNEWS_API_KEY
   
   if (!apiKey) {
-    console.warn('MEDIASTACK_API_KEY nicht gesetzt')
+    console.warn('GNEWS_API_KEY nicht gesetzt')
     return []
   }
 
   try {
-    const encodedKeywords = encodeURIComponent(keywords)
-    const url = `http://api.mediastack.com/v1/news?access_key=${apiKey}&keywords=${encodedKeywords}&limit=${limit}&sort=published_desc`
+    const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(keywords)}&max=${limit}&apikey=${apiKey}`
     
     const response = await fetch(url)
-    const data: MediastackResponse = await response.json()
 
-    if (data.error) {
-      console.error('Mediastack Error:', data.error)
-      return []
-    }
+    if (!response.ok) return []
 
-    return data.data
+    const data: GNewsResponse = await response.json()
+    return data.articles
   } catch (error) {
     console.error('Fehler beim Suchen von News:', error)
     return []
   }
+}
+
+/**
+ * Mock-Daten falls kein API Key vorhanden
+ */
+function getMockNews(category: CollectionCategory): NewsArticle[] {
+  const mockArticles: Record<CollectionCategory, NewsArticle[]> = {
+    'hot-wheels': [
+      {
+        title: 'Neue Hot Wheels Legends Tour 2024 angekündigt',
+        description: 'Mattel kündigt die nächste Runde der Hot Wheels Legends Tour an...',
+        content: 'Mattel hat die Details zur Hot Wheels Legends Tour 2024 bekannt gegeben.',
+        url: 'https://hotwheels.fandom.com',
+        image: null,
+        publishedAt: new Date().toISOString(),
+        source: { name: 'Hot Wheels News', url: 'https://hotwheels.com' }
+      }
+    ],
+    'antiques': [
+      {
+        title: 'Rekordauktion für antike Möbel',
+        description: 'Bei einer Auktion in London wurden Rekordpreise erzielt...',
+        content: 'Seltene antike Möbel erzielen Höchstpreise.',
+        url: 'https://www.sothebys.com',
+        image: null,
+        publishedAt: new Date().toISOString(),
+        source: { name: "Sotheby's", url: 'https://sothebys.com' }
+      }
+    ],
+    'general': [
+      {
+        title: '💡 Aktiviere die News-Funktion!',
+        description: 'Registriere dich kostenlos auf gnews.io und erhalte Echtzeit-News zu deinen Sammelgebieten.',
+        content: 'Gehe zu https://gnews.io/register und hole dir deinen kostenlosen API Key.',
+        url: 'https://gnews.io/register',
+        image: null,
+        publishedAt: new Date().toISOString(),
+        source: { name: 'CollectR Setup', url: '' }
+      }
+    ]
+  }
+
+  return mockArticles[category] || mockArticles.general
 }
 
 /**
@@ -157,7 +208,7 @@ export function formatNewsDate(dateString: string, locale: string = 'de-DE'): st
 /**
  * Gibt relative Zeit zurück (z.B. "vor 2 Stunden")
  */
-export function getRelativeTime(dateString: string, locale: string = 'de-DE'): string {
+export function getRelativeTime(dateString: string): string {
   const date = new Date(dateString)
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
@@ -165,13 +216,9 @@ export function getRelativeTime(dateString: string, locale: string = 'de-DE'): s
   const diffHours = Math.floor(diffMins / 60)
   const diffDays = Math.floor(diffHours / 24)
 
-  if (diffMins < 60) {
-    return `vor ${diffMins} Minuten`
-  } else if (diffHours < 24) {
-    return `vor ${diffHours} Stunde${diffHours > 1 ? 'n' : ''}`
-  } else if (diffDays < 7) {
-    return `vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`
-  } else {
-    return formatNewsDate(dateString, locale)
-  }
+  if (diffMins < 1) return 'gerade eben'
+  if (diffMins < 60) return `vor ${diffMins} Min.`
+  if (diffHours < 24) return `vor ${diffHours} Std.`
+  if (diffDays < 7) return `vor ${diffDays} Tag${diffDays > 1 ? 'en' : ''}`
+  return formatNewsDate(dateString)
 }
