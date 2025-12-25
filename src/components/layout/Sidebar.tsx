@@ -41,6 +41,8 @@ export function Sidebar() {
     { href: '/tools/currency', label: 'Währungsrechner', icon: '💱' },
     { href: '/tools/market', label: 'Marktnews', icon: '📈' },
     { href: '/tools/news', label: 'Sammler-News', icon: '📰' },
+    { href: '/tools/books', label: 'Bücher-Suche', icon: '📚' },
+    { href: '/tools/vinyl', label: 'Vinyl-Suche', icon: '💿' },
   ]
 
   return (
