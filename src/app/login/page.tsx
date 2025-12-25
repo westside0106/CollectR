@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -28,8 +29,6 @@ export default function LoginPage() {
         setError(error.message)
         setLoading(false)
       } else {
-        // WICHTIG: router.refresh() stellt sicher, dass die Session
-        // auf dem Server aktualisiert wird bevor wir navigieren
         router.refresh()
         router.push('/')
       }
@@ -40,22 +39,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold">📦 CollectR</h1>
-          <p className="text-gray-600 mt-2">Melde dich an</p>
+          <Image
+            src="/icons/icon-192.png"
+            alt="CollectR Logo"
+            width={96}
+            height={96}
+            className="mx-auto mb-4"
+          />
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">CollectR</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-2">Melde dich an</p>
         </div>
 
-        <form onSubmit={handleLogin} className="bg-white p-8 rounded-xl shadow-sm space-y-4">
+        <form onSubmit={handleLogin} className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               E-Mail
             </label>
             <input
@@ -63,13 +69,13 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="deine@email.de"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Passwort
             </label>
             <input
@@ -77,7 +83,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="••••••••"
             />
           </div>
@@ -90,9 +96,9 @@ export default function LoginPage() {
             {loading ? 'Wird angemeldet...' : 'Anmelden'}
           </button>
 
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-slate-600 dark:text-slate-400">
             Noch kein Konto?{' '}
-            <Link href="/register" className="text-blue-600 hover:underline">
+            <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:underline">
               Registrieren
             </Link>
           </p>

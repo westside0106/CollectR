@@ -11,6 +11,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { CollectionGoals } from '@/components/CollectionGoals'
 
 type ViewMode = 'grid' | 'list'
+type TabMode = 'items' | 'goals'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -27,6 +28,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
+  const [activeTab, setActiveTab] = useState<TabMode>('items')
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('collectionViewMode') as ViewMode) || 'grid'
@@ -214,33 +216,60 @@ export default function CollectionDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Stats Bar & Goals */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 flex gap-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-          <div>
-            <span className="text-2xl font-bold dark:text-white">{stats.totalItems}</span>
-            <span className="text-slate-500 dark:text-slate-400 ml-2">Items</span>
-          </div>
-          <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
-            <span className="text-2xl font-bold dark:text-white">{stats.totalValue.toFixed(2)}</span>
-            <span className="text-slate-500 dark:text-slate-400 ml-2">EUR</span>
-          </div>
-          <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
-            <span className="text-2xl font-bold dark:text-white">{categories.length}</span>
-            <span className="text-slate-500 dark:text-slate-400 ml-2">Kategorien</span>
-          </div>
+      {/* Stats Bar */}
+      <div className="flex gap-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 mb-6">
+        <div>
+          <span className="text-2xl font-bold dark:text-white">{stats.totalItems}</span>
+          <span className="text-slate-500 dark:text-slate-400 ml-2">Items</span>
         </div>
+        <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
+          <span className="text-2xl font-bold dark:text-white">{stats.totalValue.toFixed(2)}</span>
+          <span className="text-slate-500 dark:text-slate-400 ml-2">EUR</span>
+        </div>
+        <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
+          <span className="text-2xl font-bold dark:text-white">{categories.length}</span>
+          <span className="text-slate-500 dark:text-slate-400 ml-2">Kategorien</span>
+        </div>
+      </div>
 
-        {/* Collection Goals */}
+      {/* Tabs */}
+      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mb-6 w-fit">
+        <button
+          onClick={() => setActiveTab('items')}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+            activeTab === 'items'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          Items
+        </button>
+        <button
+          onClick={() => setActiveTab('goals')}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+            activeTab === 'goals'
+              ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          Ziele
+        </button>
+      </div>
+
+      {/* Goals Tab Content */}
+      {activeTab === 'goals' && (
         <CollectionGoals
           collectionId={id}
           itemCount={items.length}
           totalValue={items.reduce((sum, item) => sum + (item.purchase_price || 0), 0)}
           categoryCounts={categoryCounts}
         />
-      </div>
+      )}
 
-      {/* Search */}
+      {/* Items Tab Content */}
+      {activeTab === 'items' && (
+        <>
+          {/* Search */}
       <div className="mb-4">
         <SearchBar
           value={searchQuery}
@@ -332,6 +361,8 @@ export default function CollectionDetailPage({ params }: PageProps) {
             </tbody>
           </table>
         </div>
+      )}
+        </>
       )}
     </div>
   )
