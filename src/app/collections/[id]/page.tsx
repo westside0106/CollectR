@@ -8,6 +8,7 @@ import { use } from 'react'
 import { SearchBar } from '@/components/SearchBar'
 import { FilterBar } from '@/components/FilterBar'
 import { useDebounce } from '@/hooks/useDebounce'
+import { CollectionGoals } from '@/components/CollectionGoals'
 
 type ViewMode = 'grid' | 'list'
 
@@ -120,6 +121,17 @@ export default function CollectionDetailPage({ params }: PageProps) {
     return { totalItems, totalValue }
   }, [filteredItems])
 
+  // Calculate category counts for goals
+  const categoryCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    items.forEach(item => {
+      if (item.category_id) {
+        counts.set(item.category_id, (counts.get(item.category_id) || 0) + 1)
+      }
+    })
+    return counts
+  }, [items])
+
   if (loading && !collection) {
     return <div className="p-8 dark:text-white">Laden...</div>
   }
@@ -202,20 +214,30 @@ export default function CollectionDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Stats Bar */}
-      <div className="flex gap-6 mb-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-        <div>
-          <span className="text-2xl font-bold dark:text-white">{stats.totalItems}</span>
-          <span className="text-slate-500 dark:text-slate-400 ml-2">Items</span>
+      {/* Stats Bar & Goals */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2 flex gap-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div>
+            <span className="text-2xl font-bold dark:text-white">{stats.totalItems}</span>
+            <span className="text-slate-500 dark:text-slate-400 ml-2">Items</span>
+          </div>
+          <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
+            <span className="text-2xl font-bold dark:text-white">{stats.totalValue.toFixed(2)}</span>
+            <span className="text-slate-500 dark:text-slate-400 ml-2">EUR</span>
+          </div>
+          <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
+            <span className="text-2xl font-bold dark:text-white">{categories.length}</span>
+            <span className="text-slate-500 dark:text-slate-400 ml-2">Kategorien</span>
+          </div>
         </div>
-        <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
-          <span className="text-2xl font-bold dark:text-white">{stats.totalValue.toFixed(2)}</span>
-          <span className="text-slate-500 dark:text-slate-400 ml-2">EUR</span>
-        </div>
-        <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
-          <span className="text-2xl font-bold dark:text-white">{categories.length}</span>
-          <span className="text-slate-500 dark:text-slate-400 ml-2">Kategorien</span>
-        </div>
+
+        {/* Collection Goals */}
+        <CollectionGoals
+          collectionId={id}
+          itemCount={items.length}
+          totalValue={items.reduce((sum, item) => sum + (item.purchase_price || 0), 0)}
+          categoryCounts={categoryCounts}
+        />
       </div>
 
       {/* Search */}
