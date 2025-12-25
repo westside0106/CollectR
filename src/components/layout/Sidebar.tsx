@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { UserMenu } from '@/components/UserMenu'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -170,6 +171,11 @@ export function Sidebar() {
             })}
           </ul>
         </nav>
+
+        {/* Theme Toggle */}
+        <div className="px-4 py-2">
+          <ThemeToggle />
+        </div>
 
         {/* User Menu */}
         <div className="p-4 border-t border-slate-700">

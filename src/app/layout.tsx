@@ -4,6 +4,7 @@ import './globals.css'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { InstallPrompt } from '@/components/InstallPrompt'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -55,16 +56,34 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="de">
-      <body className={`${inter.className} bg-slate-100`}>
-        <ServiceWorkerRegistration />
-        <div className="flex min-h-screen min-h-[100dvh]">
-          <Sidebar />
-          <main className="flex-1 overflow-auto pt-14 lg:pt-0">
-            {children}
-          </main>
-        </div>
-        <InstallPrompt />
+    <html lang="de" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body className={`${inter.className} bg-slate-100 dark:bg-slate-900 transition-colors`}>
+        <ThemeProvider>
+          <ServiceWorkerRegistration />
+          <div className="flex min-h-screen min-h-[100dvh]">
+            <Sidebar />
+            <main className="flex-1 overflow-auto pt-14 lg:pt-0">
+              {children}
+            </main>
+          </div>
+          <InstallPrompt />
+        </ThemeProvider>
       </body>
     </html>
   )

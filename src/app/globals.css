@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Dark Mode Configuration */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* iOS Safe Area Support */
 @supports (padding: env(safe-area-inset-top)) {
   .safe-area-top {

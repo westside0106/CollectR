@@ -94,7 +94,7 @@ function BarChart({ data, maxHeight = 150 }: { data: BarChartData[], maxHeight?:
         const height = (bar.value / maxValue) * maxHeight
         return (
           <div key={index} className="flex flex-col items-center gap-2">
-            <div className="text-xs text-gray-600 font-medium">
+            <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">
               {bar.value.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })}
             </div>
             <div
@@ -105,7 +105,7 @@ function BarChart({ data, maxHeight = 150 }: { data: BarChartData[], maxHeight?:
               }}
               title={`${bar.label}: ${bar.value.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}`}
             />
-            <div className="text-xs text-gray-600 text-center max-w-16 truncate" title={bar.label}>
+            <div className="text-xs text-gray-600 dark:text-gray-400 text-center max-w-16 truncate" title={bar.label}>
               {bar.label.length > 8 ? bar.label.slice(0, 8) + '...' : bar.label}
             </div>
           </div>
@@ -125,7 +125,7 @@ function ChartLegend({ data }: { data: PieChartData[] }) {
             className="w-3 h-3 rounded-full"
             style={{ backgroundColor: item.color }}
           />
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-600 dark:text-gray-400">
             {item.label} ({item.value})
           </span>
         </div>
@@ -153,8 +153,8 @@ export default function DashboardCharts({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       {/* Category Distribution Pie Chart */}
       {hasCategories && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Verteilung nach Kategorie</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Verteilung nach Kategorie</h3>
           <PieChart data={categoryDistribution} />
           <ChartLegend data={categoryDistribution} />
         </div>
@@ -162,8 +162,8 @@ export default function DashboardCharts({
 
       {/* Status Distribution Pie Chart */}
       {hasStatus && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Status-Verteilung</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Status-Verteilung</h3>
           <PieChart data={statusDistribution} size={180} />
           <ChartLegend data={statusDistribution} />
         </div>
@@ -171,22 +171,22 @@ export default function DashboardCharts({
 
       {/* Value by Collection Bar Chart */}
       {hasCollectionValues && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Wert nach Sammlung</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Wert nach Sammlung</h3>
           <BarChart data={collectionValues} />
         </div>
       )}
 
       {/* Top 5 Valuable Items */}
       {hasTopItems && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900">Top 5 wertvollste Artikel</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Top 5 wertvollste Artikel</h3>
           <div className="space-y-3">
             {topItems.map((item, index) => (
               <a
                 key={item.id}
                 href={`/collections/${item.collection_id}/items/${item.id}`}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition"
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white font-bold text-sm">
                   {index + 1}
@@ -198,15 +198,15 @@ export default function DashboardCharts({
                     className="w-10 h-10 object-cover rounded"
                   />
                 ) : (
-                  <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center text-gray-400">
+                  <div className="w-10 h-10 bg-gray-200 dark:bg-slate-700 rounded flex items-center justify-center text-gray-400">
                     📦
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900 truncate">{item.name}</div>
-                  <div className="text-xs text-gray-500 truncate">{item.collection_name}</div>
+                  <div className="font-medium text-gray-900 dark:text-white truncate">{item.name}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{item.collection_name}</div>
                 </div>
-                <div className="text-green-600 font-semibold whitespace-nowrap">
+                <div className="text-green-600 dark:text-green-400 font-semibold whitespace-nowrap">
                   {item.purchase_price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
                 </div>
               </a>

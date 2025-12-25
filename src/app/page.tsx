@@ -262,18 +262,18 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors">
+      <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">📦 CollectR</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{user?.email}</span>
+            <span className="text-sm text-gray-600 dark:text-gray-300">{user?.email}</span>
             <button
               onClick={async () => {
                 await supabase.auth.signOut()
                 router.push('/login')
               }}
-              className="text-sm text-red-600 hover:text-red-800"
+              className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
             >
               Abmelden
             </button>
@@ -283,19 +283,19 @@ function DashboardContent() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="text-3xl font-bold text-blue-600">{stats.totalCollections}</div>
-            <div className="text-gray-600">Sammlungen</div>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalCollections}</div>
+            <div className="text-gray-600 dark:text-gray-400">Sammlungen</div>
           </div>
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="text-3xl font-bold text-green-600">{stats.totalItems}</div>
-            <div className="text-gray-600">Artikel</div>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+            <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.totalItems}</div>
+            <div className="text-gray-600 dark:text-gray-400">Artikel</div>
           </div>
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="text-3xl font-bold text-purple-600">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+            <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
               {stats.totalValue.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
             </div>
-            <div className="text-gray-600">Gesamtwert</div>
+            <div className="text-gray-600 dark:text-gray-400">Gesamtwert</div>
           </div>
         </div>
 
@@ -322,17 +322,17 @@ function DashboardContent() {
           statusDistribution={chartData.statusDistribution}
         />
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold mb-4">Kürzlich hinzugefügt</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-semibold mb-4 dark:text-white">Kürzlich hinzugefügt</h2>
           {stats.recentItems.length === 0 ? (
-            <p className="text-gray-500">Noch keine Artikel vorhanden.</p>
+            <p className="text-gray-500 dark:text-gray-400">Noch keine Artikel vorhanden.</p>
           ) : (
             <div className="space-y-3">
               {stats.recentItems.map((item) => (
                 <Link
                   key={item.id}
                   href={`/collections/${item.collection_id}/items/${item.id}`}
-                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition"
+                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition"
                 >
                   {item.images?.[0] ? (
                     <img
@@ -341,18 +341,18 @@ function DashboardContent() {
                       className="w-12 h-12 object-cover rounded"
                     />
                   ) : (
-                    <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-slate-700 rounded flex items-center justify-center">
                       📷
                     </div>
                   )}
                   <div className="flex-1">
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-sm text-gray-500">
+                    <div className="font-medium dark:text-white">{item.name}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                       {(item.collections as any)?.name}
                     </div>
                   </div>
                   {item.purchase_price && (
-                    <div className="text-green-600 font-medium">
+                    <div className="text-green-600 dark:text-green-400 font-medium">
                       {item.purchase_price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
                     </div>
                   )}
@@ -368,10 +368,10 @@ function DashboardContent() {
 
 function DashboardLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">Laden...</p>
+        <p className="text-gray-600 dark:text-gray-400">Laden...</p>
       </div>
     </div>
   )
