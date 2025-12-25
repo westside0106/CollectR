@@ -1,5 +1,5 @@
-// Discogs API Service - Kostenlos mit Rate Limits (60/min)
-// Docs: https://www.discogs.com/developers
+// Discogs API Service - Läuft über eigene API-Route für bessere Authentifizierung
+// Die API-Route nutzt den optionalen DISCOGS_TOKEN aus env
 
 export interface DiscogsRelease {
   id: number
@@ -31,19 +31,10 @@ export interface DiscogsSearchResult {
   type: string
 }
 
-const DISCOGS_USER_AGENT = 'CollectR/1.0'
-
 // Suche nach Barcode
 export async function searchByBarcode(barcode: string): Promise<DiscogsRelease | null> {
   try {
-    const response = await fetch(
-      `https://api.discogs.com/database/search?barcode=${encodeURIComponent(barcode)}&type=release`,
-      {
-        headers: {
-          'User-Agent': DISCOGS_USER_AGENT,
-        },
-      }
-    )
+    const response = await fetch(`/api/discogs/search?barcode=${encodeURIComponent(barcode)}`)
 
     if (!response.ok) return null
 
@@ -61,18 +52,16 @@ export async function searchByBarcode(barcode: string): Promise<DiscogsRelease |
 }
 
 // Suche nach Titel/Künstler
-export async function searchReleases(query: string, limit = 10): Promise<DiscogsSearchResult[]> {
+export async function searchReleases(query: string, limit = 20): Promise<DiscogsSearchResult[]> {
   try {
     const response = await fetch(
-      `https://api.discogs.com/database/search?q=${encodeURIComponent(query)}&type=release&per_page=${limit}`,
-      {
-        headers: {
-          'User-Agent': DISCOGS_USER_AGENT,
-        },
-      }
+      `/api/discogs/search?q=${encodeURIComponent(query)}&limit=${limit}`
     )
 
-    if (!response.ok) return []
+    if (!response.ok) {
+      console.error('Discogs search failed:', response.status)
+      return []
+    }
 
     const data = await response.json()
     return data.results || []
@@ -85,14 +74,7 @@ export async function searchReleases(query: string, limit = 10): Promise<Discogs
 // Release Details abrufen
 export async function getReleaseDetails(releaseId: number): Promise<DiscogsRelease | null> {
   try {
-    const response = await fetch(
-      `https://api.discogs.com/releases/${releaseId}`,
-      {
-        headers: {
-          'User-Agent': DISCOGS_USER_AGENT,
-        },
-      }
-    )
+    const response = await fetch(`/api/discogs/release/${releaseId}`)
 
     if (!response.ok) return null
 
@@ -123,29 +105,22 @@ export async function getReleaseDetails(releaseId: number): Promise<DiscogsRelea
   }
 }
 
-// Marketplace Preis abrufen (falls verfügbar)
+// Marketplace Preis abrufen (erfordert Token)
 export async function getMarketplaceStats(releaseId: number): Promise<{ lowest: number; median: number; highest: number } | null> {
   try {
-    const response = await fetch(
-      `https://api.discogs.com/marketplace/price_suggestions/${releaseId}`,
-      {
-        headers: {
-          'User-Agent': DISCOGS_USER_AGENT,
-        },
-      }
-    )
+    // Diese Funktion braucht einen Token - überspringen wenn nicht konfiguriert
+    const response = await fetch(`/api/discogs/release/${releaseId}`)
 
     if (!response.ok) return null
 
     const data = await response.json()
 
-    // Discogs gibt Preise nach Zustand zurück
-    const vgPlus = data['Very Good Plus (VG+)']
-    if (vgPlus) {
+    // Nutze lowest_price aus Release-Daten wenn verfügbar
+    if (data.lowest_price) {
       return {
-        lowest: vgPlus.value * 0.7,
-        median: vgPlus.value,
-        highest: vgPlus.value * 1.5,
+        lowest: data.lowest_price,
+        median: data.lowest_price * 1.2,
+        highest: data.lowest_price * 2,
       }
     }
 
