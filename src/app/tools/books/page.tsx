@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { searchByISBN, searchBooks, getIsbnCoverUrl, type OpenLibraryBook, type OpenLibrarySearchResult, getCoverUrl } from '@/services/openLibraryApi'
+import { AddToCollectionModal } from '@/components/AddToCollectionModal'
 
 export default function BooksLookupPage() {
   const [searchType, setSearchType] = useState<'isbn' | 'text'>('isbn')
@@ -11,6 +12,7 @@ export default function BooksLookupPage() {
   const [book, setBook] = useState<OpenLibraryBook | null>(null)
   const [searchResults, setSearchResults] = useState<OpenLibrarySearchResult[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -264,6 +266,12 @@ export default function BooksLookupPage() {
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3 pt-4">
                   <button
+                    onClick={() => setShowAddModal(true)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+                  >
+                    + Zur Sammlung hinzufügen
+                  </button>
+                  <button
                     onClick={() => {
                       navigator.clipboard.writeText(JSON.stringify(book, null, 2))
                       alert('Buchdaten in Zwischenablage kopiert!')
@@ -295,6 +303,35 @@ export default function BooksLookupPage() {
           </p>
         </div>
       </div>
+
+      {/* Add to Collection Modal */}
+      {book && (
+        <AddToCollectionModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          itemType="book"
+          itemData={{
+            name: book.title,
+            description: book.authors.join(', '),
+            barcode: book.isbn13 || book.isbn10 || undefined,
+            coverUrl: book.coverUrl || (book.isbn13 ? getIsbnCoverUrl(book.isbn13, 'L') : undefined),
+            notes: [
+              book.publishers.length > 0 ? `Verlag: ${book.publishers.join(', ')}` : '',
+              book.publishDate ? `Erschienen: ${book.publishDate}` : '',
+              book.pageCount ? `${book.pageCount} Seiten` : '',
+            ].filter(Boolean).join('\n'),
+            attributes: {
+              isbn13: book.isbn13,
+              isbn10: book.isbn10,
+              authors: book.authors,
+              publishers: book.publishers,
+              publishDate: book.publishDate,
+              pageCount: book.pageCount,
+              subjects: book.subjects,
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -100,7 +100,7 @@ export function AddToCollectionModal({
       if (itemData.coverUrl && item) {
         await supabase.from('item_images').insert({
           item_id: item.id,
-          url: itemData.coverUrl,
+          original_url: itemData.coverUrl,
           is_primary: true,
         })
       }

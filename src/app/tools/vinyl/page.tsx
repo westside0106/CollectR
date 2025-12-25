@@ -10,6 +10,7 @@ import {
   type DiscogsRelease,
   type DiscogsSearchResult
 } from '@/services/discogsApi'
+import { AddToCollectionModal } from '@/components/AddToCollectionModal'
 
 export default function VinylLookupPage() {
   const [searchType, setSearchType] = useState<'barcode' | 'text'>('barcode')
@@ -19,6 +20,7 @@ export default function VinylLookupPage() {
   const [marketStats, setMarketStats] = useState<{ lowest: number; median: number; highest: number } | null>(null)
   const [searchResults, setSearchResults] = useState<DiscogsSearchResult[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [showAddModal, setShowAddModal] = useState(false)
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -329,6 +331,12 @@ export default function VinylLookupPage() {
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3 pt-4">
                   <button
+                    onClick={() => setShowAddModal(true)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+                  >
+                    + Zur Sammlung hinzufügen
+                  </button>
+                  <button
                     onClick={() => {
                       navigator.clipboard.writeText(JSON.stringify(release, null, 2))
                       alert('Release-Daten in Zwischenablage kopiert!')
@@ -364,6 +372,38 @@ export default function VinylLookupPage() {
           </p>
         </div>
       </div>
+
+      {/* Add to Collection Modal */}
+      {release && (
+        <AddToCollectionModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          itemType="vinyl"
+          itemData={{
+            name: `${release.artist} - ${release.title}`,
+            description: release.artist,
+            coverUrl: release.coverUrl,
+            notes: [
+              release.label ? `Label: ${release.label}` : '',
+              release.year ? `Jahr: ${release.year}` : '',
+              release.country ? `Land: ${release.country}` : '',
+              release.format ? `Format: ${release.format.join(', ')}` : '',
+            ].filter(Boolean).join('\n'),
+            attributes: {
+              discogsId: release.id,
+              artist: release.artist,
+              title: release.title,
+              year: release.year,
+              label: release.label,
+              country: release.country,
+              format: release.format,
+              genre: release.genre,
+              style: release.style,
+              lowestPrice: release.lowestPrice,
+            }
+          }}
+        />
+      )}
     </div>
   )
 }
