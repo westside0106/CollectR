@@ -12,7 +12,15 @@ interface MappedField {
   target: string
 }
 
-const TARGET_FIELDS = [
+interface AttributeDefinition {
+  id: string
+  name: string
+  display_name: string
+  type: string
+  category_id: string
+}
+
+const BASE_TARGET_FIELDS = [
   { value: '', label: '-- Nicht importieren --' },
   { value: 'name', label: 'Name *', required: true },
   { value: 'description', label: 'Beschreibung' },
@@ -33,13 +41,27 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
   const [userId, setUserId] = useState<string | null>(null)
   const [collection, setCollection] = useState<any>(null)
   const [step, setStep] = useState<'upload' | 'mapping' | 'preview' | 'importing' | 'done'>('upload')
-  
+
   const [fileData, setFileData] = useState<Record<string, string>[]>([])
   const [sourceColumns, setSourceColumns] = useState<string[]>([])
   const [mappings, setMappings] = useState<MappedField[]>([])
-  
+
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0, errors: 0 })
   const [importedCount, setImportedCount] = useState(0)
+
+  // Kategorie-Attribute
+  const [attributes, setAttributes] = useState<AttributeDefinition[]>([])
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+
+  // Dynamische Target-Fields (Basis + Attribute)
+  const TARGET_FIELDS = [
+    ...BASE_TARGET_FIELDS,
+    ...attributes.map(attr => ({
+      value: `attr:${attr.name}`,
+      label: `📋 ${attr.display_name}`,
+    }))
+  ]
 
   useEffect(() => {
     async function loadData() {
@@ -52,15 +74,49 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
         return
       }
 
-      const { data } = await supabase
+      // Collection laden
+      const { data: collectionData } = await supabase
         .from('collections')
         .select('*')
         .eq('id', collectionId)
         .single()
-      setCollection(data)
+      setCollection(collectionData)
+
+      // Kategorien der Sammlung laden
+      const { data: catData } = await supabase
+        .from('categories')
+        .select('id, name')
+        .eq('collection_id', collectionId)
+        .order('sort_order')
+
+      if (catData && catData.length > 0) {
+        setCategories(catData)
+        setSelectedCategoryId(catData[0].id)
+      }
     }
     loadData()
   }, [collectionId])
+
+  // Attribute laden wenn Kategorie gewählt
+  useEffect(() => {
+    async function loadAttributes() {
+      if (!selectedCategoryId) {
+        setAttributes([])
+        return
+      }
+
+      const { data } = await supabase
+        .from('attribute_definitions')
+        .select('id, name, display_name, type, category_id')
+        .eq('category_id', selectedCategoryId)
+        .order('sort_order')
+
+      if (data) {
+        setAttributes(data)
+      }
+    }
+    loadAttributes()
+  }, [selectedCategoryId])
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -87,9 +143,10 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
       setSourceColumns(columns)
       
       const autoMappings: MappedField[] = columns.map(col => {
-        const colLower = col.toLowerCase()
+        const colLower = col.toLowerCase().replace(/[_\-\s]+/g, '')
         let target = ''
-        
+
+        // Standard-Felder
         if (colLower.includes('name') || colLower.includes('titel') || colLower.includes('bezeichnung')) {
           target = 'name'
         } else if (colLower.includes('beschreibung') || colLower.includes('description')) {
@@ -106,8 +163,19 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
           target = 'status'
         } else if (colLower.includes('ort') || colLower.includes('location') || colLower.includes('gekauft')) {
           target = 'purchase_location'
+        } else {
+          // Versuche Attribut zu matchen
+          const matchingAttr = attributes.find(attr => {
+            const attrLower = attr.name.toLowerCase().replace(/[_\-\s]+/g, '')
+            const displayLower = attr.display_name.toLowerCase().replace(/[_\-\s]+/g, '')
+            return colLower === attrLower || colLower === displayLower ||
+                   colLower.includes(attrLower) || attrLower.includes(colLower)
+          })
+          if (matchingAttr) {
+            target = `attr:${matchingAttr.name}`
+          }
         }
-        
+
         return { source: col, target }
       })
       
@@ -141,22 +209,41 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
 
     for (let i = 0; i < fileData.length; i++) {
       const row = fileData[i]
-      
+
       const itemData: Record<string, any> = {
         collection_id: collectionId,
         status: 'in_collection',
-        created_by: userId,  // <-- WICHTIG für RLS!
+        created_by: userId,
+        category_id: selectedCategoryId,
+        attributes: {},
       }
 
       mappings.forEach(m => {
         if (m.target && row[m.source]) {
           let value: any = row[m.source]
-          
-          if (m.target === 'purchase_price') {
-            value = parseFloat(value.replace(',', '.')) || null
+
+          // Prüfen ob es ein Attribut ist (attr:xxx)
+          if (m.target.startsWith('attr:')) {
+            const attrName = m.target.replace('attr:', '')
+            const attrDef = attributes.find(a => a.name === attrName)
+
+            // Typ-Konvertierung
+            if (attrDef) {
+              if (attrDef.type === 'number') {
+                value = parseFloat(value.replace(',', '.')) || null
+              } else if (attrDef.type === 'checkbox') {
+                value = ['ja', 'yes', 'true', '1', 'x'].includes(value.toLowerCase())
+              }
+            }
+
+            itemData.attributes[attrName] = value
+          } else {
+            // Standard-Felder
+            if (m.target === 'purchase_price') {
+              value = parseFloat(value.replace(',', '.')) || null
+            }
+            itemData[m.target] = value
           }
-          
-          itemData[m.target] = value
         }
       })
 
@@ -252,6 +339,29 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
           <p className="text-slate-500 mb-6">
             {fileData.length} Einträge gefunden. Ordne die Spalten den Feldern zu.
           </p>
+
+          {/* Kategorie-Auswahl */}
+          {categories.length > 0 && (
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <label className="block text-sm font-medium text-blue-800 mb-2">
+                Kategorie für Import
+              </label>
+              <select
+                value={selectedCategoryId || ''}
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-blue-300 focus:ring-2 focus:ring-blue-500"
+              >
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
+              {attributes.length > 0 && (
+                <p className="text-blue-600 text-sm mt-2">
+                  {attributes.length} Attribute verfügbar (mit 📋 markiert)
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="space-y-3 mb-6">
             {mappings.map(m => (

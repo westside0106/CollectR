@@ -4,6 +4,21 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import DashboardCharts, { CHART_COLORS } from '@/components/DashboardCharts'
+
+interface ChartData {
+  categoryDistribution: { label: string; value: number; color: string }[]
+  collectionValues: { label: string; value: number; color: string }[]
+  topItems: {
+    id: string
+    name: string
+    collection_id: string
+    collection_name: string
+    purchase_price: number
+    image_url?: string
+  }[]
+  statusDistribution: { label: string; value: number; color: string }[]
+}
 
 function DashboardContent() {
   const router = useRouter()
@@ -15,6 +30,12 @@ function DashboardContent() {
     totalItems: 0,
     totalValue: 0,
     recentItems: [] as any[]
+  })
+  const [chartData, setChartData] = useState<ChartData>({
+    categoryDistribution: [],
+    collectionValues: [],
+    topItems: [],
+    statusDistribution: [],
   })
 
   useEffect(() => {
@@ -30,8 +51,153 @@ function DashboardContent() {
     }
     
     setUser(user)
-    await loadDashboardStats(user.id)
+    await Promise.all([
+      loadDashboardStats(user.id),
+      loadChartData(user.id)
+    ])
     setLoading(false)
+  }
+
+  async function loadChartData(userId: string) {
+    try {
+      // Get user's collections
+      const { data: collections } = await supabase
+        .from('collections')
+        .select('id, name')
+        .eq('owner_id', userId)
+
+      if (!collections || collections.length === 0) return
+
+      const collectionIds = collections.map(c => c.id)
+      const collectionMap = new Map(collections.map(c => [c.id, c.name]))
+
+      // Get all items with categories for charts
+      const { data: items } = await supabase
+        .from('items')
+        .select(`
+          id,
+          name,
+          collection_id,
+          category_id,
+          purchase_price,
+          status,
+          categories(name)
+        `)
+        .in('collection_id', collectionIds)
+
+      if (!items || items.length === 0) return
+
+      // Category distribution
+      const categoryCount = new Map<string, number>()
+      items.forEach(item => {
+        const catName = (item.categories as any)?.name || 'Ohne Kategorie'
+        categoryCount.set(catName, (categoryCount.get(catName) || 0) + 1)
+      })
+
+      const categoryDistribution = Array.from(categoryCount.entries())
+        .map(([label, value], index) => ({
+          label,
+          value,
+          color: CHART_COLORS[index % CHART_COLORS.length]
+        }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 8)
+
+      // Status distribution
+      const STATUS_LABELS: Record<string, string> = {
+        'in_collection': 'In Sammlung',
+        'sold': 'Verkauft',
+        'lent': 'Verliehen',
+        'wishlist': 'Wunschliste',
+      }
+      const STATUS_COLORS: Record<string, string> = {
+        'in_collection': '#10B981',
+        'sold': '#EF4444',
+        'lent': '#F59E0B',
+        'wishlist': '#8B5CF6',
+      }
+      const statusCount = new Map<string, number>()
+      items.forEach(item => {
+        const status = item.status || 'in_collection'
+        statusCount.set(status, (statusCount.get(status) || 0) + 1)
+      })
+
+      const statusDistribution = Array.from(statusCount.entries())
+        .map(([status, value]) => ({
+          label: STATUS_LABELS[status] || status,
+          value,
+          color: STATUS_COLORS[status] || '#6B7280'
+        }))
+
+      // Value by collection
+      const collectionValueMap = new Map<string, number>()
+      items.forEach(item => {
+        if (item.purchase_price) {
+          const current = collectionValueMap.get(item.collection_id) || 0
+          collectionValueMap.set(item.collection_id, current + item.purchase_price)
+        }
+      })
+
+      const collectionValues = Array.from(collectionValueMap.entries())
+        .map(([collId, value], index) => ({
+          label: collectionMap.get(collId) || 'Unbekannt',
+          value,
+          color: CHART_COLORS[index % CHART_COLORS.length]
+        }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 6)
+
+      // Top 5 valuable items
+      const { data: topItemsData } = await supabase
+        .from('items')
+        .select(`
+          id,
+          name,
+          collection_id,
+          purchase_price,
+          collections(name)
+        `)
+        .in('collection_id', collectionIds)
+        .not('purchase_price', 'is', null)
+        .order('purchase_price', { ascending: false })
+        .limit(5)
+
+      // Get images for top items
+      let topItems: ChartData['topItems'] = []
+      if (topItemsData && topItemsData.length > 0) {
+        const itemIds = topItemsData.map(i => i.id)
+        const { data: images } = await supabase
+          .from('item_images')
+          .select('item_id, url')
+          .in('item_id', itemIds)
+          .order('sort_order')
+
+        const imageMap = new Map<string, string>()
+        images?.forEach(img => {
+          if (!imageMap.has(img.item_id)) {
+            imageMap.set(img.item_id, img.url)
+          }
+        })
+
+        topItems = topItemsData.map(item => ({
+          id: item.id,
+          name: item.name,
+          collection_id: item.collection_id,
+          collection_name: (item.collections as any)?.name || 'Unbekannt',
+          purchase_price: item.purchase_price,
+          image_url: imageMap.get(item.id)
+        }))
+      }
+
+      setChartData({
+        categoryDistribution,
+        collectionValues,
+        topItems,
+        statusDistribution,
+      })
+    } catch (error) {
+      console.error('Error loading chart data:', error)
+    }
   }
 
   async function loadDashboardStats(userId: string) {
@@ -147,6 +313,14 @@ function DashboardContent() {
             ➕ Neue Sammlung
           </Link>
         </div>
+
+        {/* Charts Section */}
+        <DashboardCharts
+          categoryDistribution={chartData.categoryDistribution}
+          collectionValues={chartData.collectionValues}
+          topItems={chartData.topItems}
+          statusDistribution={chartData.statusDistribution}
+        />
 
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">Kürzlich hinzugefügt</h2>
