@@ -179,8 +179,8 @@ export function AddToCollectionModal({
           if (!foundDuplicates.some(d => d.id === item.id)) {
             // Check if at least 2 words match
             const itemWords = item.name.toLowerCase().split(/\s+/)
-            const matchingWords = nameWords.filter(w =>
-              itemWords.some(iw => iw.includes(w) || w.includes(iw))
+            const matchingWords = nameWords.filter((w: string) =>
+              itemWords.some((iw: string) => iw.includes(w) || w.includes(iw))
             )
 
             if (matchingWords.length >= 2 ||
