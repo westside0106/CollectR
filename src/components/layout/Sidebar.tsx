@@ -10,11 +10,6 @@ export function Sidebar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
-  // Nicht auf Login/Register Seiten zeigen
-  if (pathname === '/login' || pathname === '/register') {
-    return null
-  }
-
   // Schließen wenn Route wechselt
   useEffect(() => {
     setIsOpen(false)
@@ -31,6 +26,11 @@ export function Sidebar() {
       document.body.style.overflow = ''
     }
   }, [isOpen])
+
+  // Nicht auf Login/Register Seiten zeigen (NACH den Hooks!)
+  if (pathname === '/login' || pathname === '/register') {
+    return null
+  }
 
   const mainLinks = [
     { href: '/', label: 'Dashboard', icon: '📊' },
