@@ -26,7 +26,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
   const { id: collectionId, itemId } = use(params)
   const router = useRouter()
   const supabase = createClient()
-  
+
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -60,9 +60,9 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         .select('*')
         .eq('collection_id', collectionId)
         .order('sort_order')
-      
+
       if (catData) setCategories(catData)
-      
+
       setLoading(false)
     }
     loadData()
@@ -75,13 +75,13 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         setAttributes([])
         return
       }
-      
+
       const { data } = await supabase
         .from('attribute_definitions')
         .select('*')
         .eq('category_id', selectedCategory)
         .order('sort_order')
-      
+
       if (data) setAttributes(data)
     }
     loadAttributes()
@@ -93,7 +93,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
     setError(null)
 
     const formData = new FormData(e.currentTarget)
-    
+
     const { error: updateError } = await supabase
       .from('items')
       .update({
@@ -124,42 +124,42 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
   }
 
   if (loading) {
-    return <div className="p-8">Laden...</div>
+    return <div className="p-8 dark:bg-slate-900 dark:text-white min-h-screen">Laden...</div>
   }
 
   if (!item) {
-    return <div className="p-8">Item nicht gefunden</div>
+    return <div className="p-8 dark:bg-slate-900 dark:text-white min-h-screen">Item nicht gefunden</div>
   }
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="p-8 max-w-3xl dark:bg-slate-900 min-h-screen">
       {/* Header */}
       <div className="mb-8">
-        <Link 
+        <Link
           href={`/collections/${collectionId}/items/${itemId}`}
-          className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1 mb-2"
+          className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm flex items-center gap-1 mb-2"
         >
           ← Zurück zum Item
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Item bearbeiten</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Item bearbeiten</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Bilder */}
-        <section className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <ImageUpload 
-            itemId={itemId} 
+        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+          <ImageUpload
+            itemId={itemId}
             existingImages={existingImages}
           />
         </section>
 
         {/* Basis-Informationen */}
-        <section className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <h2 className="text-lg font-semibold mb-4">Basis-Informationen</h2>
-          
+        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-lg font-semibold mb-4 dark:text-white">Basis-Informationen</h2>
+
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Name *
               </label>
               <input
@@ -168,12 +168,12 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 name="name"
                 required
                 defaultValue={item.name}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="description" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Beschreibung
               </label>
               <textarea
@@ -181,20 +181,20 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 name="description"
                 rows={2}
                 defaultValue={item.description || ''}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
               />
             </div>
 
             {categories.length > 0 && (
               <div>
-                <label htmlFor="category" className="block text-sm font-medium text-slate-700 mb-2">
+                <label htmlFor="category" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Kategorie
                 </label>
                 <select
                   id="category"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 >
                   <option value="">Keine Kategorie</option>
                   {categories.map((cat) => (
@@ -207,14 +207,14 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
             )}
 
             <div>
-              <label htmlFor="status" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="status" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Status
               </label>
               <select
                 id="status"
                 name="status"
                 defaultValue={item.status}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               >
                 <option value="in_collection">📦 In Sammlung</option>
                 <option value="wishlist">⭐ Wunschliste</option>
@@ -227,12 +227,12 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         </section>
 
         {/* Kauf-Informationen */}
-        <section className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <h2 className="text-lg font-semibold mb-4">Kauf-Informationen</h2>
-          
+        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-lg font-semibold mb-4 dark:text-white">Kauf-Informationen</h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="purchase_price" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="purchase_price" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Kaufpreis (€)
               </label>
               <input
@@ -242,12 +242,12 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 step="0.01"
                 min="0"
                 defaultValue={item.purchase_price || ''}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>
 
             <div>
-              <label htmlFor="purchase_date" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="purchase_date" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Kaufdatum
               </label>
               <input
@@ -255,12 +255,12 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 id="purchase_date"
                 name="purchase_date"
                 defaultValue={item.purchase_date || ''}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label htmlFor="purchase_location" className="block text-sm font-medium text-slate-700 mb-2">
+              <label htmlFor="purchase_location" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Gekauft bei
               </label>
               <input
@@ -268,7 +268,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 id="purchase_location"
                 name="purchase_location"
                 defaultValue={item.purchase_location || ''}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>
           </div>
@@ -276,14 +276,14 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
 
         {/* Dynamische Attribute */}
         {attributes.length > 0 && (
-          <section className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-            <h2 className="text-lg font-semibold mb-4">Kategorie-Attribute</h2>
-            
+          <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+            <h2 className="text-lg font-semibold mb-4 dark:text-white">Kategorie-Attribute</h2>
+
             <div className="space-y-4">
               {attributes.map((attr) => (
-                <DynamicField 
-                  key={attr.id} 
-                  attribute={attr} 
+                <DynamicField
+                  key={attr.id}
+                  attribute={attr}
                   value={attributeValues[attr.name]}
                   onChange={(value) => updateAttributeValue(attr.name, value)}
                 />
@@ -293,19 +293,19 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         )}
 
         {/* Notizen */}
-        <section className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <h2 className="text-lg font-semibold mb-4">Notizen</h2>
+        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-lg font-semibold mb-4 dark:text-white">Notizen</h2>
           <textarea
             id="notes"
             name="notes"
             rows={3}
             defaultValue={item.notes || ''}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
           />
         </section>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-lg border border-red-200 dark:border-red-800">
             {error}
           </div>
         )}
@@ -320,7 +320,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
           </button>
           <Link
             href={`/collections/${collectionId}/items/${itemId}`}
-            className="px-6 py-3 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors"
+            className="px-6 py-3 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           >
             Abbrechen
           </Link>
@@ -330,29 +330,32 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
   )
 }
 
-function DynamicField({ 
-  attribute, 
-  value, 
-  onChange 
-}: { 
+function DynamicField({
+  attribute,
+  value,
+  onChange
+}: {
   attribute: AttributeDefinition
   value: any
   onChange: (value: any) => void
 }) {
   const { name, display_name, type, options, required } = attribute
 
+  const inputClasses = "w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+  const labelClasses = "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+
   switch (type) {
     case 'text':
       return (
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className={labelClasses}>
             {display_name} {required && '*'}
           </label>
           <input
             type="text"
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            className={inputClasses}
             required={required}
           />
         </div>
@@ -361,7 +364,7 @@ function DynamicField({
     case 'number':
       return (
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className={labelClasses}>
             {display_name} {required && '*'}
           </label>
           <input
@@ -370,7 +373,7 @@ function DynamicField({
             onChange={(e) => onChange(e.target.value ? parseInt(e.target.value) : null)}
             min={options?.min}
             max={options?.max}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            className={inputClasses}
             required={required}
           />
         </div>
@@ -379,13 +382,13 @@ function DynamicField({
     case 'select':
       return (
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className={labelClasses}>
             {display_name} {required && '*'}
           </label>
           <select
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            className={inputClasses}
             required={required}
           >
             <option value="">Bitte wählen...</option>
@@ -404,9 +407,9 @@ function DynamicField({
             id={name}
             checked={value || false}
             onChange={(e) => onChange(e.target.checked)}
-            className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            className="w-5 h-5 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 bg-white dark:bg-slate-700"
           />
-          <label htmlFor={name} className="text-sm font-medium text-slate-700">
+          <label htmlFor={name} className="text-sm font-medium text-slate-700 dark:text-slate-300">
             {display_name}
           </label>
         </div>
@@ -415,14 +418,14 @@ function DynamicField({
     case 'date':
       return (
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className={labelClasses}>
             {display_name} {required && '*'}
           </label>
           <input
             type="date"
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            className={inputClasses}
             required={required}
           />
         </div>
@@ -431,7 +434,7 @@ function DynamicField({
     case 'tags':
       return (
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className={labelClasses}>
             {display_name}
           </label>
           <input
@@ -439,7 +442,7 @@ function DynamicField({
             value={Array.isArray(value) ? value.join(', ') : value || ''}
             onChange={(e) => onChange(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
             placeholder="Komma-getrennt"
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            className={inputClasses}
           />
         </div>
       )

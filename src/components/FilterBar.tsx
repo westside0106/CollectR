@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 interface FilterBarProps {
   categories: { id: string; name: string; icon: string | null }[]
   selectedCategory: string
@@ -45,44 +47,51 @@ export function FilterBar({
   maxPrice,
   onPriceChange,
 }: FilterBarProps) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  const activeFilterCount = [
+    selectedCategory,
+    selectedStatus,
+    minPrice,
+    maxPrice
+  ].filter(Boolean).length
+
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-200 space-y-4">
-      {/* Erste Zeile: Kategorie, Status, Sortierung */}
-      <div className="flex flex-wrap gap-3">
-        {/* Kategorie Filter */}
-        {categories.length > 0 && (
-          <select
-            value={selectedCategory}
-            onChange={(e) => onCategoryChange(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-          >
-            <option value="">Alle Kategorien</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.icon} {cat.name}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {/* Status Filter */}
-        <select
-          value={selectedStatus}
-          onChange={(e) => onStatusChange(e.target.value)}
-          className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+    <div className="space-y-3">
+      {/* Kompakte Filter-Zeile */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+            isExpanded || activeFilterCount > 0
+              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+              : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500'
+          }`}
         >
-          {STATUS_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          <span className="text-sm font-medium">Filter</span>
+          {activeFilterCount > 0 && (
+            <span className="bg-blue-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+              {activeFilterCount}
+            </span>
+          )}
+          <svg
+            className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
 
-        {/* Sortierung */}
+        {/* Sortierung immer sichtbar */}
         <select
           value={sortBy}
           onChange={(e) => onSortChange(e.target.value)}
-          className="px-4 py-2 rounded-lg border border-slate-200 bg-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+          className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
         >
           {SORT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -90,38 +99,100 @@ export function FilterBar({
             </option>
           ))}
         </select>
-
-        {/* Preis Filter */}
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            value={minPrice}
-            onChange={(e) => onPriceChange(e.target.value, maxPrice)}
-            placeholder="Min €"
-            className="w-24 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-          <span className="text-slate-400">–</span>
-          <input
-            type="number"
-            value={maxPrice}
-            onChange={(e) => onPriceChange(minPrice, e.target.value)}
-            placeholder="Max €"
-            className="w-24 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-          />
-        </div>
       </div>
 
-      {/* Aktive Filter Tags */}
-      <ActiveFilterTags
-        selectedCategory={selectedCategory}
-        categories={categories}
-        selectedStatus={selectedStatus}
-        minPrice={minPrice}
-        maxPrice={maxPrice}
-        onClearCategory={() => onCategoryChange('')}
-        onClearStatus={() => onStatusChange('')}
-        onClearPrice={() => onPriceChange('', '')}
-      />
+      {/* Erweiterte Filter (aufklappbar) */}
+      {isExpanded && (
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+          <div className="flex flex-wrap gap-3">
+            {/* Kategorie Filter */}
+            {categories.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Kategorie</label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => onCategoryChange(e.target.value)}
+                  className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+                >
+                  <option value="">Alle Kategorien</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.icon} {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Status Filter */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Status</label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => onStatusChange(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                {STATUS_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Preis Filter */}
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Preis</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={minPrice}
+                  onChange={(e) => onPriceChange(e.target.value, maxPrice)}
+                  placeholder="Min €"
+                  className="w-24 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                />
+                <span className="text-slate-400 dark:text-slate-500">–</span>
+                <input
+                  type="number"
+                  value={maxPrice}
+                  onChange={(e) => onPriceChange(minPrice, e.target.value)}
+                  placeholder="Max €"
+                  className="w-24 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Aktive Filter Tags */}
+          <ActiveFilterTags
+            selectedCategory={selectedCategory}
+            categories={categories}
+            selectedStatus={selectedStatus}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onClearCategory={() => onCategoryChange('')}
+            onClearStatus={() => onStatusChange('')}
+            onClearPrice={() => onPriceChange('', '')}
+          />
+        </div>
+      )}
+
+      {/* Kompakte aktive Filter Anzeige wenn eingeklappt */}
+      {!isExpanded && activeFilterCount > 0 && (
+        <div className="flex flex-wrap gap-2">
+          <ActiveFilterTags
+            selectedCategory={selectedCategory}
+            categories={categories}
+            selectedStatus={selectedStatus}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onClearCategory={() => onCategoryChange('')}
+            onClearStatus={() => onStatusChange('')}
+            onClearPrice={() => onPriceChange('', '')}
+            compact
+          />
+        </div>
+      )}
     </div>
   )
 }
@@ -135,6 +206,7 @@ function ActiveFilterTags({
   onClearCategory,
   onClearStatus,
   onClearPrice,
+  compact = false,
 }: {
   selectedCategory: string
   categories: { id: string; name: string; icon: string | null }[]
@@ -144,36 +216,37 @@ function ActiveFilterTags({
   onClearCategory: () => void
   onClearStatus: () => void
   onClearPrice: () => void
+  compact?: boolean
 }) {
   const hasFilters = selectedCategory || selectedStatus || minPrice || maxPrice
-  
+
   if (!hasFilters) return null
 
   const category = categories.find(c => c.id === selectedCategory)
   const status = STATUS_OPTIONS.find(s => s.value === selectedStatus)
 
   return (
-    <div className="flex flex-wrap gap-2">
-      <span className="text-sm text-slate-500">Aktive Filter:</span>
-      
+    <div className="flex flex-wrap gap-2 items-center">
+      {!compact && <span className="text-sm text-slate-500 dark:text-slate-400">Aktive Filter:</span>}
+
       {category && (
-        <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+        <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full text-sm">
           {category.icon} {category.name}
-          <button onClick={onClearCategory} className="hover:text-blue-900">✕</button>
+          <button onClick={onClearCategory} className="hover:text-blue-900 dark:hover:text-blue-100">✕</button>
         </span>
       )}
-      
+
       {status && selectedStatus && (
-        <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
+        <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 rounded-full text-sm">
           {status.label}
-          <button onClick={onClearStatus} className="hover:text-green-900">✕</button>
+          <button onClick={onClearStatus} className="hover:text-green-900 dark:hover:text-green-100">✕</button>
         </span>
       )}
-      
+
       {(minPrice || maxPrice) && (
-        <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+        <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-full text-sm">
           {minPrice || '0'}€ – {maxPrice || '∞'}€
-          <button onClick={onClearPrice} className="hover:text-purple-900">✕</button>
+          <button onClick={onClearPrice} className="hover:text-purple-900 dark:hover:text-purple-100">✕</button>
         </span>
       )}
     </div>
