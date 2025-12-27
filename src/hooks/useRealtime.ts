@@ -2,9 +2,15 @@
 
 import { useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js'
+import { RealtimeChannel } from '@supabase/supabase-js'
 
 type PostgresChangeEvent = 'INSERT' | 'UPDATE' | 'DELETE' | '*'
+
+interface RealtimePayload {
+  eventType: 'INSERT' | 'UPDATE' | 'DELETE'
+  new: Record<string, unknown>
+  old: Record<string, unknown>
+}
 
 interface UseRealtimeOptions<T> {
   table: string
@@ -43,7 +49,7 @@ export function useRealtime<T extends Record<string, unknown>>({
   const channelRef = useRef<RealtimeChannel | null>(null)
 
   const handleChange = useCallback(
-    (payload: RealtimePostgresChangesPayload<T>) => {
+    (payload: RealtimePayload) => {
       const { eventType, new: newRecord, old: oldRecord } = payload
 
       if (eventType === 'INSERT' && onInsert && newRecord) {
@@ -66,28 +72,17 @@ export function useRealtime<T extends Record<string, unknown>>({
     // Eindeutiger Channel-Name
     const channelName = `${table}-${filter || 'all'}-${Date.now()}`
 
-    // Channel konfigurieren
-    const channelConfig: {
-      event: PostgresChangeEvent
-      schema: string
-      table: string
-      filter?: string
-    } = {
-      event,
-      schema,
-      table
-    }
-
-    if (filter) {
-      channelConfig.filter = filter
-    }
-
     const channel = supabase
       .channel(channelName)
       .on(
-        'postgres_changes',
-        channelConfig,
-        handleChange
+        'postgres_changes' as const,
+        {
+          event,
+          schema,
+          table,
+          ...(filter ? { filter } : {})
+        },
+        (payload) => handleChange(payload as unknown as RealtimePayload)
       )
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
