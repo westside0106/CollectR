@@ -201,35 +201,35 @@ export default function CollectionDetailPage({ params }: PageProps) {
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors"
+              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200"
             >
               ⋯
             </button>
             {showMenu && (
               <>
-                <div 
-                  className="fixed inset-0 z-10" 
-                  onClick={() => setShowMenu(false)} 
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowMenu(false)}
                 />
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 z-20 py-1">
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 z-20 py-1">
                   <Link
                     href={`/collections/${id}/import`}
-                    className="block px-4 py-2 hover:bg-slate-50 text-sm"
+                    className="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm text-slate-700 dark:text-slate-200"
                     onClick={() => setShowMenu(false)}
                   >
                     📥 Import (CSV/JSON)
                   </Link>
                   <Link
                     href={`/collections/${id}/export`}
-                    className="block px-4 py-2 hover:bg-slate-50 text-sm"
+                    className="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm text-slate-700 dark:text-slate-200"
                     onClick={() => setShowMenu(false)}
                   >
                     📤 Export
                   </Link>
-                  <hr className="my-1" />
+                  <hr className="my-1 border-slate-200 dark:border-slate-700" />
                   <Link
                     href={`/collections/${id}/categories`}
-                    className="block px-4 py-2 hover:bg-slate-50 text-sm"
+                    className="block px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 text-sm text-slate-700 dark:text-slate-200"
                     onClick={() => setShowMenu(false)}
                   >
                     🏷️ Kategorien verwalten
