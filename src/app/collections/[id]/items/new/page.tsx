@@ -6,6 +6,9 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { use } from 'react'
 import { ImageUpload } from '@/components/ImageUpload'
+import { useToast } from '@/components/Toast'
+import { AIAnalyzeButton, AIAnalysisResult } from '@/components/AIAnalyzeButton'
+import { AIResultModal } from '@/components/AIResultModal'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -15,6 +18,7 @@ export default function NewItemPage({ params }: PageProps) {
   const { id: collectionId } = use(params)
   const router = useRouter()
   const supabase = createClient()
+  const { showToast } = useToast()
 
   const [userId, setUserId] = useState<string | null>(null)
   const [collection, setCollection] = useState<any>(null)
@@ -27,6 +31,7 @@ export default function NewItemPage({ params }: PageProps) {
   const [categoryId, setCategoryId] = useState('')
   const [status, setStatus] = useState('in_collection')
   const [purchasePrice, setPurchasePrice] = useState('')
+  const [estimatedValue, setEstimatedValue] = useState('')
   const [purchaseDate, setPurchaseDate] = useState('')
   const [purchaseLocation, setPurchaseLocation] = useState('')
   const [barcode, setBarcode] = useState('')
@@ -35,9 +40,46 @@ export default function NewItemPage({ params }: PageProps) {
   
   // NEU: State für Bilder (vor dem Upload)
   const [pendingImages, setPendingImages] = useState<{ url: string; file?: File }[]>([])
-  
+
+  // KI-Analyse State
+  const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null)
+  const [showAiModal, setShowAiModal] = useState(false)
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Collection-Typ für KI-Analyse ermitteln
+  const getCollectionType = (): string | undefined => {
+    const collectionName = collection?.name?.toLowerCase() || ''
+    if (collectionName.includes('hot wheels') || collectionName.includes('modellauto')) return 'hot-wheels'
+    if (collectionName.includes('münz')) return 'coins'
+    if (collectionName.includes('briefmark')) return 'stamps'
+    if (collectionName.includes('vinyl') || collectionName.includes('schallplatte')) return 'vinyl'
+    if (collectionName.includes('lego')) return 'lego'
+    if (collectionName.includes('uhr')) return 'watches'
+    return undefined
+  }
+
+  // KI-Ergebnisse anwenden
+  function applyAiResult(result: Partial<AIAnalysisResult>) {
+    if (result.name) setName(result.name)
+    if (result.description) setDescription(result.description)
+    if (result.estimatedValue) {
+      // Mittleren Wert als Schätzung nehmen
+      const avgValue = (result.estimatedValue.min + result.estimatedValue.max) / 2
+      setEstimatedValue(avgValue.toFixed(2))
+    }
+    if (result.attributes) {
+      setAttributeValues(prev => ({ ...prev, ...result.attributes }))
+    }
+    showToast('KI-Vorschläge übernommen!')
+  }
+
+  // Handler für KI-Analyse Ergebnis
+  function handleAiResult(result: AIAnalysisResult) {
+    setAiResult(result)
+    setShowAiModal(true)
+  }
 
   useEffect(() => {
     async function loadData() {
@@ -109,6 +151,7 @@ export default function NewItemPage({ params }: PageProps) {
           description: description || null,
           status,
           purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
+          estimated_value: estimatedValue ? parseFloat(estimatedValue) : null,
           purchase_date: purchaseDate || null,
           purchase_location: purchaseLocation || null,
           barcode: barcode || null,
@@ -152,6 +195,7 @@ export default function NewItemPage({ params }: PageProps) {
         }
       }
 
+      showToast('Item erstellt!')
       router.push(`/collections/${collectionId}/items/${data.id}`)
     } catch (err: any) {
       setError(err.message || 'Ein Fehler ist aufgetreten')
@@ -160,61 +204,81 @@ export default function NewItemPage({ params }: PageProps) {
   }
 
   return (
-    <div className="p-4 sm:p-8 max-w-3xl">
+    <div className="p-4 sm:p-8 max-w-3xl dark:bg-slate-900 min-h-screen">
       <div className="mb-8">
         <Link
           href={`/collections/${collectionId}`}
-          className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1 mb-2"
+          className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm flex items-center gap-1 mb-2"
         >
           ← Zurück zur Sammlung
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Neues Item</h1>
-        <p className="text-slate-500 mt-1">{collection?.name}</p>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Neues Item</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">{collection?.name}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* NEU: Bilder-Upload Sektion */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <ImageUpload 
-            onImagesChange={(images) => setPendingImages(images)}
-          />
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <ImageUpload
+              onImagesChange={(images) => setPendingImages(images)}
+            />
+          </div>
+
+          {/* KI-Analyse Button - nur wenn Bild vorhanden */}
+          {pendingImages.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-3">
+                <AIAnalyzeButton
+                  imageUrl={pendingImages[0].url}
+                  imageFile={pendingImages[0].file}
+                  collectionType={getCollectionType()}
+                  existingAttributes={attributes.map(a => a.display_name)}
+                  onResult={handleAiResult}
+                />
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  KI analysiert das Bild und füllt Felder automatisch aus
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Basis-Infos */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <h2 className="font-semibold mb-4">Basis-Informationen</h2>
-          
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="font-semibold mb-4 dark:text-white">Basis-Informationen</h2>
+
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name *</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="z.B. '67 Camaro"
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Beschreibung</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Beschreibung</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 placeholder="Optional..."
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Kategorie</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kategorie</label>
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                 >
                   <option value="">-- Keine --</option>
                   {categories.map(cat => (
@@ -226,11 +290,11 @@ export default function NewItemPage({ params }: PageProps) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Status</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                 >
                   <option value="in_collection">📦 In Sammlung</option>
                   <option value="wishlist">⭐ Wunschliste</option>
@@ -242,53 +306,65 @@ export default function NewItemPage({ params }: PageProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Barcode</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Barcode</label>
               <input
                 type="text"
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
                 placeholder="EAN/UPC..."
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none font-mono"
               />
             </div>
           </div>
         </div>
 
         {/* Kauf-Infos */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <h2 className="font-semibold mb-4">Kauf-Informationen</h2>
-          
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="font-semibold mb-4 dark:text-white">Kauf-Informationen</h2>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Kaufpreis (€)</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kaufpreis / EK (€)</label>
               <input
                 type="number"
                 step="0.01"
                 value={purchasePrice}
                 onChange={(e) => setPurchasePrice(e.target.value)}
                 placeholder="0.00"
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Kaufdatum</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Geschätzter Wert / VK (€)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={estimatedValue}
+                onChange={(e) => setEstimatedValue(e.target.value)}
+                placeholder="0.00"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kaufdatum</label>
               <input
                 type="date"
                 value={purchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
 
-            <div className="col-span-1 sm:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Gekauft bei</label>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Gekauft bei</label>
               <input
                 type="text"
                 value={purchaseLocation}
                 onChange={(e) => setPurchaseLocation(e.target.value)}
                 placeholder="z.B. eBay, Flohmarkt..."
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
               />
             </div>
           </div>
@@ -296,24 +372,24 @@ export default function NewItemPage({ params }: PageProps) {
 
         {/* Dynamische Attribute */}
         {attributes.length > 0 && (
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-            <h2 className="font-semibold mb-4">Kategorie-Attribute</h2>
-            
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+            <h2 className="font-semibold mb-4 dark:text-white">Kategorie-Attribute</h2>
+
             <div className="space-y-4">
               {attributes.map(attr => (
                 <div key={attr.id}>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     {attr.display_name}
                     {attr.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
-                  
+
                   {attr.type === 'text' && (
                     <input
                       type="text"
                       value={attributeValues[attr.name] || ''}
                       onChange={(e) => setAttributeValues({...attributeValues, [attr.name]: e.target.value})}
                       required={attr.required}
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                     />
                   )}
 
@@ -325,7 +401,7 @@ export default function NewItemPage({ params }: PageProps) {
                       required={attr.required}
                       min={attr.options?.min}
                       max={attr.options?.max}
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                     />
                   )}
 
@@ -334,7 +410,7 @@ export default function NewItemPage({ params }: PageProps) {
                       value={attributeValues[attr.name] || ''}
                       onChange={(e) => setAttributeValues({...attributeValues, [attr.name]: e.target.value})}
                       required={attr.required}
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                     >
                       <option value="">-- Auswählen --</option>
                       {attr.options?.choices?.map((choice: string) => (
@@ -352,9 +428,9 @@ export default function NewItemPage({ params }: PageProps) {
                         type="checkbox"
                         checked={attributeValues[attr.name] || false}
                         onChange={(e) => setAttributeValues({...attributeValues, [attr.name]: e.target.checked})}
-                        className="w-5 h-5 rounded border-slate-300"
+                        className="w-5 h-5 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
                       />
-                      <span className="text-slate-600">Ja</span>
+                      <span className="text-slate-600 dark:text-slate-300">Ja</span>
                     </label>
                   )}
 
@@ -364,7 +440,7 @@ export default function NewItemPage({ params }: PageProps) {
                       value={attributeValues[attr.name] || ''}
                       onChange={(e) => setAttributeValues({...attributeValues, [attr.name]: e.target.value})}
                       required={attr.required}
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                     />
                   )}
 
@@ -374,7 +450,7 @@ export default function NewItemPage({ params }: PageProps) {
                       value={Array.isArray(attributeValues[attr.name]) ? attributeValues[attr.name].join(', ') : attributeValues[attr.name] || ''}
                       onChange={(e) => setAttributeValues({...attributeValues, [attr.name]: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})}
                       placeholder="Komma-getrennt"
-                      className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                     />
                   )}
                 </div>
@@ -384,20 +460,20 @@ export default function NewItemPage({ params }: PageProps) {
         )}
 
         {/* Notizen */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <h2 className="font-semibold mb-4">Notizen</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="font-semibold mb-4 dark:text-white">Notizen</h2>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             placeholder="Weitere Notizen..."
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+            className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
           />
         </div>
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-lg">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-lg border border-red-200 dark:border-red-800">
             {error}
           </div>
         )}
@@ -413,12 +489,21 @@ export default function NewItemPage({ params }: PageProps) {
           </button>
           <Link
             href={`/collections/${collectionId}`}
-            className="px-6 py-3 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors"
+            className="px-6 py-3 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
           >
             Abbrechen
           </Link>
         </div>
       </form>
+
+      {/* KI-Ergebnis Modal */}
+      {showAiModal && aiResult && (
+        <AIResultModal
+          result={aiResult}
+          onApply={applyAiResult}
+          onClose={() => setShowAiModal(false)}
+        />
+      )}
     </div>
   )
 }

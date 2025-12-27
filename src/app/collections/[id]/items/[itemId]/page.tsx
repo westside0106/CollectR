@@ -116,14 +116,14 @@ export default async function ItemDetailPage({ params }: PageProps) {
             </section>
           )}
 
-          {/* Purchase Info */}
+          {/* Purchase Info & Value */}
           <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
             <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Kauf-Informationen</h2>
             <div className="grid grid-cols-2 gap-4">
               {item.purchase_price !== null && item.purchase_price !== undefined && (
                 <div>
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Kaufpreis</p>
-                  <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Kaufpreis (EK)</p>
+                  <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
                     {item.purchase_price.toLocaleString('de-DE', {
                       style: 'currency',
                       currency: item.purchase_currency || 'EUR'
@@ -131,6 +131,60 @@ export default async function ItemDetailPage({ params }: PageProps) {
                   </p>
                 </div>
               )}
+              {item.estimated_value !== null && item.estimated_value !== undefined && (
+                <div>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Geschätzter Wert (VK)</p>
+                  <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                    {item.estimated_value.toLocaleString('de-DE', {
+                      style: 'currency',
+                      currency: item.purchase_currency || 'EUR'
+                    })}
+                  </p>
+                </div>
+              )}
+
+              {/* Marge/Gewinn Anzeige */}
+              {item.purchase_price !== null && item.estimated_value !== null &&
+               item.purchase_price !== undefined && item.estimated_value !== undefined && (
+                <div className="col-span-2 mt-2 p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Marge / Gewinn</p>
+                      {(() => {
+                        const margin = item.estimated_value - item.purchase_price
+                        const marginPercent = item.purchase_price > 0
+                          ? ((margin / item.purchase_price) * 100).toFixed(1)
+                          : 0
+                        const isProfit = margin >= 0
+
+                        return (
+                          <div className="flex items-center gap-3">
+                            <p className={`text-2xl font-bold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                              {isProfit ? '+' : ''}{margin.toLocaleString('de-DE', {
+                                style: 'currency',
+                                currency: item.purchase_currency || 'EUR'
+                              })}
+                            </p>
+                            <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                              isProfit
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400'
+                                : 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400'
+                            }`}>
+                              {isProfit ? '+' : ''}{marginPercent}%
+                            </span>
+                          </div>
+                        )
+                      })()}
+                    </div>
+                    <div className={`text-4xl ${
+                      (item.estimated_value - item.purchase_price) >= 0 ? 'text-green-500' : 'text-red-500'
+                    }`}>
+                      {(item.estimated_value - item.purchase_price) >= 0 ? '📈' : '📉'}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {item.purchase_date && (
                 <div>
                   <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Kaufdatum</p>
@@ -144,12 +198,12 @@ export default async function ItemDetailPage({ params }: PageProps) {
                 </div>
               )}
               {item.purchase_location && (
-                <div className="col-span-2">
+                <div>
                   <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Gekauft bei</p>
                   <p className="font-medium text-slate-900 dark:text-white">{item.purchase_location}</p>
                 </div>
               )}
-              {!item.purchase_price && !item.purchase_date && !item.purchase_location && (
+              {!item.purchase_price && !item.purchase_date && !item.purchase_location && !item.estimated_value && (
                 <p className="col-span-2 text-slate-400 dark:text-slate-500 italic">
                   Keine Kaufinformationen hinterlegt
                 </p>

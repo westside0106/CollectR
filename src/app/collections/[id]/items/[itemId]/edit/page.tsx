@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { use } from 'react'
 import { ImageUpload } from '@/components/ImageUpload'
+import { useToast } from '@/components/Toast'
 
 interface Category {
   id: string
@@ -26,6 +27,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
   const { id: collectionId, itemId } = use(params)
   const router = useRouter()
   const supabase = createClient()
+  const { showToast } = useToast()
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -101,6 +103,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         name: formData.get('name') as string,
         description: formData.get('description') as string || null,
         purchase_price: formData.get('purchase_price') ? parseFloat(formData.get('purchase_price') as string) : null,
+        estimated_value: formData.get('estimated_value') ? parseFloat(formData.get('estimated_value') as string) : null,
         purchase_date: formData.get('purchase_date') as string || null,
         purchase_location: formData.get('purchase_location') as string || null,
         notes: formData.get('notes') as string || null,
@@ -115,6 +118,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
       return
     }
 
+    showToast('Item gespeichert!')
     router.push(`/collections/${collectionId}/items/${itemId}`)
     router.refresh()
   }
@@ -124,7 +128,57 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
   }
 
   if (loading) {
-    return <div className="p-8 dark:bg-slate-900 dark:text-white min-h-screen">Laden...</div>
+    return (
+      <div className="p-4 sm:p-8 max-w-3xl dark:bg-slate-900 min-h-screen">
+        {/* Header Skeleton */}
+        <div className="mb-8">
+          <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-2" />
+          <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+        </div>
+
+        {/* Form Sections Skeleton */}
+        <div className="space-y-6">
+          {/* Images */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
+            <div className="flex gap-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="w-24 h-24 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          </div>
+
+          {/* Basic Info */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+            <div className="h-5 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
+            <div className="space-y-4">
+              <div className="h-12 w-full bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+              <div className="h-20 w-full bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+                <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+              </div>
+            </div>
+          </div>
+
+          {/* Purchase Info */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+            <div className="h-5 w-36 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
+            <div className="grid grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-4">
+            <div className="flex-1 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+            <div className="w-32 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (!item) {
@@ -233,7 +287,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="purchase_price" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Kaufpreis (€)
+                Kaufpreis / EK (€)
               </label>
               <input
                 type="number"
@@ -242,6 +296,21 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 step="0.01"
                 min="0"
                 defaultValue={item.purchase_price || ''}
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="estimated_value" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Geschätzter Wert / VK (€)
+              </label>
+              <input
+                type="number"
+                id="estimated_value"
+                name="estimated_value"
+                step="0.01"
+                min="0"
+                defaultValue={item.estimated_value || ''}
                 className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>

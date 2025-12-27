@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { useToast } from '@/components/Toast'
 
 // Preset-Definitionen für verschiedene Sammlungstypen
 const COLLECTION_PRESETS = [
@@ -223,6 +224,7 @@ const COLLECTION_PRESETS = [
 export default function NewCollectionPage() {
   const router = useRouter()
   const supabase = createClient()
+  const { showToast } = useToast()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [selectedPreset, setSelectedPreset] = useState('custom')
@@ -311,37 +313,39 @@ export default function NewCollectionPage() {
         }
       }
 
+      showToast('Sammlung erstellt!')
       router.push(`/collections/${collection.id}`)
     } catch (err: any) {
       setError(err.message || 'Ein Fehler ist aufgetreten')
+      showToast('Fehler beim Erstellen', 'error')
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+      <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/" className="text-2xl font-bold text-gray-900">📦 CollectR</Link>
-          <span className="text-gray-400">/</span>
-          <Link href="/collections" className="text-gray-600 hover:text-gray-900">Sammlungen</Link>
-          <span className="text-gray-400">/</span>
-          <span className="text-gray-600">Neu</span>
+          <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
+          <span className="text-gray-400 dark:text-slate-500">/</span>
+          <Link href="/collections" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white">Sammlungen</Link>
+          <span className="text-gray-400 dark:text-slate-500">/</span>
+          <span className="text-gray-600 dark:text-slate-400">Neu</span>
         </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6">Neue Sammlung erstellen</h1>
+        <h1 className="text-2xl font-bold mb-6 dark:text-white">Neue Sammlung erstellen</h1>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 space-y-6 border border-slate-200 dark:border-slate-700">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm border border-red-200 dark:border-red-800">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Name *
             </label>
             <input
@@ -349,27 +353,27 @@ export default function NewCollectionPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
               placeholder="z.B. Meine Hot Wheels Sammlung"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Beschreibung
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
               placeholder="Optional: Beschreibe deine Sammlung..."
             />
           </div>
 
           {/* Preset-Auswahl */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">
               Vorlage (Optional)
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -380,17 +384,17 @@ export default function NewCollectionPage() {
                   onClick={() => setSelectedPreset(preset.id)}
                   className={`p-3 rounded-lg border-2 text-left transition-all ${
                     selectedPreset === preset.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                      : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 hover:bg-gray-50 dark:hover:bg-slate-700'
                   }`}
                 >
                   <div className="text-xl mb-1">{preset.icon}</div>
-                  <div className="text-sm font-medium text-gray-900 truncate">{preset.name}</div>
+                  <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{preset.name}</div>
                 </button>
               ))}
             </div>
             {selectedPreset !== 'custom' && (
-              <p className="mt-3 text-sm text-gray-500">
+              <p className="mt-3 text-sm text-gray-500 dark:text-slate-400">
                 {COLLECTION_PRESETS.find(p => p.id === selectedPreset)?.description}
                 {' '}Kategorien und Attribute werden automatisch erstellt.
               </p>
@@ -407,7 +411,7 @@ export default function NewCollectionPage() {
             </button>
             <Link
               href="/collections"
-              className="px-6 py-3 border rounded-lg hover:bg-gray-50 transition text-center"
+              className="px-6 py-3 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition text-center dark:text-slate-300"
             >
               Abbrechen
             </Link>

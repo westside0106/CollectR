@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 interface PieChartData {
   label: string
   value: number
@@ -10,6 +12,14 @@ interface BarChartData {
   label: string
   value: number
   color: string
+}
+
+interface CollectionFinancials {
+  name: string
+  spent: number      // Ausgaben (Kaufpreis)
+  value: number      // Geschätzter Wert
+  profit: number     // Gewinn/Verlust
+  itemCount: number
 }
 
 interface DashboardChartsProps {
@@ -24,6 +34,7 @@ interface DashboardChartsProps {
     image_url?: string
   }[]
   statusDistribution: PieChartData[]
+  collectionFinancials?: CollectionFinancials[]
 }
 
 // Color palette for charts
@@ -134,43 +145,231 @@ function ChartLegend({ data }: { data: PieChartData[] }) {
   )
 }
 
+// Tab Button Component
+function TabButton({
+  active,
+  onClick,
+  children
+}: {
+  active: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+        active
+          ? 'bg-blue-600 text-white'
+          : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+// Financial Summary Bar Chart
+function FinancialBarChart({ data, type }: { data: CollectionFinancials[], type: 'spent' | 'value' | 'profit' }) {
+  const maxValue = Math.max(...data.map(d => Math.abs(d[type])), 1)
+  const maxHeight = 120
+
+  const getColor = (value: number) => {
+    if (type === 'profit') {
+      return value >= 0 ? '#10B981' : '#EF4444'
+    }
+    if (type === 'spent') return '#3B82F6'
+    return '#8B5CF6'
+  }
+
+  const formatValue = (value: number) => {
+    return value.toLocaleString('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 })
+  }
+
+  return (
+    <div className="flex items-end justify-center gap-2 h-44 pt-6">
+      {data.slice(0, 6).map((item, index) => {
+        const value = item[type]
+        const height = (Math.abs(value) / maxValue) * maxHeight
+        const isNegative = value < 0
+
+        return (
+          <div key={index} className="flex flex-col items-center gap-1 min-w-0 flex-1 max-w-20">
+            <div className={`text-xs font-medium text-center ${isNegative ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
+              {formatValue(value)}
+            </div>
+            <div
+              className="w-full max-w-12 rounded-t-lg transition-all hover:opacity-80"
+              style={{
+                height: `${Math.max(height, 4)}px`,
+                backgroundColor: getColor(value),
+              }}
+              title={`${item.name}: ${formatValue(value)}`}
+            />
+            <div className="text-xs text-gray-600 dark:text-gray-400 text-center truncate w-full" title={item.name}>
+              {item.name.length > 8 ? item.name.slice(0, 8) + '...' : item.name}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+// Financial Summary Stats
+function FinancialSummary({ data }: { data: CollectionFinancials[] }) {
+  const totals = data.reduce(
+    (acc, item) => ({
+      spent: acc.spent + item.spent,
+      value: acc.value + item.value,
+      profit: acc.profit + item.profit,
+    }),
+    { spent: 0, value: 0, profit: 0 }
+  )
+
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
+  }
+
+  return (
+    <div className="grid grid-cols-3 gap-3 mb-4">
+      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 text-center">
+        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+          {formatCurrency(totals.spent)}
+        </div>
+        <div className="text-xs text-blue-600/70 dark:text-blue-400/70">Ausgaben</div>
+      </div>
+      <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 text-center">
+        <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+          {formatCurrency(totals.value)}
+        </div>
+        <div className="text-xs text-purple-600/70 dark:text-purple-400/70">Wert</div>
+      </div>
+      <div className={`rounded-lg p-3 text-center ${
+        totals.profit >= 0
+          ? 'bg-green-50 dark:bg-green-900/20'
+          : 'bg-red-50 dark:bg-red-900/20'
+      }`}>
+        <div className={`text-lg font-bold ${
+          totals.profit >= 0
+            ? 'text-green-600 dark:text-green-400'
+            : 'text-red-600 dark:text-red-400'
+        }`}>
+          {totals.profit >= 0 ? '+' : ''}{formatCurrency(totals.profit)}
+        </div>
+        <div className={`text-xs ${
+          totals.profit >= 0
+            ? 'text-green-600/70 dark:text-green-400/70'
+            : 'text-red-600/70 dark:text-red-400/70'
+        }`}>
+          {totals.profit >= 0 ? 'Gewinn' : 'Verlust'}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function DashboardCharts({
   categoryDistribution,
   collectionValues,
   topItems,
   statusDistribution,
+  collectionFinancials = [],
 }: DashboardChartsProps) {
+  const [distributionTab, setDistributionTab] = useState<'category' | 'status'>('category')
+  const [financialTab, setFinancialTab] = useState<'spent' | 'value' | 'profit'>('spent')
+
   const hasCategories = categoryDistribution.length > 0
   const hasCollectionValues = collectionValues.length > 0 && collectionValues.some(c => c.value > 0)
   const hasTopItems = topItems.length > 0
   const hasStatus = statusDistribution.length > 0
+  const hasFinancials = collectionFinancials.length > 0
 
-  if (!hasCategories && !hasCollectionValues && !hasTopItems && !hasStatus) {
+  if (!hasCategories && !hasCollectionValues && !hasTopItems && !hasStatus && !hasFinancials) {
     return null
   }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      {/* Category Distribution Pie Chart */}
-      {hasCategories && (
+      {/* Distribution Chart with Tabs (Category / Status) */}
+      {(hasCategories || hasStatus) && (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Verteilung nach Kategorie</h3>
-          <PieChart data={categoryDistribution} />
-          <ChartLegend data={categoryDistribution} />
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Verteilung</h3>
+            <div className="flex gap-1 bg-gray-100 dark:bg-slate-700 rounded-lg p-1">
+              <TabButton
+                active={distributionTab === 'category'}
+                onClick={() => setDistributionTab('category')}
+              >
+                Kategorie
+              </TabButton>
+              <TabButton
+                active={distributionTab === 'status'}
+                onClick={() => setDistributionTab('status')}
+              >
+                Status
+              </TabButton>
+            </div>
+          </div>
+
+          {distributionTab === 'category' && hasCategories && (
+            <>
+              <PieChart data={categoryDistribution} />
+              <ChartLegend data={categoryDistribution} />
+            </>
+          )}
+
+          {distributionTab === 'status' && hasStatus && (
+            <>
+              <PieChart data={statusDistribution} size={180} />
+              <ChartLegend data={statusDistribution} />
+            </>
+          )}
+
+          {distributionTab === 'category' && !hasCategories && (
+            <p className="text-center text-gray-500 dark:text-gray-400 py-8">Keine Kategorien vorhanden</p>
+          )}
+
+          {distributionTab === 'status' && !hasStatus && (
+            <p className="text-center text-gray-500 dark:text-gray-400 py-8">Keine Status-Daten vorhanden</p>
+          )}
         </div>
       )}
 
-      {/* Status Distribution Pie Chart */}
-      {hasStatus && (
+      {/* Financial Overview with Tabs (Ausgaben / Wert / Gewinn) */}
+      {hasFinancials && (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Status-Verteilung</h3>
-          <PieChart data={statusDistribution} size={180} />
-          <ChartLegend data={statusDistribution} />
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Finanzen</h3>
+            <div className="flex gap-1 bg-gray-100 dark:bg-slate-700 rounded-lg p-1">
+              <TabButton
+                active={financialTab === 'spent'}
+                onClick={() => setFinancialTab('spent')}
+              >
+                Ausgaben
+              </TabButton>
+              <TabButton
+                active={financialTab === 'value'}
+                onClick={() => setFinancialTab('value')}
+              >
+                Wert
+              </TabButton>
+              <TabButton
+                active={financialTab === 'profit'}
+                onClick={() => setFinancialTab('profit')}
+              >
+                Gewinn
+              </TabButton>
+            </div>
+          </div>
+
+          <FinancialSummary data={collectionFinancials} />
+          <FinancialBarChart data={collectionFinancials} type={financialTab} />
         </div>
       )}
 
-      {/* Value by Collection Bar Chart */}
-      {hasCollectionValues && (
+      {/* Value by Collection Bar Chart (fallback if no financials) */}
+      {hasCollectionValues && !hasFinancials && (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Wert nach Sammlung</h3>
           <BarChart data={collectionValues} />

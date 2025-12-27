@@ -18,6 +18,13 @@ interface ChartData {
     image_url?: string
   }[]
   statusDistribution: { label: string; value: number; color: string }[]
+  collectionFinancials: {
+    name: string
+    spent: number
+    value: number
+    profit: number
+    itemCount: number
+  }[]
 }
 
 function DashboardContent() {
@@ -36,6 +43,7 @@ function DashboardContent() {
     collectionValues: [],
     topItems: [],
     statusDistribution: [],
+    collectionFinancials: [],
   })
 
   useEffect(() => {
@@ -80,6 +88,7 @@ function DashboardContent() {
           collection_id,
           category_id,
           purchase_price,
+          estimated_value,
           status,
           categories(name)
         `)
@@ -147,6 +156,28 @@ function DashboardContent() {
         .sort((a, b) => b.value - a.value)
         .slice(0, 6)
 
+      // Collection Financials (Ausgaben / Wert / Gewinn pro Sammlung)
+      const financialsMap = new Map<string, { spent: number; value: number; itemCount: number }>()
+      items.forEach(item => {
+        const current = financialsMap.get(item.collection_id) || { spent: 0, value: 0, itemCount: 0 }
+        financialsMap.set(item.collection_id, {
+          spent: current.spent + (item.purchase_price || 0),
+          value: current.value + (item.estimated_value || item.purchase_price || 0),
+          itemCount: current.itemCount + 1,
+        })
+      })
+
+      const collectionFinancials = Array.from(financialsMap.entries())
+        .map(([collId, data]) => ({
+          name: collectionMap.get(collId) || 'Unbekannt',
+          spent: data.spent,
+          value: data.value,
+          profit: data.value - data.spent,
+          itemCount: data.itemCount,
+        }))
+        .sort((a, b) => b.spent - a.spent)
+        .slice(0, 6)
+
       // Top 5 valuable items
       const { data: topItemsData } = await supabase
         .from('items')
@@ -194,6 +225,7 @@ function DashboardContent() {
         collectionValues,
         topItems,
         statusDistribution,
+        collectionFinancials,
       })
     } catch (error) {
       console.error('Error loading chart data:', error)
@@ -320,6 +352,7 @@ function DashboardContent() {
           collectionValues={chartData.collectionValues}
           topItems={chartData.topItems}
           statusDistribution={chartData.statusDistribution}
+          collectionFinancials={chartData.collectionFinancials}
         />
 
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
@@ -368,11 +401,67 @@ function DashboardContent() {
 
 function DashboardLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-600 dark:text-gray-400">Laden...</p>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+      {/* Header Skeleton */}
+      <div className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="h-8 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+          <div className="flex items-center gap-4">
+            <div className="h-4 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            <div className="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+          </div>
+        </div>
       </div>
+
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Stats Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+              <div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-2" />
+              <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            </div>
+          ))}
+        </div>
+
+        {/* Buttons Skeleton */}
+        <div className="flex gap-4 mb-8">
+          <div className="h-12 w-48 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+          <div className="h-12 w-40 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+        </div>
+
+        {/* Charts Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {[1, 2].map(i => (
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+              <div className="h-6 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
+              <div className="flex items-end justify-center gap-3 h-48">
+                <div className="w-12 h-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                <div className="w-12 h-36 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                <div className="w-12 h-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                <div className="w-12 h-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Recent Items Skeleton */}
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
+          <div className="h-6 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="flex items-center gap-4 p-3">
+                <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                  <div className="h-3 w-1/2 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+                </div>
+                <div className="h-5 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
     </div>
   )
 }

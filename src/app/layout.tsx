@@ -5,6 +5,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { InstallPrompt } from '@/components/InstallPrompt'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { ToastProvider } from '@/components/Toast'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -75,14 +76,16 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-slate-100 dark:bg-slate-900 transition-colors`}>
         <ThemeProvider>
-          <ServiceWorkerRegistration />
-          <div className="flex min-h-screen min-h-[100dvh]">
-            <Sidebar />
-            <main className="flex-1 overflow-auto pt-14 lg:pt-0">
-              {children}
-            </main>
-          </div>
-          <InstallPrompt />
+          <ToastProvider>
+            <ServiceWorkerRegistration />
+            <div className="flex min-h-screen min-h-[100dvh]">
+              <Sidebar />
+              <main className="flex-1 overflow-auto pt-14 lg:pt-0">
+                {children}
+              </main>
+            </div>
+            <InstallPrompt />
+          </ToastProvider>
         </ThemeProvider>
       </body>
     </html>
