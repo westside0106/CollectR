@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useToast } from '@/components/Toast'
 
 interface ShareItemButtonProps {
@@ -12,10 +12,13 @@ interface ShareItemButtonProps {
 export function ShareItemButton({ itemId, itemName, collectionId }: ShareItemButtonProps) {
   const { showToast } = useToast()
   const [showModal, setShowModal] = useState(false)
+  const [canShare, setCanShare] = useState(false)
+  const [itemUrl, setItemUrl] = useState('')
 
-  const itemUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/collections/${collectionId}/items/${itemId}`
-    : ''
+  useEffect(() => {
+    setItemUrl(`${window.location.origin}/collections/${collectionId}/items/${itemId}`)
+    setCanShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function')
+  }, [collectionId, itemId])
 
   async function copyLink() {
     await navigator.clipboard.writeText(itemUrl)
@@ -23,14 +26,14 @@ export function ShareItemButton({ itemId, itemName, collectionId }: ShareItemBut
   }
 
   async function shareNative() {
-    if (navigator.share) {
+    if (canShare) {
       try {
         await navigator.share({
           title: itemName,
           text: `Schau dir "${itemName}" an!`,
           url: itemUrl,
         })
-      } catch (err) {
+      } catch {
         // User cancelled or share failed
       }
     } else {
@@ -67,7 +70,7 @@ export function ShareItemButton({ itemId, itemName, collectionId }: ShareItemBut
 
             <div className="space-y-3">
               {/* Native Share (Mobile) */}
-              {typeof navigator !== 'undefined' && navigator.share && (
+              {canShare && (
                 <button
                   onClick={shareNative}
                   className="w-full flex items-center gap-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
