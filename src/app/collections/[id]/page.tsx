@@ -241,7 +241,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
           
           <Link
             href={`/collections/${id}/scan`}
-            className="px-4 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors flex items-center gap-2"
+            className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-slate-700 dark:text-slate-200"
           >
             📷 Scannen
           </Link>
