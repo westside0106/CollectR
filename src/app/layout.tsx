@@ -6,6 +6,7 @@ import { InstallPrompt } from '@/components/InstallPrompt'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { ToastProvider } from '@/components/Toast'
+import { Analytics } from '@vercel/analytics/next'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -87,6 +88,7 @@ export default function RootLayout({
             <InstallPrompt />
           </ToastProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )
