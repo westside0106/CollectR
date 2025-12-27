@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { use } from 'react'
 import { SearchBar } from '@/components/SearchBar'
 import { FilterBar } from '@/components/FilterBar'
-import { useDebounce } from '@/hooks/useDebounce'
+import { useDebounce, useRealtimeRefresh } from '@/hooks'
 import { CollectionGoals } from '@/components/CollectionGoals'
+import { ShareModal } from '@/components/ShareModal'
 
 type ViewMode = 'grid' | 'list'
 type TabMode = 'items' | 'goals'
@@ -28,6 +29,8 @@ export default function CollectionDetailPage({ params }: PageProps) {
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [isOwner, setIsOwner] = useState(false)
   const [activeTab, setActiveTab] = useState<TabMode>('items')
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     if (typeof window !== 'undefined') {
@@ -63,47 +66,56 @@ export default function CollectionDetailPage({ params }: PageProps) {
     router.replace(`/collections/${id}${queryString ? `?${queryString}` : ''}`, { scroll: false })
   }, [debouncedSearch, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice, id, router])
 
-  useEffect(() => {
-    async function loadData() {
-      setLoading(true)
+  const loadData = useCallback(async () => {
+    setLoading(true)
 
-      const { data: collectionData } = await supabase
-        .from('collections')
-        .select('*')
-        .eq('id', id)
-        .single()
+    // User holen um Owner-Status zu prüfen
+    const { data: { user } } = await supabase.auth.getUser()
 
-      if (collectionData) setCollection(collectionData)
+    const { data: collectionData } = await supabase
+      .from('collections')
+      .select('*')
+      .eq('id', id)
+      .single()
 
-      const { data: categoriesData } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('collection_id', id)
-        .order('sort_order')
-
-      if (categoriesData) setCategories(categoriesData)
-
-      let query = supabase
-        .from('items')
-        .select('*, item_images(*)')
-        .eq('collection_id', id)
-
-      if (selectedCategory) query = query.eq('category_id', selectedCategory)
-      if (selectedStatus) query = query.eq('status', selectedStatus)
-      if (minPrice) query = query.gte('purchase_price', parseFloat(minPrice))
-      if (maxPrice) query = query.lte('purchase_price', parseFloat(maxPrice))
-
-      const [sortField, sortDir] = sortBy.split(':')
-      query = query.order(sortField, { ascending: sortDir === 'asc', nullsFirst: false })
-
-      const { data: itemsData } = await query
-
-      setItems(itemsData || [])
-      setLoading(false)
+    if (collectionData) {
+      setCollection(collectionData)
+      setIsOwner(user?.id === collectionData.owner_id)
     }
 
+    const { data: categoriesData } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('collection_id', id)
+      .order('sort_order')
+
+    if (categoriesData) setCategories(categoriesData)
+
+    let query = supabase
+      .from('items')
+      .select('*, item_images(*)')
+      .eq('collection_id', id)
+
+    if (selectedCategory) query = query.eq('category_id', selectedCategory)
+    if (selectedStatus) query = query.eq('status', selectedStatus)
+    if (minPrice) query = query.gte('purchase_price', parseFloat(minPrice))
+    if (maxPrice) query = query.lte('purchase_price', parseFloat(maxPrice))
+
+    const [sortField, sortDir] = sortBy.split(':')
+    query = query.order(sortField, { ascending: sortDir === 'asc', nullsFirst: false })
+
+    const { data: itemsData } = await query
+
+    setItems(itemsData || [])
+    setLoading(false)
+  }, [id, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice, supabase])
+
+  useEffect(() => {
     loadData()
-  }, [id, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice])
+  }, [loadData])
+
+  // Realtime: Live-Updates wenn Items hinzugefügt/geändert/gelöscht werden
+  useRealtimeRefresh('items', loadData, `collection_id=eq.${id}`)
 
   const filteredItems = useMemo(() => {
     if (!debouncedSearch) return items
@@ -197,6 +209,18 @@ export default function CollectionDetailPage({ params }: PageProps) {
           )}
         </div>
         <div className="flex gap-3">
+          {/* Share Button */}
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-slate-700 dark:text-slate-200"
+            title="Sammlung teilen"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            Teilen
+          </button>
+
           {/* More Menu */}
           <div className="relative">
             <button
@@ -401,6 +425,16 @@ export default function CollectionDetailPage({ params }: PageProps) {
         </div>
       )}
         </>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <ShareModal
+          collectionId={id}
+          collectionName={collection.name}
+          isOwner={isOwner}
+          onClose={() => setShowShareModal(false)}
+        />
       )}
     </div>
   )

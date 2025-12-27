@@ -98,6 +98,13 @@ export function UserMenu() {
               👤 Profil
             </Link>
             <Link
+              href="/collections"
+              className="block px-4 py-2 hover:bg-slate-50 text-sm"
+              onClick={() => setShowMenu(false)}
+            >
+              📁 Meine Sammlungen
+            </Link>
+            <Link
               href="/settings"
               className="block px-4 py-2 hover:bg-slate-50 text-sm"
               onClick={() => setShowMenu(false)}

@@ -1,16 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useToast } from '@/components/Toast'
+import { useRealtimeRefresh } from '@/hooks'
+import { ShareModal } from '@/components/ShareModal'
 
 interface Collection {
   id: string
   name: string
   description: string | null
   item_count?: number
+  is_shared?: boolean // true wenn geteilte Sammlung
+  role?: 'viewer' | 'editor' | 'admin' // Rolle bei geteilten Sammlungen
 }
 
 interface EditModalProps {
@@ -163,12 +167,9 @@ export default function CollectionsPage() {
   const [deleteCollection, setDeleteCollection] = useState<Collection | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'items' | 'newest'>('newest')
+  const [shareCollection, setShareCollection] = useState<Collection | null>(null)
 
-  useEffect(() => {
-    loadCollections()
-  }, [])
-
-  async function loadCollections() {
+  const loadCollections = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
@@ -176,8 +177,8 @@ export default function CollectionsPage() {
       return
     }
 
-    // Collections mit Item-Count laden
-    const { data, error } = await supabase
+    // Eigene Collections laden
+    const { data: ownCollections } = await supabase
       .from('collections')
       .select(`
         id,
@@ -188,17 +189,50 @@ export default function CollectionsPage() {
       .eq('owner_id', user.id)
       .order('created_at', { ascending: false })
 
-    if (data) {
-      const collectionsWithCount = data.map(c => ({
-        id: c.id,
-        name: c.name,
-        description: c.description,
-        item_count: (c.items as any)?.[0]?.count || 0
+    // Geteilte Collections laden (wo User Mitglied ist)
+    const { data: memberships } = await supabase
+      .from('collection_members')
+      .select(`
+        role,
+        collections (
+          id,
+          name,
+          description,
+          items(count)
+        )
+      `)
+      .eq('user_id', user.id)
+
+    const ownWithCount = (ownCollections || []).map(c => ({
+      id: c.id,
+      name: c.name,
+      description: c.description,
+      item_count: (c.items as any)?.[0]?.count || 0,
+      is_shared: false
+    }))
+
+    const sharedWithCount = (memberships || [])
+      .filter(m => m.collections) // Filter null collections
+      .map(m => ({
+        id: (m.collections as any).id,
+        name: (m.collections as any).name,
+        description: (m.collections as any).description,
+        item_count: ((m.collections as any).items as any)?.[0]?.count || 0,
+        is_shared: true,
+        role: m.role as 'viewer' | 'editor' | 'admin'
       }))
-      setCollections(collectionsWithCount)
-    }
+
+    setCollections([...ownWithCount, ...sharedWithCount])
     setLoading(false)
-  }
+  }, [supabase, router])
+
+  useEffect(() => {
+    loadCollections()
+  }, [loadCollections])
+
+  // Realtime: Live-Updates wenn Collections/Items geändert werden
+  useRealtimeRefresh('collections', loadCollections)
+  useRealtimeRefresh('items', loadCollections)
 
   async function handleSave(id: string, name: string, description: string) {
     const { error } = await supabase
@@ -365,44 +399,72 @@ export default function CollectionsPage() {
             {filteredCollections.map((collection) => (
               <div
                 key={collection.id}
-                className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-6 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition relative group"
+                className={`bg-white dark:bg-slate-800 rounded-xl shadow-sm border p-6 hover:shadow-md transition relative group ${
+                  collection.is_shared
+                    ? 'border-purple-200 dark:border-purple-800 hover:border-purple-400 dark:hover:border-purple-600'
+                    : 'border-gray-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600'
+                }`}
               >
-                {/* Edit/Delete Buttons */}
-                <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setEditCollection(collection)
-                    }}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
-                    title="Bearbeiten"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setDeleteCollection(collection)
-                    }}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition"
-                    title="Löschen"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
+                {/* Action Buttons - nur für eigene Sammlungen */}
+                {!collection.is_shared && (
+                  <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setShareCollection(collection)
+                      }}
+                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition"
+                      title="Teilen"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setEditCollection(collection)
+                      }}
+                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
+                      title="Bearbeiten"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        setDeleteCollection(collection)
+                      }}
+                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition"
+                      title="Löschen"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+
+                {/* Shared Badge */}
+                {collection.is_shared && (
+                  <div className="absolute top-3 right-3">
+                    <span className="px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 rounded-full">
+                      {collection.role === 'viewer' ? 'Betrachter' : collection.role === 'editor' ? 'Bearbeiter' : 'Admin'}
+                    </span>
+                  </div>
+                )}
 
                 <Link href={`/collections/${collection.id}`}>
-                  <div className="text-3xl mb-2">📁</div>
+                  <div className="text-3xl mb-2">{collection.is_shared ? '👥' : '📁'}</div>
                   <h3 className="text-lg font-semibold dark:text-white">{collection.name}</h3>
                   {collection.description && (
                     <p className="text-gray-600 dark:text-slate-400 text-sm mt-1 line-clamp-2">{collection.description}</p>
                   )}
                   <p className="text-gray-400 dark:text-slate-500 text-xs mt-2">
                     {collection.item_count} {collection.item_count === 1 ? 'Item' : 'Items'}
+                    {collection.is_shared && ' • Geteilt mit dir'}
                   </p>
                 </Link>
               </div>
@@ -424,6 +486,14 @@ export default function CollectionsPage() {
           collection={deleteCollection}
           onClose={() => setDeleteCollection(null)}
           onDelete={handleDelete}
+        />
+      )}
+      {shareCollection && (
+        <ShareModal
+          collectionId={shareCollection.id}
+          collectionName={shareCollection.name}
+          isOwner={true}
+          onClose={() => setShareCollection(null)}
         />
       )}
     </div>

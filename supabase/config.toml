@@ -20,3 +20,6 @@ site_url = "http://localhost:3000"
 
 [functions.analyze-image]
 verify_jwt = false
+
+[realtime]
+enabled = true

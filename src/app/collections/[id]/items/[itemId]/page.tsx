@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { DeleteItemButton } from './DeleteItemButton'
+import { ShareItemButton } from './ShareItemButton'
 import { ImageGallery } from '@/components/ImageGallery'
 
 interface PageProps {
@@ -90,6 +91,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
           </div>
         </div>
         <div className="flex gap-3 w-full sm:w-auto">
+          <ShareItemButton itemId={itemId} itemName={item.name} collectionId={collectionId} />
           <Link
             href={`/collections/${collectionId}/items/${itemId}/edit`}
             className="flex-1 sm:flex-none px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-center text-slate-700 dark:text-slate-300"

@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, Suspense, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import DashboardCharts, { CHART_COLORS } from '@/components/DashboardCharts'
+import { useRealtimeRefresh } from '@/hooks'
 
 interface ChartData {
   categoryDistribution: { label: string; value: number; color: string }[]
@@ -46,18 +47,30 @@ function DashboardContent() {
     collectionFinancials: [],
   })
 
+  const refreshData = useCallback(async () => {
+    if (!user) return
+    await Promise.all([
+      loadDashboardStats(user.id),
+      loadChartData(user.id)
+    ])
+  }, [user])
+
   useEffect(() => {
     checkUserAndLoadData()
   }, [])
 
+  // Realtime: Live-Updates für Dashboard-Stats
+  useRealtimeRefresh('items', refreshData)
+  useRealtimeRefresh('collections', refreshData)
+
   async function checkUserAndLoadData() {
     const { data: { user } } = await supabase.auth.getUser()
-    
+
     if (!user) {
       router.push('/login')
       return
     }
-    
+
     setUser(user)
     await Promise.all([
       loadDashboardStats(user.id),
