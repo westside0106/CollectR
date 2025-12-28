@@ -19,7 +19,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray
 }
 
-export type PushPermissionState = 'prompt' | 'granted' | 'denied' | 'unsupported'
+export type PushPermissionState = 'prompt' | 'granted' | 'denied' | 'unsupported' | 'default'
 
 export function usePushNotifications() {
   const [permission, setPermission] = useState<PushPermissionState>('prompt')
