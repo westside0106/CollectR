@@ -4,7 +4,9 @@
   "description": "Verwalte deine Sammlungen – Hot Wheels, Möbel, Antiquitäten und mehr",
   "start_url": "/",
   "scope": "/",
+  "id": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "background_color": "#0f172a",
   "theme_color": "#2563eb",
   "orientation": "portrait-primary",
@@ -13,18 +15,96 @@
 
   "icons": [
     {
-      "src": "/icons/icon-192.v2.png",
+      "src": "/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.v2.png",
+      "src": "/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
 
-  "categories": ["lifestyle", "utilities", "productivity"]
+  "shortcuts": [
+    {
+      "name": "Meine Sammlungen",
+      "short_name": "Sammlungen",
+      "description": "Alle deine Sammlungen anzeigen",
+      "url": "/collections",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Neue Sammlung",
+      "short_name": "Neu",
+      "description": "Eine neue Sammlung erstellen",
+      "url": "/collections?new=true",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ],
+
+  "categories": ["lifestyle", "utilities", "productivity"],
+
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "CollectR Startseite"
+    },
+    {
+      "src": "/screenshots/mobile-collections.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Sammlungen auf dem Handy"
+    }
+  ],
+
+  "related_applications": [],
+  "prefer_related_applications": false,
+
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }
