@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useToast } from '@/components/Toast'
-import { usePushNotifications } from '@/hooks/usePushNotifications'
 
 interface Profile {
   id: string
@@ -41,14 +40,6 @@ export default function SettingsPage() {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
-  const {
-    permission: pushPermission,
-    isSubscribed: pushSubscribed,
-    isLoading: pushLoading,
-    isSupported: pushSupported,
-    subscribe: subscribePush,
-    unsubscribe: unsubscribePush
-  } = usePushNotifications()
 
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -366,61 +357,6 @@ export default function SettingsPage() {
                   <div className="text-sm font-medium dark:text-white">System</div>
                 </button>
               </div>
-            </div>
-          </div>
-
-          {/* Push Notifications */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold dark:text-white">Benachrichtigungen</h2>
-            </div>
-            <div className="p-6">
-              {!pushSupported ? (
-                <div className="text-slate-500 dark:text-slate-400 text-sm">
-                  Push-Benachrichtigungen werden von diesem Browser nicht unterstützt.
-                </div>
-              ) : pushPermission === 'denied' ? (
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                  <div className="text-amber-800 dark:text-amber-200 font-medium mb-1">Benachrichtigungen blockiert</div>
-                  <div className="text-amber-700 dark:text-amber-300 text-sm">
-                    Du hast Benachrichtigungen in den Browser-Einstellungen blockiert.
-                    Um sie zu aktivieren, ändere die Einstellungen in deinem Browser.
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium dark:text-white">Push-Benachrichtigungen</div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
-                      Erhalte Updates bei geteilten Sammlungen und wichtigen Ereignissen
-                    </div>
-                  </div>
-                  <button
-                    onClick={async () => {
-                      if (pushSubscribed) {
-                        const success = await unsubscribePush()
-                        if (success) showToast('Benachrichtigungen deaktiviert')
-                      } else {
-                        const success = await subscribePush()
-                        if (success) showToast('Benachrichtigungen aktiviert!')
-                        else if (pushPermission === 'denied') {
-                          showToast('Bitte erlaube Benachrichtigungen in den Browser-Einstellungen', 'error')
-                        }
-                      }
-                    }}
-                    disabled={pushLoading}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                      pushSubscribed ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'
-                    } ${pushLoading ? 'opacity-50 cursor-wait' : ''}`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        pushSubscribed ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 
