@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import webpush from 'web-push'
 
 // VAPID Keys müssen in Umgebungsvariablen gesetzt werden
