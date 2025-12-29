@@ -262,8 +262,6 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
         } catch (reloadErr) {
           console.error('Reload error:', reloadErr)
         }
-        // Form zurücksetzen
-        e.currentTarget.reset()
       }
     } catch (err: any) {
       console.error('Exception creating category:', err)
@@ -324,8 +322,6 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
         } catch (reloadErr) {
           console.error('Reload error:', reloadErr)
         }
-        // Form zurücksetzen
-        e.currentTarget.reset()
       }
     } catch (err: any) {
       console.error('Exception creating attribute:', err)
