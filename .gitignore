@@ -26,3 +26,5 @@ build/
 
 # Optional: Next generated typing file (prevents churn)
 next-env.d.ts
+.vercel
+.env*.local
