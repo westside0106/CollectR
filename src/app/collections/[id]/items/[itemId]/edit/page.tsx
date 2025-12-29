@@ -7,11 +7,15 @@ import Link from 'next/link'
 import { use } from 'react'
 import { ImageUpload } from '@/components/ImageUpload'
 import { useToast } from '@/components/Toast'
+import { CategorySelect } from '@/components/CategorySelect'
 
 interface Category {
   id: string
   name: string
   icon: string | null
+  color: string | null
+  parent_id: string | null
+  sort_order: number
 }
 
 interface AttributeDefinition {
@@ -244,19 +248,13 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 <label htmlFor="category" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                   Kategorie
                 </label>
-                <select
-                  id="category"
+                <CategorySelect
+                  categories={categories}
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={setSelectedCategory}
+                  placeholder="Keine Kategorie"
                   className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                >
-                  <option value="">Keine Kategorie</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.icon} {cat.name}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             )}
 

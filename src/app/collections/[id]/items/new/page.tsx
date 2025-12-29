@@ -9,6 +9,7 @@ import { ImageUpload } from '@/components/ImageUpload'
 import { useToast } from '@/components/Toast'
 import { AIAnalyzeButton, AIAnalysisResult } from '@/components/AIAnalyzeButton'
 import { AIResultModal } from '@/components/AIResultModal'
+import { CategorySelect } from '@/components/CategorySelect'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -275,18 +276,12 @@ export default function NewItemPage({ params }: PageProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kategorie</label>
-                <select
+                <CategorySelect
+                  categories={categories}
                   value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
+                  onChange={setCategoryId}
                   className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                >
-                  <option value="">-- Keine --</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.icon} {cat.name}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div>
