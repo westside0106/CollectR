@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface ImageUploadProps {
@@ -17,6 +17,17 @@ export function ImageUpload({ itemId, existingImages = [], onImagesChange }: Ima
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
+
+  // Cleanup blob URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      images.forEach(img => {
+        if (img.url.startsWith('blob:')) {
+          URL.revokeObjectURL(img.url)
+        }
+      })
+    }
+  }, [images])
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files
@@ -68,6 +79,11 @@ export function ImageUpload({ itemId, existingImages = [], onImagesChange }: Ima
 
   async function removeImage(index: number) {
     const img = images[index]
+
+    // Revoke blob URL if it's a temporary preview to prevent memory leak
+    if (img.url.startsWith('blob:')) {
+      URL.revokeObjectURL(img.url)
+    }
 
     // Aus DB löschen wenn vorhanden
     if (img.id) {

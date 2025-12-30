@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -11,6 +11,7 @@ export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
   const [isIOS, setIsIOS] = useState(false)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     // Check if already installed
@@ -31,20 +32,25 @@ export function InstallPrompt() {
     setIsIOS(isIOSDevice)
 
     if (isIOSDevice) {
-      // iOS: Nach 3 Sekunden Banner zeigen
-      setTimeout(() => setShowPrompt(true), 3000)
-      return
+      // iOS: Nach 3 Sekunden Banner zeigen (with cleanup tracking)
+      timerRef.current = setTimeout(() => setShowPrompt(true), 3000)
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current)
+      }
     }
 
     // Android/Desktop: beforeinstallprompt Event
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
-      setTimeout(() => setShowPrompt(true), 3000)
+      timerRef.current = setTimeout(() => setShowPrompt(true), 3000)
     }
 
     window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler)
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
   }, [])
 
   async function handleInstall() {

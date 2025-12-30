@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react'
 
 interface Toast {
   id: string
@@ -24,18 +24,36 @@ export function useToast() {
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
+  const timersRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
   const showToast = useCallback((message: string, type: Toast['type'] = 'success') => {
     const id = Math.random().toString(36).substring(7)
     setToasts(prev => [...prev, { id, message, type }])
 
-    // Auto-remove after 3 seconds
-    setTimeout(() => {
+    // Auto-remove after 3 seconds with cleanup tracking
+    const timer = setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id))
+      timersRef.current.delete(id)
     }, 3000)
+
+    timersRef.current.set(id, timer)
+  }, [])
+
+  // Cleanup all timers on unmount
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach(timer => clearTimeout(timer))
+      timersRef.current.clear()
+    }
   }, [])
 
   const removeToast = useCallback((id: string) => {
+    // Clear the timer if it exists
+    const timer = timersRef.current.get(id)
+    if (timer) {
+      clearTimeout(timer)
+      timersRef.current.delete(id)
+    }
     setToasts(prev => prev.filter(t => t.id !== id))
   }, [])
 
