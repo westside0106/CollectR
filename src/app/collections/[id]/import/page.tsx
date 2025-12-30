@@ -433,7 +433,7 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
                   <tr key={i} className="border-t">
                     {mappings.filter(m => m.target).map(m => (
                       <td key={m.target} className="px-4 py-2 truncate max-w-[200px]">
-                        {row[m.source] || '-'}
+                        {String(row[m.source] ?? '-')}
                       </td>
                     ))}
                   </tr>
