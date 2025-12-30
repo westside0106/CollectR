@@ -72,6 +72,7 @@ export function useRealtime<T extends Record<string, unknown>>({
     // Eindeutiger Channel-Name
     const channelName = `${table}-${filter || 'all'}-${Date.now()}`
 
+    // @ts-ignore - Supabase type definitions incorrectly restrict .on() to 'system' events only
     const channel = supabase
       .channel(channelName)
       .on(
