@@ -72,7 +72,6 @@ export function useRealtime<T extends Record<string, unknown>>({
     // Eindeutiger Channel-Name
     const channelName = `${table}-${filter || 'all'}-${Date.now()}`
 
-    // @ts-expect-error - Supabase type definitions have issues with postgres_changes event type
     const channel = supabase
       .channel(channelName)
       .on(
