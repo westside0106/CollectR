@@ -72,10 +72,10 @@ export function useRealtime<T extends Record<string, unknown>>({
     // Eindeutiger Channel-Name
     const channelName = `${table}-${filter || 'all'}-${Date.now()}`
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const channel = (supabase.channel(channelName) as any)
+    const channel = supabase
+      .channel(channelName)
       .on(
-        'postgres_changes',
+        'postgres_changes' as const,
         {
           event,
           schema,
@@ -84,10 +84,8 @@ export function useRealtime<T extends Record<string, unknown>>({
         },
         (payload: unknown) => handleChange(payload as RealtimePayload)
       )
-      .subscribe((status: string) => {
-        if (status === 'SUBSCRIBED') {
-          console.log(`Realtime: Subscribed to ${table}${filter ? ` (${filter})` : ''}`)
-        }
+      .subscribe(() => {
+        // Successfully subscribed to realtime updates
       })
 
     channelRef.current = channel
