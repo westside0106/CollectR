@@ -42,7 +42,7 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
   const [collection, setCollection] = useState<any>(null)
   const [step, setStep] = useState<'upload' | 'mapping' | 'preview' | 'importing' | 'done'>('upload')
 
-  const [fileData, setFileData] = useState<Record<string, string>[]>([])
+  const [fileData, setFileData] = useState<Record<string, unknown>[]>([])
   const [sourceColumns, setSourceColumns] = useState<string[]>([])
   const [mappings, setMappings] = useState<MappedField[]>([])
 
@@ -125,8 +125,8 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
     const reader = new FileReader()
     reader.onload = (event) => {
       const content = event.target?.result as string
-      
-      let parsed: Record<string, string>[]
+
+      let parsed: Record<string, unknown>[]
       if (file.name.endsWith('.json')) {
         parsed = parseJSON(content)
       } else {
