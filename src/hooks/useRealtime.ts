@@ -84,10 +84,8 @@ export function useRealtime<T extends Record<string, unknown>>({
         },
         (payload: unknown) => handleChange(payload as RealtimePayload)
       )
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log(`Realtime: Subscribed to ${table}${filter ? ` (${filter})` : ''}`)
-        }
+      .subscribe(() => {
+        // Successfully subscribed to realtime updates
       })
 
     channelRef.current = channel
