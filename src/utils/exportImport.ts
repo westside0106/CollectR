@@ -1,5 +1,8 @@
+// Type for exportable item data
+type ExportableItem = Record<string, unknown>
+
 // CSV Export Helper
-export function exportToCSV(items: any[], filename: string) {
+export function exportToCSV(items: ExportableItem[], filename: string) {
   if (items.length === 0) return
 
   // Spalten definieren
@@ -36,7 +39,7 @@ export function exportToCSV(items: any[], filename: string) {
 }
 
 // JSON Export Helper
-export function exportToJSON(items: any[], filename: string) {
+export function exportToJSON(items: ExportableItem[], filename: string) {
   const data = items.map(item => ({
     name: item.name,
     description: item.description,
@@ -119,9 +122,9 @@ function parseCSVLine(line: string): string[] {
 }
 
 // JSON Parser
-export function parseJSON(content: string): any[] {
+export function parseJSON(content: string): ExportableItem[] {
   try {
-    const data = JSON.parse(content)
+    const data = JSON.parse(content) as unknown
     return Array.isArray(data) ? data : [data]
   } catch {
     return []

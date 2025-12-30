@@ -1,6 +1,24 @@
 // Discogs API Service - Läuft über eigene API-Route für bessere Authentifizierung
 // Die API-Route nutzt den optionalen DISCOGS_TOKEN aus env
 
+// Internal API response types
+interface DiscogsArtist {
+  name: string
+  id?: number
+}
+
+interface DiscogsFormat {
+  name: string
+  qty?: string
+  descriptions?: string[]
+}
+
+interface DiscogsTrack {
+  position: string
+  title: string
+  duration: string
+}
+
 export interface DiscogsRelease {
   id: number
   title: string
@@ -80,18 +98,22 @@ export async function getReleaseDetails(releaseId: number): Promise<DiscogsRelea
 
     const data = await response.json()
 
+    const artists = data.artists as DiscogsArtist[] | undefined
+    const formats = data.formats as DiscogsFormat[] | undefined
+    const tracklist = data.tracklist as DiscogsTrack[] | undefined
+
     return {
       id: data.id,
       title: data.title,
-      artist: data.artists?.map((a: any) => a.name).join(', ') || 'Unknown',
+      artist: artists?.map(a => a.name).join(', ') || 'Unknown',
       year: data.year,
       label: data.labels?.[0]?.name,
-      format: data.formats?.map((f: any) => f.name),
+      format: formats?.map(f => f.name),
       genre: data.genres,
       style: data.styles,
       country: data.country,
       coverUrl: data.images?.[0]?.uri || data.images?.[0]?.resource_url,
-      tracklist: data.tracklist?.map((t: any) => ({
+      tracklist: tracklist?.map(t => ({
         position: t.position,
         title: t.title,
         duration: t.duration,

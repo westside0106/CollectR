@@ -1,6 +1,21 @@
 // Open Library API Service - Kostenlos, kein API Key nötig
 // Docs: https://openlibrary.org/developers/api
 
+// Internal API response types
+interface OpenLibraryAuthor {
+  name: string
+  url?: string
+}
+
+interface OpenLibraryPublisher {
+  name: string
+}
+
+interface OpenLibrarySubject {
+  name: string
+  url?: string
+}
+
 export interface OpenLibraryBook {
   title: string
   authors: string[]
@@ -40,16 +55,20 @@ export async function searchByISBN(isbn: string): Promise<OpenLibraryBook | null
 
     if (!bookData) return null
 
+    const authors = bookData.authors as OpenLibraryAuthor[] | undefined
+    const publishers = bookData.publishers as OpenLibraryPublisher[] | undefined
+    const subjects = bookData.subjects as OpenLibrarySubject[] | undefined
+
     return {
       title: bookData.title || '',
-      authors: bookData.authors?.map((a: any) => a.name) || [],
+      authors: authors?.map(a => a.name) || [],
       publishDate: bookData.publish_date || '',
-      publishers: bookData.publishers?.map((p: any) => p.name) || [],
+      publishers: publishers?.map(p => p.name) || [],
       isbn10: bookData.identifiers?.isbn_10?.[0],
       isbn13: bookData.identifiers?.isbn_13?.[0],
       coverUrl: bookData.cover?.large || bookData.cover?.medium || bookData.cover?.small,
       pageCount: bookData.number_of_pages,
-      subjects: bookData.subjects?.map((s: any) => s.name).slice(0, 5) || [],
+      subjects: subjects?.map(s => s.name).slice(0, 5) || [],
     }
   } catch (error) {
     console.error('Open Library API error:', error)
