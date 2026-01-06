@@ -44,6 +44,11 @@ export default function CollectionDetailPage({ params }: PageProps) {
     return 'grid'
   })
 
+  // Bulk Operations
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
+  const [bulkEditMode, setBulkEditMode] = useState(false)
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false)
+
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '')
   const [selectedStatus, setSelectedStatus] = useState(searchParams.get('status') || '')
@@ -150,6 +155,72 @@ export default function CollectionDetailPage({ params }: PageProps) {
     })
     return counts
   }, [items])
+
+  // Bulk Operations Handlers
+  const toggleItemSelection = (itemId: string) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId)
+      } else {
+        newSet.add(itemId)
+      }
+      return newSet
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedItems.size === filteredItems.length) {
+      setSelectedItems(new Set())
+    } else {
+      setSelectedItems(new Set(filteredItems.map(item => item.id)))
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedItems.size === 0) return
+
+    if (!confirm(`${selectedItems.size} Item(s) wirklich löschen?`)) return
+
+    try {
+      const { error } = await supabase
+        .from('items')
+        .delete()
+        .in('id', Array.from(selectedItems))
+
+      if (error) throw error
+
+      showToast(`${selectedItems.size} Item(s) gelöscht!`)
+      setSelectedItems(new Set())
+      setBulkEditMode(false)
+      loadData()
+    } catch (error) {
+      console.error('Bulk delete error:', error)
+      showToast('Fehler beim Löschen', 'error')
+    }
+  }
+
+  const handleBulkEdit = async (updates: { category_id?: string; status?: string }) => {
+    if (selectedItems.size === 0) return
+
+    try {
+      const { error } = await supabase
+        .from('items')
+        .update(updates)
+        .in('id', Array.from(selectedItems))
+
+      if (error) throw error
+
+      showToast(`${selectedItems.size} Item(s) aktualisiert!`)
+      setSelectedItems(new Set())
+      setBulkEditMode(false)
+      setShowBulkEditModal(false)
+      loadData()
+    } catch (error) {
+      console.error('Bulk edit error:', error)
+      showToast('Fehler beim Aktualisieren', 'error')
+    }
+  }
 
   if (loading && !collection) {
     return (
@@ -341,6 +412,52 @@ export default function CollectionDetailPage({ params }: PageProps) {
         />
       </div>
 
+      {/* Bulk Actions Bar */}
+      {bulkEditMode && (
+        <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex flex-wrap items-center gap-3">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={selectedItems.size === filteredItems.length && filteredItems.length > 0}
+              onChange={toggleSelectAll}
+              className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Alle auswählen ({filteredItems.length})
+            </span>
+          </label>
+          <div className="flex-1" />
+          {selectedItems.size > 0 && (
+            <>
+              <span className="text-sm text-slate-600 dark:text-slate-400">
+                {selectedItems.size} ausgewählt
+              </span>
+              <button
+                onClick={() => setShowBulkEditModal(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+              >
+                Bearbeiten
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
+              >
+                Löschen
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => {
+              setBulkEditMode(false)
+              setSelectedItems(new Set())
+            }}
+            className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition text-sm font-medium"
+          >
+            Abbrechen
+          </button>
+        </div>
+      )}
+
       {/* Filters & View Toggle */}
       <div className="mb-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
         <FilterBar
@@ -359,8 +476,21 @@ export default function CollectionDetailPage({ params }: PageProps) {
           }}
         />
 
-        {/* View Toggle */}
-        <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+        {/* View Toggle & Bulk Edit Button */}
+        <div className="flex gap-2">
+          {!bulkEditMode && filteredItems.length > 0 && (
+            <button
+              onClick={() => setBulkEditMode(true)}
+              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-2"
+              title="Mehrere Items auswählen"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <span className="hidden sm:inline">Auswählen</span>
+            </button>
+          )}
+          <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
           <button
             onClick={() => setViewMode('grid')}
             className={`px-3 py-2 rounded-md text-sm font-medium transition ${
@@ -404,7 +534,14 @@ export default function CollectionDetailPage({ params }: PageProps) {
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
-            <ItemCard key={item.id} item={item} collectionId={id} />
+            <ItemCard
+              key={item.id}
+              item={item}
+              collectionId={id}
+              bulkEditMode={bulkEditMode}
+              isSelected={selectedItems.has(item.id)}
+              onToggleSelect={() => toggleItemSelection(item.id)}
+            />
           ))}
         </div>
       ) : (
@@ -412,6 +549,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
           <table className="w-full">
             <thead className="bg-slate-50 dark:bg-slate-900">
               <tr>
+                {bulkEditMode && <th className="w-12"></th>}
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400">Item</th>
                 <th className="text-left px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hidden sm:table-cell">Status</th>
                 <th className="text-right px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400">Preis</th>
@@ -419,7 +557,14 @@ export default function CollectionDetailPage({ params }: PageProps) {
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
               {filteredItems.map((item) => (
-                <ItemRow key={item.id} item={item} collectionId={id} />
+                <ItemRow
+                  key={item.id}
+                  item={item}
+                  collectionId={id}
+                  bulkEditMode={bulkEditMode}
+                  isSelected={selectedItems.has(item.id)}
+                  onToggleSelect={() => toggleItemSelection(item.id)}
+                />
               ))}
             </tbody>
           </table>
@@ -451,6 +596,108 @@ export default function CollectionDetailPage({ params }: PageProps) {
           onClose={() => setShowAIBatchUpload(false)}
         />
       )}
+
+      {/* Bulk Edit Modal */}
+      {showBulkEditModal && (
+        <BulkEditModal
+          selectedCount={selectedItems.size}
+          categories={categories}
+          onClose={() => setShowBulkEditModal(false)}
+          onSave={handleBulkEdit}
+        />
+      )}
+    </div>
+  )
+}
+
+// Bulk Edit Modal Component
+function BulkEditModal({
+  selectedCount,
+  categories,
+  onClose,
+  onSave
+}: {
+  selectedCount: number
+  categories: any[]
+  onClose: () => void
+  onSave: (updates: { category_id?: string; status?: string }) => void
+}) {
+  const [category, setCategory] = useState('')
+  const [status, setStatus] = useState('')
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const updates: { category_id?: string; status?: string } = {}
+    if (category) updates.category_id = category
+    if (status) updates.status = status
+
+    if (Object.keys(updates).length === 0) {
+      onClose()
+      return
+    }
+
+    onSave(updates)
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={e => e.stopPropagation()}>
+        <h2 className="text-xl font-bold mb-4 dark:text-white">
+          {selectedCount} Item(s) bearbeiten
+        </h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Kategorie ändern (optional)
+            </label>
+            <select
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
+            >
+              <option value="">-- Nicht ändern --</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+              Status ändern (optional)
+            </label>
+            <select
+              value={status}
+              onChange={e => setStatus(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
+            >
+              <option value="">-- Nicht ändern --</option>
+              <option value="in_collection">In Sammlung</option>
+              <option value="wishlist">Wunschliste</option>
+              <option value="sold">Verkauft</option>
+              <option value="ordered">Bestellt</option>
+              <option value="lost">Verloren</option>
+            </select>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+            >
+              Abbrechen
+            </button>
+            <button
+              type="submit"
+              disabled={!category && !status}
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Speichern
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }
@@ -468,20 +715,40 @@ function getCollectionType(name: string | undefined): string | undefined {
   return undefined
 }
 
-function ItemCard({ item, collectionId }: { item: any; collectionId: string }) {
+function ItemCard({ item, collectionId, bulkEditMode, isSelected, onToggleSelect }: {
+  item: any;
+  collectionId: string;
+  bulkEditMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
+}) {
   const primaryImage = item.item_images?.find((img: any) => img.is_primary) ?? item.item_images?.[0]
 
-  return (
-    <Link
-      href={`/collections/${collectionId}/items/${item.id}`}
-      className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all group"
-    >
+  const cardContent = (
+    <>
       <div className="aspect-square bg-slate-100 dark:bg-slate-700 relative">
         {primaryImage ? (
           <img src={primaryImage.thumbnail_url ?? primaryImage.original_url} alt={item.name} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-4xl text-slate-300 dark:text-slate-500">📷</div>
         )}
+
+        {/* Checkbox in Bulk Mode */}
+        {bulkEditMode && (
+          <div className="absolute top-2 left-2">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={(e) => {
+                e.stopPropagation()
+                onToggleSelect?.()
+              }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-6 h-6 rounded border-2 border-white bg-white/90 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+            />
+          </div>
+        )}
+
         {item.status !== 'in_collection' && (
           <span className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium ${
             item.status === 'sold' ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400' :
@@ -503,11 +770,41 @@ function ItemCard({ item, collectionId }: { item: any; collectionId: string }) {
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{item.purchase_price.toFixed(2)} {item.purchase_currency}</p>
         )}
       </div>
+    </>
+  )
+
+  if (bulkEditMode) {
+    return (
+      <div
+        onClick={onToggleSelect}
+        className={`bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm border-2 transition-all cursor-pointer ${
+          isSelected
+            ? 'border-blue-500 dark:border-blue-400 ring-2 ring-blue-200 dark:ring-blue-900'
+            : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600'
+        }`}
+      >
+        {cardContent}
+      </div>
+    )
+  }
+
+  return (
+    <Link
+      href={`/collections/${collectionId}/items/${item.id}`}
+      className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all group"
+    >
+      {cardContent}
     </Link>
   )
 }
 
-function ItemRow({ item, collectionId }: { item: any; collectionId: string }) {
+function ItemRow({ item, collectionId, bulkEditMode, isSelected, onToggleSelect }: {
+  item: any;
+  collectionId: string;
+  bulkEditMode?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
+}) {
   const primaryImage = item.item_images?.find((img: any) => img.is_primary) ?? item.item_images?.[0]
 
   const statusLabels: Record<string, string> = {
@@ -519,29 +816,63 @@ function ItemRow({ item, collectionId }: { item: any; collectionId: string }) {
   }
 
   return (
-    <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+    <tr className={`transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
+      {bulkEditMode && (
+        <td className="px-4 py-3">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={onToggleSelect}
+            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+          />
+        </td>
+      )}
       <td className="px-4 py-3">
-        <Link href={`/collections/${collectionId}/items/${item.id}`} className="flex items-center gap-3">
-          {primaryImage ? (
-            <img
-              src={primaryImage.thumbnail_url ?? primaryImage.original_url}
-              alt={item.name}
-              className="w-12 h-12 object-cover rounded-lg"
-            />
-          ) : (
-            <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-slate-400">
-              📷
-            </div>
-          )}
-          <div>
-            <div className="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
-              {item.name}
-            </div>
-            {item.barcode && (
-              <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">{item.barcode}</div>
+        {bulkEditMode ? (
+          <div className="flex items-center gap-3 cursor-pointer" onClick={onToggleSelect}>
+            {primaryImage ? (
+              <img
+                src={primaryImage.thumbnail_url ?? primaryImage.original_url}
+                alt={item.name}
+                className="w-12 h-12 object-cover rounded-lg"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-slate-400">
+                📷
+              </div>
             )}
+            <div>
+              <div className="font-medium text-slate-900 dark:text-white">
+                {item.name}
+              </div>
+              {item.barcode && (
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">{item.barcode}</div>
+              )}
+            </div>
           </div>
-        </Link>
+        ) : (
+          <Link href={`/collections/${collectionId}/items/${item.id}`} className="flex items-center gap-3">
+            {primaryImage ? (
+              <img
+                src={primaryImage.thumbnail_url ?? primaryImage.original_url}
+                alt={item.name}
+                className="w-12 h-12 object-cover rounded-lg"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-slate-400">
+                📷
+              </div>
+            )}
+            <div>
+              <div className="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
+                {item.name}
+              </div>
+              {item.barcode && (
+                <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">{item.barcode}</div>
+              )}
+            </div>
+          </Link>
+        )}
       </td>
       <td className="px-4 py-3 hidden sm:table-cell">
         <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
