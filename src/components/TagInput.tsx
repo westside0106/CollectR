@@ -61,8 +61,8 @@ export function TagInput({ itemId, userId, initialTags = [], onTagsChange }: Tag
 
       if (data) {
         const itemTags = data
-          .map(it => it.tags)
-          .filter(Boolean) as Tag[]
+          .map((it: any) => it.tags)
+          .filter((tag: any): tag is Tag => tag !== null) as Tag[]
         setTags(itemTags)
         onTagsChange?.(itemTags)
       }
