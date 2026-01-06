@@ -1,4 +1,4 @@
-const CACHE_NAME = 'collectr-v2';
+const CACHE_NAME = 'collectr-v3';
 
 // Dateien die immer gecacht werden
 const STATIC_ASSETS = [

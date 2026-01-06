@@ -126,7 +126,6 @@ export function parseJSON(content: string): ExportableItem[] {
   try {
     const data = JSON.parse(content) as unknown
     return Array.isArray(data) ? (data as ExportableItem[]) : ([data] as ExportableItem[])
-    return Array.isArray(data) ? data as ExportableItem[] : [data as ExportableItem]
   } catch {
     return []
   }
