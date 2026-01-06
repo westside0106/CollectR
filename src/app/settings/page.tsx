@@ -248,7 +248,7 @@ export default function SettingsPage() {
             ← Zurück zum Dashboard
           </Link>
           <h1 className="text-2xl font-bold dark:text-white">Einstellungen</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">{user?.email}</p>
+          <p className="text-slate-700 dark:text-slate-300 mt-1">{user?.email}</p>
         </div>
 
         <div className="space-y-6">
@@ -269,19 +269,19 @@ export default function SettingsPage() {
             </Link>
             <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
               <div className="text-2xl font-bold dark:text-white">{stats.collections}</div>
-              <div className="text-sm text-slate-500 dark:text-slate-400">Sammlungen</div>
+              <div className="text-sm text-slate-700 dark:text-slate-300">Sammlungen</div>
             </div>
             <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
               <div className="text-2xl font-bold dark:text-white">{stats.items}</div>
-              <div className="text-sm text-slate-500 dark:text-slate-400">Items</div>
+              <div className="text-sm text-slate-700 dark:text-slate-300">Items</div>
             </div>
             <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
               <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.sharedWithMe}</div>
-              <div className="text-sm text-slate-500 dark:text-slate-400">Geteilt mit mir</div>
+              <div className="text-sm text-slate-700 dark:text-slate-300">Geteilt mit mir</div>
             </div>
             <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
               <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.sharedByMe}</div>
-              <div className="text-sm text-slate-500 dark:text-slate-400">Offene Einladungen</div>
+              <div className="text-sm text-slate-700 dark:text-slate-300">Offene Einladungen</div>
             </div>
           </div>
 
@@ -302,7 +302,7 @@ export default function SettingsPage() {
                   placeholder={user?.email?.split('@')[0]}
                   className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-slate-700 dark:text-slate-300 mt-1">
                   Wird anderen Nutzern angezeigt
                 </p>
               </div>
@@ -314,7 +314,7 @@ export default function SettingsPage() {
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400"
+                  className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                 />
               </div>
               <div className="flex justify-end">
@@ -378,7 +378,7 @@ export default function SettingsPage() {
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
               <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
                 <h2 className="text-lg font-semibold dark:text-white">Geteilte Sammlungen</h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Sammlungen, die mit dir geteilt wurden</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300">Sammlungen, die mit dir geteilt wurden</p>
               </div>
               <div className="divide-y divide-slate-200 dark:divide-slate-700">
                 {sharedCollections.map(sc => (
@@ -394,7 +394,7 @@ export default function SettingsPage() {
                         >
                           {sc.collection.name}
                         </Link>
-                        <div className="text-sm text-slate-500 dark:text-slate-400">
+                        <div className="text-sm text-slate-700 dark:text-slate-300">
                           {ROLE_LABELS[sc.role]}
                         </div>
                       </div>
@@ -462,7 +462,7 @@ export default function SettingsPage() {
               <div className="flex justify-between items-center">
                 <div>
                   <div className="font-medium dark:text-white">Account erstellt</div>
-                  <div className="text-sm text-slate-500 dark:text-slate-400">
+                  <div className="text-sm text-slate-700 dark:text-slate-300">
                     {user?.created_at ? new Date(user.created_at).toLocaleDateString('de-DE', {
                       day: '2-digit',
                       month: 'long',
@@ -474,7 +474,7 @@ export default function SettingsPage() {
               <div className="flex justify-between items-center">
                 <div>
                   <div className="font-medium dark:text-white">Letzte Anmeldung</div>
-                  <div className="text-sm text-slate-500 dark:text-slate-400">
+                  <div className="text-sm text-slate-700 dark:text-slate-300">
                     {user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString('de-DE', {
                       day: '2-digit',
                       month: 'long',

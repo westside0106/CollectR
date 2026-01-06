@@ -50,7 +50,7 @@ export default function LoginPage() {
             className="mx-auto mb-4"
           />
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">CollectR</h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-2">Melde dich an</p>
+          <p className="text-slate-700 dark:text-slate-300 mt-2">Melde dich an</p>
         </div>
 
         <form onSubmit={handleLogin} className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
@@ -96,7 +96,7 @@ export default function LoginPage() {
             {loading ? 'Wird angemeldet...' : 'Anmelden'}
           </button>
 
-          <p className="text-center text-sm text-slate-600 dark:text-slate-400">
+          <p className="text-center text-sm text-slate-700 dark:text-slate-300">
             Noch kein Konto?{' '}
             <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:underline">
               Registrieren

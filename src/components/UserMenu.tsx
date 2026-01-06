@@ -72,6 +72,7 @@ export function UserMenu() {
       <button
         onClick={() => setShowMenu(!showMenu)}
         className="flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-2 transition-colors"
+        className="flex items-center gap-2 hover:bg-slate-700 rounded-lg p-2 transition-colors"
         aria-label="Benutzermenu öffnen"
         aria-expanded={showMenu}
       >
