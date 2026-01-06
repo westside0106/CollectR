@@ -183,14 +183,14 @@ export function AIBatchUpload({
           .from('items')
           .insert({
             collection_id: collectionId,
-            user_id: user.id,
+            created_by: user.id,
             name: item.result.name || 'Unbekannt',
             description: item.result.description,
             category_id: item.selectedCategory,
-            estimated_value: item.result.estimatedValue
+            _computed_value: item.result.estimatedValue
               ? (item.result.estimatedValue.min + item.result.estimatedValue.max) / 2
               : null,
-            estimated_currency: item.result.estimatedValue?.currency || 'EUR',
+            _value_currency: item.result.estimatedValue?.currency || 'EUR',
             attributes: item.result.attributes || {},
             status: 'in_collection'
           })
@@ -204,7 +204,7 @@ export function AIBatchUpload({
 
         // 2. Upload Image
         const fileName = `${newItem.id}/${Date.now()}-${item.file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
-        const { error: uploadError } = await supabase.storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
           .from('item-images')
           .upload(fileName, item.file)
 
@@ -216,16 +216,24 @@ export function AIBatchUpload({
         // 3. Get Public URL
         const { data: urlData } = supabase.storage
           .from('item-images')
-          .getPublicUrl(fileName)
+          .getPublicUrl(uploadData?.path ?? fileName)
 
         // 4. Create Image Record
-        await supabase
+        const { error: imageError } = await supabase
           .from('item_images')
           .insert({
             item_id: newItem.id,
-            url: urlData.publicUrl,
+            original_url: urlData.publicUrl,
+            filename: item.file.name,
+            size_bytes: item.file.size,
+            mime_type: item.file.type,
+            uploaded_by: user.id,
             is_primary: true
           })
+
+        if (imageError) {
+          console.error('Error creating image record:', imageError)
+        }
 
         successCount++
       }
