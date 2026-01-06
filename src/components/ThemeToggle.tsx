@@ -15,6 +15,7 @@ export function ThemeToggle() {
     <button
       onClick={cycleTheme}
       className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+      aria-label={`Theme wechseln (aktuell: ${theme === 'system' ? 'System' : theme === 'dark' ? 'Dunkel' : 'Hell'})`}
       title={`Theme: ${theme === 'system' ? 'System' : theme === 'dark' ? 'Dunkel' : 'Hell'}`}
     >
       <span className="text-lg">

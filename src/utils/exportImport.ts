@@ -125,7 +125,7 @@ function parseCSVLine(line: string): string[] {
 export function parseJSON(content: string): ExportableItem[] {
   try {
     const data = JSON.parse(content) as unknown
-    return Array.isArray(data) ? data : [data]
+    return Array.isArray(data) ? data as ExportableItem[] : [data as ExportableItem]
   } catch {
     return []
   }

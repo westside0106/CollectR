@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { InstallPrompt } from '@/components/InstallPrompt'
@@ -133,20 +134,8 @@ export default function RootLayout({
   return (
     <html lang="de" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        {/* Theme initialization - prevents flash of unstyled content */}
+        <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
       <body className={`${inter.className} bg-slate-100 dark:bg-slate-900 transition-colors`}>
         <ThemeProvider>

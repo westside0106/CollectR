@@ -33,17 +33,34 @@ export function ImageUpload({ itemId, existingImages = [], onImagesChange }: Ima
     const files = e.target.files
     if (!files?.length) return
 
+    // File validation constants
+    const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif']
+
     setUploading(true)
     const newImages: { url: string; file?: File }[] = []
 
     for (const file of Array.from(files)) {
+      // Validate file type
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        alert(`Ungültiger Dateityp: ${file.name}. Erlaubt sind nur: JPEG, PNG, WebP, GIF`)
+        continue
+      }
+
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        alert(`Datei zu groß: ${file.name}. Maximale Größe: 5MB`)
+        continue
+      }
       // Für neue Items: nur Preview zeigen, Upload später
       if (!itemId) {
         const previewUrl = URL.createObjectURL(file)
         newImages.push({ url: previewUrl, file })
       } else {
         // Für existierende Items: direkt hochladen
-        const fileName = `${itemId}/${Date.now()}-${file.name}`
+        // Sanitize filename to prevent path traversal attacks
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+        const fileName = `${itemId}/${Date.now()}-${safeName}`
 
         const { data, error } = await supabase.storage
           .from('item-images')
