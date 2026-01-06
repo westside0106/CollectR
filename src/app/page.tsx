@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import DashboardCharts, { CHART_COLORS } from '@/components/DashboardCharts'
 import { useRealtimeRefresh } from '@/hooks'
+import { DashboardSkeleton } from '@/components/Skeleton'
 
 interface ChartData {
   categoryDistribution: { label: string; value: number; color: string }[]
@@ -299,11 +300,7 @@ function DashboardContent() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   return (
@@ -412,76 +409,9 @@ function DashboardContent() {
   )
 }
 
-function DashboardLoading() {
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      {/* Header Skeleton */}
-      <div className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="h-8 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-          <div className="flex items-center gap-4">
-            <div className="h-4 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-            <div className="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-          </div>
-        </div>
-      </div>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-              <div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-2" />
-              <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-            </div>
-          ))}
-        </div>
-
-        {/* Buttons Skeleton */}
-        <div className="flex gap-4 mb-8">
-          <div className="h-12 w-48 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
-          <div className="h-12 w-40 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
-        </div>
-
-        {/* Charts Skeleton */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {[1, 2].map(i => (
-            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-              <div className="h-6 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
-              <div className="flex items-end justify-center gap-3 h-48">
-                <div className="w-12 h-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                <div className="w-12 h-36 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                <div className="w-12 h-20 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                <div className="w-12 h-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Recent Items Skeleton */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-          <div className="h-6 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="flex items-center gap-4 p-3">
-                <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                  <div className="h-3 w-1/2 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                </div>
-                <div className="h-5 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </main>
-    </div>
-  )
-}
-
 export default function HomePage() {
   return (
-    <Suspense fallback={<DashboardLoading />}>
+    <Suspense fallback={<DashboardSkeleton />}>
       <DashboardContent />
     </Suspense>
   )

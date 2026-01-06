@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useToast } from '@/components/Toast'
 import { useRealtimeRefresh } from '@/hooks'
 import { ShareModal } from '@/components/ShareModal'
+import { CollectionCardSkeleton } from '@/components/Skeleton'
 
 interface Collection {
   id: string
@@ -287,32 +288,25 @@ export default function CollectionsPage() {
         <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
           <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <div className="h-8 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+              <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
               <span className="text-gray-400 dark:text-slate-500">/</span>
-              <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+              <span className="text-gray-600 dark:text-slate-400">Sammlungen</span>
             </div>
           </div>
         </header>
         <main className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex justify-between items-center mb-6">
-            <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-            <div className="h-10 w-40 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
+            <h1 className="text-2xl font-bold dark:text-white">Meine Sammlungen</h1>
+            <Link
+              href="/collections/new"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              + Neue Sammlung
+            </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 border border-slate-200 dark:border-slate-700">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-6 w-2/3 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                    <div className="h-4 w-1/3 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-                  </div>
-                </div>
-                <div className="mt-4 flex gap-2">
-                  <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
-                  <div className="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded-full animate-pulse" />
-                </div>
-              </div>
+              <CollectionCardSkeleton key={i} />
             ))}
           </div>
         </main>
