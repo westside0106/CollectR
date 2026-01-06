@@ -122,9 +122,32 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
     const file = e.target.files?.[0]
     if (!file) return
 
+    // File validation
+    const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+    const MAX_ROWS = 5000 // Prevent DOS attacks
+    const ALLOWED_TYPES = ['text/csv', 'application/json', 'text/plain']
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      alert('Datei zu groß. Maximale Größe: 10MB')
+      return
+    }
+
+    // Validate file type
+    if (!ALLOWED_TYPES.includes(file.type) && !file.name.match(/\.(csv|json)$/i)) {
+      alert('Ungültiger Dateityp. Erlaubt sind nur CSV und JSON Dateien.')
+      return
+    }
+
     const reader = new FileReader()
     reader.onload = (event) => {
       const content = event.target?.result as string
+
+      // Validate content size (after reading)
+      if (content.length > MAX_FILE_SIZE) {
+        alert('Dateiinhalt zu groß')
+        return
+      }
 
       let parsed: Record<string, unknown>[]
       if (file.name.endsWith('.json')) {
@@ -135,6 +158,12 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
 
       if (parsed.length === 0) {
         alert('Datei konnte nicht gelesen werden oder ist leer.')
+        return
+      }
+
+      // Limit number of rows
+      if (parsed.length > MAX_ROWS) {
+        alert(`Zu viele Zeilen. Maximum: ${MAX_ROWS}. Gefunden: ${parsed.length}`)
         return
       }
 
@@ -222,6 +251,11 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
         if (m.target && row[m.source]) {
           let value: any = row[m.source]
 
+          // Sanitize input: Convert to string and limit length
+          if (typeof value === 'string') {
+            value = value.trim().substring(0, 10000) // Max 10k chars per field
+          }
+
           // Prüfen ob es ein Attribut ist (attr:xxx)
           if (m.target.startsWith('attr:')) {
             const attrName = m.target.replace('attr:', '')
@@ -230,9 +264,11 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
             // Typ-Konvertierung
             if (attrDef) {
               if (attrDef.type === 'number') {
-                value = parseFloat(value.replace(',', '.')) || null
+                const stringValue = String(value).replace(',', '.')
+                value = parseFloat(stringValue) || null
               } else if (attrDef.type === 'checkbox') {
-                value = ['ja', 'yes', 'true', '1', 'x'].includes(value.toLowerCase())
+                const stringValue = String(value).toLowerCase()
+                value = ['ja', 'yes', 'true', '1', 'x'].includes(stringValue)
               }
             }
 
@@ -240,7 +276,8 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
           } else {
             // Standard-Felder
             if (m.target === 'purchase_price') {
-              value = parseFloat(value.replace(',', '.')) || null
+              const stringValue = String(value).replace(',', '.')
+              value = parseFloat(stringValue) || null
             }
             itemData[m.target] = value
           }

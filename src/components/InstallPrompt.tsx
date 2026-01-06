@@ -98,6 +98,7 @@ export function InstallPrompt() {
         <button
           onClick={handleDismiss}
           className="text-slate-400 hover:text-white p-2"
+          aria-label="Installationsaufforderung schließen"
         >
           ✕
         </button>

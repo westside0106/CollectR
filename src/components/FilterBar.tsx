@@ -65,10 +65,12 @@ export function FilterBar({
           className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
             isExpanded || activeFilterCount > 0
               ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
-              : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-500'
+              : 'border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500'
           }`}
+          aria-label={isExpanded ? 'Filter einklappen' : 'Filter ausklappen'}
+          aria-expanded={isExpanded}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
           </svg>
           <span className="text-sm font-medium">Filter</span>
@@ -82,6 +84,7 @@ export function FilterBar({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
@@ -108,7 +111,7 @@ export function FilterBar({
             {/* Kategorie Filter */}
             {categories.length > 0 && (
               <div className="flex flex-col gap-1">
-                <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Kategorie</label>
+                <label className="text-xs text-slate-700 dark:text-slate-300 font-medium">Kategorie</label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => onCategoryChange(e.target.value)}
@@ -126,7 +129,7 @@ export function FilterBar({
 
             {/* Status Filter */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Status</label>
+              <label className="text-xs text-slate-700 dark:text-slate-300 font-medium">Status</label>
               <select
                 value={selectedStatus}
                 onChange={(e) => onStatusChange(e.target.value)}
@@ -142,7 +145,7 @@ export function FilterBar({
 
             {/* Preis Filter */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Preis</label>
+              <label className="text-xs text-slate-700 dark:text-slate-300 font-medium">Preis</label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
