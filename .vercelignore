@@ -1,0 +1,3 @@
+# Force rebuild by ignoring cache
+.vercel/cache
+.next
