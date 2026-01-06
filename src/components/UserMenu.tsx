@@ -71,12 +71,14 @@ export function UserMenu() {
     <div className="relative">
       <button
         onClick={() => setShowMenu(!showMenu)}
-        className="flex items-center gap-2 hover:bg-slate-700 rounded-lg p-2 transition-colors"
+        className="flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg p-2 transition-colors"
+        aria-label="Benutzermenu öffnen"
+        aria-expanded={showMenu}
       >
         <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
           {initials}
         </div>
-        <span className="text-sm text-white hidden sm:block">{displayName}</span>
+        <span className="text-sm text-slate-900 dark:text-white hidden sm:block">{displayName}</span>
       </button>
 
       {showMenu && (
@@ -85,7 +87,7 @@ export function UserMenu() {
             className="fixed inset-0 z-10"
             onClick={() => setShowMenu(false)}
           />
-          <div className="absolute right-0 bottom-full mb-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-600 z-20 overflow-hidden max-h-[80vh] overflow-y-auto">
+          <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-600 z-20 overflow-hidden max-h-[80vh] overflow-y-auto">
             <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
               <p className="font-medium text-sm text-slate-900 dark:text-white truncate">{displayName}</p>
               <p className="text-xs text-slate-600 dark:text-slate-400 truncate">{user.email}</p>
