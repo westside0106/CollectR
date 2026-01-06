@@ -29,8 +29,8 @@ export default function LoginPage() {
         setError(error.message)
         setLoading(false)
       } else {
-        router.refresh()
-        router.push('/')
+        // Hard reload to ensure auth state is properly loaded
+        window.location.href = '/'
       }
     } catch (err) {
       setError('Ein unerwarteter Fehler ist aufgetreten')
