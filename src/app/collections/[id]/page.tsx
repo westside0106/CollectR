@@ -446,160 +446,138 @@ export default function CollectionDetailPage({ params }: PageProps) {
       {activeTab === 'items' && (
         <>
           {/* Search */}
-      <div className="mb-4">
-        <SearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Items durchsuchen..."
-        />
-      </div>
-
-      {/* Bulk Actions Bar */}
-      {bulkEditMode && (
-        <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedItems.size === filteredItems.length && filteredItems.length > 0}
-              onChange={toggleSelectAll}
-              className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          <div className="mb-4">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Items durchsuchen..."
             />
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Alle auswählen ({filteredItems.length})
-            </span>
-          </label>
-          <div className="flex-1" />
-          {selectedItems.size > 0 && (
-            <>
-              <span className="text-sm text-slate-600 dark:text-slate-400">
-                {selectedItems.size} ausgewählt
-              </span>
+          </div>
+
+          {/* Bulk Actions Bar */}
+          {bulkEditMode && (
+            <div className="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex flex-wrap items-center gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.size === filteredItems.length && filteredItems.length > 0}
+                  onChange={toggleSelectAll}
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Alle auswählen ({filteredItems.length})
+                </span>
+              </label>
+              <div className="flex-1" />
+              {selectedItems.size > 0 && (
+                <>
+                  <span className="text-sm text-slate-600 dark:text-slate-400">
+                    {selectedItems.size} ausgewählt
+                  </span>
+                  <button
+                    onClick={() => setShowBulkEditModal(true)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                  >
+                    Bearbeiten
+                  </button>
+                  <button
+                    onClick={handleBulkDelete}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
+                  >
+                    Löschen
+                  </button>
+                </>
+              )}
               <button
-                onClick={() => setShowBulkEditModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                onClick={() => {
+                  setBulkEditMode(false)
+                  setSelectedItems(new Set())
+                }}
+                className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition text-sm font-medium"
               >
-                Bearbeiten
+                Abbrechen
               </button>
-              <button
-                onClick={handleBulkDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
-              >
-                Löschen
-              </button>
-            </>
+            </div>
           )}
-          <button
-            onClick={() => {
-              setBulkEditMode(false)
-              setSelectedItems(new Set())
-            }}
-            className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-600 transition text-sm font-medium"
-          >
-            Abbrechen
-          </button>
-        </div>
-      )}
 
-      {/* Filters & View Toggle */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
-        <FilterBar
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-          selectedStatus={selectedStatus}
-          onStatusChange={setSelectedStatus}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          minPrice={minPrice}
-          maxPrice={maxPrice}
-          onPriceChange={(min, max) => {
-            setMinPrice(min)
-            setMaxPrice(max)
-          }}
-        />
-
-        {/* View Toggle & Bulk Edit Button */}
-        <div className="flex gap-2">
-          {!bulkEditMode && filteredItems.length > 0 && (
-            <button
-              onClick={() => setBulkEditMode(true)}
-              className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-2"
-              title="Mehrere Items auswählen"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-              </svg>
-              <span className="hidden sm:inline">Auswählen</span>
-            </button>
-          )}
-          <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`px-3 py-2 rounded-md text-sm font-medium transition ${
-              viewMode === 'grid'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-            title="Kachelansicht"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`px-3 py-2 rounded-md text-sm font-medium transition ${
-              viewMode === 'list'
-                ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-            title="Listenansicht"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Items Grid/List */}
-      {loading ? (
-        <div className="text-center py-12 text-slate-500 dark:text-slate-400">Laden...</div>
-      ) : filteredItems.length === 0 ? (
-        <EmptyState collectionId={id} hasFilters={!!(debouncedSearch || selectedCategory || selectedStatus)} onClearFilters={() => {
-          setSearchQuery('')
-          setSelectedCategory('')
-          setSelectedStatus('')
-          setMinPrice('')
-          setMaxPrice('')
-        }} />
-      ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredItems.map((item) => (
-            <ItemCard
-              key={item.id}
-              item={item}
-              collectionId={id}
-              bulkEditMode={bulkEditMode}
-              isSelected={selectedItems.has(item.id)}
-              onToggleSelect={() => toggleItemSelection(item.id)}
+          {/* Filters & View Toggle */}
+          <div className="mb-6 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+            <FilterBar
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              selectedStatus={selectedStatus}
+              onStatusChange={setSelectedStatus}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              onPriceChange={(min, max) => {
+                setMinPrice(min)
+                setMaxPrice(max)
+              }}
             />
-          ))}
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-slate-50 dark:bg-slate-900">
-              <tr>
-                {bulkEditMode && <th className="w-12"></th>}
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400">Item</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hidden sm:table-cell">Status</th>
-                <th className="text-right px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400">Preis</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+
+            {/* View Toggle & Bulk Edit Button */}
+            <div className="flex gap-2">
+              {!bulkEditMode && filteredItems.length > 0 && (
+                <button
+                  onClick={() => setBulkEditMode(true)}
+                  className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center gap-2"
+                  title="Mehrere Items auswählen"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  </svg>
+                  <span className="hidden sm:inline">Auswählen</span>
+                </button>
+              )}
+              <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition ${
+                    viewMode === 'grid'
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Kachelansicht"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition ${
+                    viewMode === 'list'
+                      ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                  title="Listenansicht"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Items Grid/List */}
+          {loading ? (
+            <div className="text-center py-12 text-slate-500 dark:text-slate-400">Laden...</div>
+          ) : filteredItems.length === 0 ? (
+            <EmptyState collectionId={id} hasFilters={!!(debouncedSearch || selectedCategory || selectedStatus)} onClearFilters={() => {
+              setSearchQuery('')
+              setSelectedCategory('')
+              setSelectedStatus('')
+              setMinPrice('')
+              setMaxPrice('')
+            }} />
+          ) : viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredItems.map((item) => (
-                <ItemRow
+                <ItemCard
                   key={item.id}
                   item={item}
                   collectionId={id}
@@ -608,11 +586,34 @@ export default function CollectionDetailPage({ params }: PageProps) {
                   onToggleSelect={() => toggleItemSelection(item.id)}
                 />
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      </>
+            </div>
+          ) : (
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-slate-50 dark:bg-slate-900">
+                  <tr>
+                    {bulkEditMode && <th className="w-12"></th>}
+                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400">Item</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hidden sm:table-cell">Status</th>
+                    <th className="text-right px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400">Preis</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  {filteredItems.map((item) => (
+                    <ItemRow
+                      key={item.id}
+                      item={item}
+                      collectionId={id}
+                      bulkEditMode={bulkEditMode}
+                      isSelected={selectedItems.has(item.id)}
+                      onToggleSelect={() => toggleItemSelection(item.id)}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
       {/* Share Modal */}
