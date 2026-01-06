@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
-import { Sidebar } from '@/components/layout/Sidebar'
+import { TopHeader } from '@/components/layout/TopHeader'
 import { InstallPrompt } from '@/components/InstallPrompt'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import { ThemeProvider } from '@/contexts/ThemeContext'
@@ -121,8 +121,8 @@ export const viewport: Viewport = {
   themeColor: '#0f172a',
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   viewportFit: 'cover'
 }
 
@@ -137,16 +137,14 @@ export default function RootLayout({
         {/* Theme initialization - prevents flash of unstyled content */}
         <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
-      <body className={`${inter.className} bg-slate-100 dark:bg-slate-900 transition-colors`}>
+      <body className={`${inter.className} bg-slate-50 dark:bg-slate-950 transition-colors`}>
         <ThemeProvider>
           <ToastProvider>
             <ServiceWorkerRegistration />
-            <div className="flex min-h-screen min-h-[100dvh]">
-              <Sidebar />
-              <main className="flex-1 overflow-auto pt-14 lg:pt-0">
-                {children}
-              </main>
-            </div>
+            <TopHeader />
+            <main className="min-h-screen min-h-[100dvh]">
+              {children}
+            </main>
             <InstallPrompt />
           </ToastProvider>
         </ThemeProvider>

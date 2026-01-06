@@ -254,6 +254,19 @@ export default function SettingsPage() {
         <div className="space-y-6">
           {/* Stats Overview */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <Link
+              href="/settings/costs"
+              className="bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl p-4 text-white hover:shadow-lg transition-shadow group"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-2xl">💰</span>
+                <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <div className="text-lg font-semibold">Service Kosten</div>
+              <div className="text-xs opacity-90 mt-1">Monitoring & Budget</div>
+            </Link>
             <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
               <div className="text-2xl font-bold dark:text-white">{stats.collections}</div>
               <div className="text-sm text-slate-700 dark:text-slate-300">Sammlungen</div>

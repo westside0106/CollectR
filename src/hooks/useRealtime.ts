@@ -75,6 +75,7 @@ export function useRealtime<T extends Record<string, unknown>>({
     const channel = supabase
       .channel(channelName)
       .on(
+        'postgres_changes' as any,
         // @ts-ignore - Supabase type definitions incorrectly restrict .on() to 'system' events only
         'postgres_changes',
         {

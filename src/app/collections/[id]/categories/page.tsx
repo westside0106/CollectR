@@ -208,12 +208,22 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
 
   async function loadAttributes(categoryId: string) {
     try {
+      // Finde die gewählte Kategorie
+      const category = categories.find(cat => cat.id === categoryId)
+      const categoryIds = [categoryId]
+
+      // Wenn Kategorie einen Parent hat, füge Parent-ID hinzu
+      if (category?.parent_id) {
+        categoryIds.push(category.parent_id)
+      }
+
+      // Lade Attribute von gewählter Kategorie UND Parent (falls vorhanden)
       const { data, error } = await supabase
         .from('attribute_definitions')
         .select('*')
-        .eq('category_id', categoryId)
+        .in('category_id', categoryIds)
         .order('sort_order')
-      
+
       if (error) {
         console.error('Error loading attributes:', error)
       } else if (data) {

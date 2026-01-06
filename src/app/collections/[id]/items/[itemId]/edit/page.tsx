@@ -74,7 +74,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
     loadData()
   }, [collectionId, itemId])
 
-  // Attribute laden wenn Kategorie gewählt
+  // Attribute laden wenn Kategorie gewählt (inkl. Parent-Kategorie)
   useEffect(() => {
     async function loadAttributes() {
       if (!selectedCategory) {
@@ -82,16 +82,26 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         return
       }
 
+      // Finde die gewählte Kategorie
+      const category = categories.find(cat => cat.id === selectedCategory)
+      const categoryIds = [selectedCategory]
+
+      // Wenn Kategorie einen Parent hat, füge Parent-ID hinzu
+      if (category?.parent_id) {
+        categoryIds.push(category.parent_id)
+      }
+
+      // Lade Attribute von gewählter Kategorie UND Parent (falls vorhanden)
       const { data } = await supabase
         .from('attribute_definitions')
         .select('*')
-        .eq('category_id', selectedCategory)
+        .in('category_id', categoryIds)
         .order('sort_order')
 
       if (data) setAttributes(data)
     }
     loadAttributes()
-  }, [selectedCategory])
+  }, [selectedCategory, categories])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
