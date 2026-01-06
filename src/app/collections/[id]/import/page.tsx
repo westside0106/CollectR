@@ -343,25 +343,25 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
 
       {/* Step: Upload */}
       {step === 'upload' && (
-        <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-8 shadow-sm border border-slate-200 dark:border-slate-700 text-center">
           <span className="text-6xl mb-4 block">📄</span>
-          <h2 className="text-xl font-semibold mb-2">Datei auswählen</h2>
-          <p className="text-slate-500 mb-6">CSV oder JSON Datei mit deinen Items</p>
-          
-          <label className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors cursor-pointer">
+          <h2 className="text-xl font-semibold mb-2 dark:text-white">Datei auswählen</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-6">CSV oder JSON Datei mit deinen Items</p>
+
+          <label className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors cursor-pointer touch-manipulation select-none min-h-[56px] min-w-[200px] flex items-center justify-center">
             <input
               type="file"
               accept=".csv,.json"
               onChange={handleFileUpload}
               disabled={!userId}
-              className="sr-only"
+              className="hidden"
             />
             Datei auswählen
           </label>
 
-          <div className="mt-8 p-4 bg-slate-50 rounded-lg text-left text-sm">
-            <p className="font-medium mb-2">Unterstützte Formate:</p>
-            <ul className="text-slate-500 space-y-1">
+          <div className="mt-8 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg text-left text-sm">
+            <p className="font-medium mb-2 dark:text-white">Unterstützte Formate:</p>
+            <ul className="text-slate-500 dark:text-slate-400 space-y-1">
               <li>• CSV (Semikolon oder Komma getrennt)</li>
               <li>• JSON (Array von Objekten)</li>
             </ul>
