@@ -1,4 +1,5 @@
 'use client'
+// Build: 2026-01-07T13:00:00Z
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
