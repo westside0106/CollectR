@@ -10,6 +10,8 @@ import { FilterBar } from '@/components/FilterBar'
 import { useDebounce, useRealtimeRefresh } from '@/hooks'
 import { CollectionGoals } from '@/components/CollectionGoals'
 import { ShareModal } from '@/components/ShareModal'
+import { AIBatchUpload } from '@/components/AIBatchUpload'
+import { useToast } from '@/components/Toast'
 
 type ViewMode = 'grid' | 'list'
 type TabMode = 'items' | 'goals'
@@ -23,6 +25,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
+  const { showToast } = useToast()
 
   const [collection, setCollection] = useState<any>(null)
   const [items, setItems] = useState<any[]>([])
@@ -30,6 +33,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
+  const [showAIBatchUpload, setShowAIBatchUpload] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
   const [activeTab, setActiveTab] = useState<TabMode>('items')
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
@@ -269,6 +273,12 @@ export default function CollectionDetailPage({ params }: PageProps) {
           >
             📷 Scannen
           </Link>
+          <button
+            onClick={() => setShowAIBatchUpload(true)}
+            className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+          >
+            ✨ KI Batch-Upload
+          </button>
           <Link
             href={`/collections/${id}/items/new`}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
@@ -436,8 +446,35 @@ export default function CollectionDetailPage({ params }: PageProps) {
           onClose={() => setShowShareModal(false)}
         />
       )}
+
+      {/* AI Batch Upload Modal */}
+      {showAIBatchUpload && (
+        <AIBatchUpload
+          collectionId={id}
+          collectionType={getCollectionType(collection?.name)}
+          categories={categories}
+          onItemsCreated={(count) => {
+            showToast(`${count} Item${count !== 1 ? 's' : ''} erfolgreich erstellt!`)
+            loadData()
+          }}
+          onClose={() => setShowAIBatchUpload(false)}
+        />
+      )}
     </div>
   )
+}
+
+// Helper: Detect collection type from name
+function getCollectionType(name: string | undefined): string | undefined {
+  if (!name) return undefined
+  const normalized = name.toLowerCase()
+  if (normalized.includes('hot wheels') || normalized.includes('modellauto')) return 'hot-wheels'
+  if (normalized.includes('münz')) return 'coins'
+  if (normalized.includes('briefmark')) return 'stamps'
+  if (normalized.includes('vinyl') || normalized.includes('schallplatte')) return 'vinyl'
+  if (normalized.includes('lego')) return 'lego'
+  if (normalized.includes('uhr')) return 'watches'
+  return undefined
 }
 
 function ItemCard({ item, collectionId }: { item: any; collectionId: string }) {
