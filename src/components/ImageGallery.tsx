@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 interface Image {
   id: string
@@ -17,8 +17,127 @@ interface ImageGalleryProps {
 export function ImageGallery({ images, itemName }: ImageGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isLightboxOpen, setIsLightboxOpen] = useState(false)
+  const [scale, setScale] = useState(1)
+  const [translateX, setTranslateX] = useState(0)
+  const [translateY, setTranslateY] = useState(0)
+
+  const imageRef = useRef<HTMLImageElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const touchStartDistance = useRef(0)
+  const touchStartScale = useRef(1)
+  const touchStartX = useRef(0)
+  const touchStartY = useRef(0)
+  const lastTouchX = useRef(0)
+  const lastTouchY = useRef(0)
+  const swipeStartX = useRef(0)
+  const swipeStartY = useRef(0)
 
   const selectedImage = images[selectedIndex]
+
+  // Reset zoom when image changes
+  useEffect(() => {
+    setScale(1)
+    setTranslateX(0)
+    setTranslateY(0)
+  }, [selectedIndex])
+
+  // Handle pinch-to-zoom and pan
+  useEffect(() => {
+    if (!isLightboxOpen || !containerRef.current) return
+
+    const container = containerRef.current
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        // Pinch zoom start
+        const touch1 = e.touches[0]
+        const touch2 = e.touches[1]
+        const distance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        )
+        touchStartDistance.current = distance
+        touchStartScale.current = scale
+        e.preventDefault()
+      } else if (e.touches.length === 1) {
+        // Pan start or swipe start
+        const touch = e.touches[0]
+        if (scale > 1) {
+          // Pan for zoomed image
+          touchStartX.current = touch.clientX - translateX
+          touchStartY.current = touch.clientY - translateY
+        } else {
+          // Swipe for navigation
+          swipeStartX.current = touch.clientX
+          swipeStartY.current = touch.clientY
+        }
+        lastTouchX.current = touch.clientX
+        lastTouchY.current = touch.clientY
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        // Pinch zoom
+        const touch1 = e.touches[0]
+        const touch2 = e.touches[1]
+        const distance = Math.hypot(
+          touch2.clientX - touch1.clientX,
+          touch2.clientY - touch1.clientY
+        )
+        const newScale = (distance / touchStartDistance.current) * touchStartScale.current
+        setScale(Math.max(1, Math.min(4, newScale)))
+        e.preventDefault()
+      } else if (e.touches.length === 1 && scale > 1) {
+        // Pan zoomed image
+        const touch = e.touches[0]
+        setTranslateX(touch.clientX - touchStartX.current)
+        setTranslateY(touch.clientY - touchStartY.current)
+        e.preventDefault()
+      }
+    }
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length === 0) {
+        // Check for swipe navigation
+        if (scale === 1 && images.length > 1) {
+          const deltaX = lastTouchX.current - swipeStartX.current
+          const deltaY = Math.abs(lastTouchY.current - swipeStartY.current)
+
+          // Horizontal swipe with minimal vertical movement
+          if (Math.abs(deltaX) > 50 && deltaY < 30) {
+            if (deltaX > 0) {
+              // Swipe right - previous image
+              setSelectedIndex(prev => prev === 0 ? images.length - 1 : prev - 1)
+            } else {
+              // Swipe left - next image
+              setSelectedIndex(prev => prev === images.length - 1 ? 0 : prev + 1)
+            }
+          }
+        }
+      }
+    }
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: false })
+    container.addEventListener('touchmove', handleTouchMove, { passive: false })
+    container.addEventListener('touchend', handleTouchEnd, { passive: false })
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+      container.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [isLightboxOpen, scale, translateX, translateY, images.length])
+
+  const handleDoubleClick = () => {
+    if (scale === 1) {
+      setScale(2)
+    } else {
+      setScale(1)
+      setTranslateX(0)
+      setTranslateY(0)
+    }
+  }
 
   if (images.length === 0) {
     return (
@@ -110,32 +229,55 @@ export function ImageGallery({ images, itemName }: ImageGalleryProps) {
       {/* Lightbox */}
       {isLightboxOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
-          onClick={() => setIsLightboxOpen(false)}
+          ref={containerRef}
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center overflow-hidden"
+          onClick={() => {
+            if (scale === 1) {
+              setIsLightboxOpen(false)
+            }
+          }}
         >
           {/* Close Button */}
           <button
-            onClick={() => setIsLightboxOpen(false)}
-            className="absolute top-4 right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+            onClick={() => {
+              setIsLightboxOpen(false)
+              setScale(1)
+              setTranslateX(0)
+              setTranslateY(0)
+            }}
+            className="absolute top-4 right-4 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors z-10"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
+          {/* Zoom Indicator */}
+          {scale > 1 && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/20 text-white text-sm px-3 py-1 rounded-full z-10">
+              {Math.round(scale * 100)}%
+            </div>
+          )}
+
           {/* Counter */}
           {images.length > 1 && (
-            <div className="absolute top-4 left-4 text-white text-lg">
+            <div className="absolute top-4 left-4 text-white text-lg z-10">
               {selectedIndex + 1} / {images.length}
             </div>
           )}
 
           {/* Main Image */}
           <img
+            ref={imageRef}
             src={selectedImage.original_url}
             alt={itemName}
-            className="max-w-[90vw] max-h-[90vh] object-contain"
+            className="max-w-[90vw] max-h-[90vh] object-contain transition-transform touch-none select-none"
+            style={{
+              transform: `scale(${scale}) translate(${translateX / scale}px, ${translateY / scale}px)`,
+              cursor: scale > 1 ? 'move' : 'zoom-in'
+            }}
             onClick={(e) => e.stopPropagation()}
+            onDoubleClick={handleDoubleClick}
           />
 
           {/* Navigation */}

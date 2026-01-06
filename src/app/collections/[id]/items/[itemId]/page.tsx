@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { DeleteItemButton } from './DeleteItemButton'
 import { ShareItemButton } from './ShareItemButton'
 import { ImageGallery } from '@/components/ImageGallery'
+import { TagSection } from '@/components/TagSection'
 
 interface PageProps {
   params: Promise<{ id: string; itemId: string }>
@@ -12,6 +13,12 @@ interface PageProps {
 export default async function ItemDetailPage({ params }: PageProps) {
   const { id: collectionId, itemId } = await params
   const supabase = await createClient()
+
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    notFound()
+  }
 
   // Load item with collection name for breadcrumb
   const { data: item, error } = await supabase
@@ -117,6 +124,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{item.description}</p>
             </section>
           )}
+
+          {/* Tags */}
+          <TagSection itemId={itemId} userId={user.id} />
 
           {/* Purchase Info & Value */}
           <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
