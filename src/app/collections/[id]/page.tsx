@@ -611,8 +611,6 @@ export default function CollectionDetailPage({ params }: PageProps) {
           </table>
         </div>
       )}
-        </>
-      )}
 
       {/* Share Modal */}
       {showShareModal && (
