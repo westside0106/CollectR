@@ -137,13 +137,13 @@ export function CategorySelect({
             <>
               {selectedCategory.icon} {selectedCategory.name}
               {selectedCategory.parent_id && (
-                <span className="text-slate-400 ml-1 text-xs">
+                <span className="text-slate-600 dark:text-slate-400 ml-1 text-xs">
                   (Unterkategorie)
                 </span>
               )}
             </>
           ) : (
-            <span className="text-slate-400">{placeholder}</span>
+            <span className="text-slate-600 dark:text-slate-400">{placeholder}</span>
           )}
         </span>
         <svg
@@ -158,13 +158,13 @@ export function CategorySelect({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg shadow-xl max-h-80 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg shadow-xl max-h-80 overflow-y-auto">
           {/* "Keine" Option */}
           <button
             type="button"
             onClick={() => handleSelect('')}
-            className={`w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors ${
-              !value ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''
+            className={`w-full text-left px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${
+              !value ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300' : ''
             }`}
           >
             {placeholder}
@@ -182,8 +182,8 @@ export function CategorySelect({
                 <button
                   type="button"
                   onClick={() => handleSelect(parent.id)}
-                  className={`w-full text-left px-4 py-3 font-medium hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors flex items-center gap-2 ${
-                    isParentSelected ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''
+                  className={`w-full text-left px-4 py-3 font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 ${
+                    isParentSelected ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300' : ''
                   }`}
                   style={parent.color ? { borderLeftColor: parent.color, borderLeftWidth: '4px' } : undefined}
                 >
@@ -197,7 +197,7 @@ export function CategorySelect({
                   <span className="flex-1">{parent.name}</span>
                   {children.length > 0 && (
                     <svg
-                      className="w-4 h-4 text-slate-400"
+                      className="w-4 h-4 text-slate-600 dark:text-slate-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -209,7 +209,7 @@ export function CategorySelect({
 
                 {/* Children */}
                 {children.length > 0 && (
-                  <div className="bg-slate-50 dark:bg-slate-800">
+                  <div className="bg-slate-50 dark:bg-slate-700/50">
                     {children.map(child => {
                       const isSelected = value === child.id
                       return (
@@ -217,12 +217,12 @@ export function CategorySelect({
                           key={child.id}
                           type="button"
                           onClick={() => handleSelect(child.id)}
-                          className={`w-full text-left px-4 py-3 pl-8 text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 ${
-                            isSelected ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : ''
+                          className={`w-full text-left px-4 py-3 pl-8 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 ${
+                            isSelected ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300' : ''
                           }`}
                           style={child.color ? { borderLeftColor: child.color, borderLeftWidth: '3px' } : undefined}
                         >
-                          <span className="text-slate-400 text-xs">└─</span>
+                          <span className="text-slate-600 dark:text-slate-400 text-xs">└─</span>
                           {child.color && (
                             <span
                               className="w-2.5 h-2.5 rounded-full flex-shrink-0"
