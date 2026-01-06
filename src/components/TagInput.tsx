@@ -97,12 +97,14 @@ export function TagInput({ itemId, userId, initialTags = [], onTagsChange }: Tag
           .select()
           .single()
 
-        if (tagError) throw tagError
+        if (tagError || !newTag) throw tagError || new Error('Failed to create tag')
         existingTag = newTag
         setSuggestions([...suggestions, newTag])
       }
 
       // Link tag to item
+      if (!existingTag) return
+
       const { error: linkError } = await supabase
         .from('item_tags')
         .insert({
