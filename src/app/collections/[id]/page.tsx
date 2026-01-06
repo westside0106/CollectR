@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { use } from 'react'
 import { SearchBar } from '@/components/SearchBar'
 import { FilterBar } from '@/components/FilterBar'
-import { useDebounce, useRealtimeRefresh } from '@/hooks'
+import { useDebounce, useRealtimeRefresh, usePullToRefresh } from '@/hooks'
 import { CollectionGoals } from '@/components/CollectionGoals'
 import { ShareModal } from '@/components/ShareModal'
 import { AIBatchUpload } from '@/components/AIBatchUpload'
@@ -126,6 +126,14 @@ export default function CollectionDetailPage({ params }: PageProps) {
 
   // Realtime: Live-Updates wenn Items hinzugefügt/geändert/gelöscht werden
   useRealtimeRefresh('items', loadData, `collection_id=eq.${id}`)
+
+  // Pull-to-Refresh
+  const { isRefreshing: isPullRefreshing, isPulling, pullDistance, shouldRefresh } = usePullToRefresh({
+    onRefresh: async () => {
+      await loadData()
+    },
+    threshold: 80
+  })
 
   const filteredItems = useMemo(() => {
     if (!debouncedSearch) return items
@@ -259,7 +267,40 @@ export default function CollectionDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="p-8 dark:bg-slate-900 min-h-screen">
+    <div className="p-8 dark:bg-slate-900 min-h-screen" data-pull-refresh>
+      {/* Pull-to-Refresh Indicator */}
+      {(isPulling || isPullRefreshing) && (
+        <div
+          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center transition-all duration-300 pointer-events-none"
+          style={{
+            transform: `translateY(${isPullRefreshing ? '60px' : Math.min(pullDistance, 80)}px)`,
+            opacity: isPullRefreshing ? 1 : pullDistance / 80
+          }}
+        >
+          <div className={`bg-white dark:bg-slate-800 rounded-full p-3 shadow-lg border-2 ${
+            shouldRefresh || isPullRefreshing
+              ? 'border-blue-500 dark:border-blue-400'
+              : 'border-slate-300 dark:border-slate-600'
+          }`}>
+            <svg
+              className={`w-6 h-6 ${
+                isPullRefreshing ? 'animate-spin text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
