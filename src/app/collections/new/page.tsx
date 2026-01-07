@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useToast } from '@/components/Toast'
+import EmojiPicker from '@/components/EmojiPicker'
 
 // Preset-Definitionen für verschiedene Sammlungstypen
 const COLLECTION_PRESETS = [
@@ -227,6 +228,7 @@ export default function NewCollectionPage() {
   const { showToast } = useToast()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [icon, setIcon] = useState('📦')
   const [selectedPreset, setSelectedPreset] = useState('custom')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -252,13 +254,14 @@ export default function NewCollectionPage() {
     setError('')
 
     try {
-      // 1. Collection erstellen
+      // 1. Collection erstellen mit Icon in settings
       const { data: collection, error: collectionError } = await supabase
         .from('collections')
         .insert({
           name,
           description,
-          owner_id: userId
+          owner_id: userId,
+          settings: { icon }
         })
         .select()
         .single()
@@ -344,18 +347,27 @@ export default function NewCollectionPage() {
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-              Name *
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
-              placeholder="z.B. Meine Hot Wheels Sammlung"
-            />
+          {/* Icon & Name */}
+          <div className="flex gap-4 items-start">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Icon
+              </label>
+              <EmojiPicker value={icon} onChange={setIcon} />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
+                Name *
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
+                placeholder="z.B. Meine Hot Wheels Sammlung"
+              />
+            </div>
           </div>
 
           <div>
@@ -381,10 +393,13 @@ export default function NewCollectionPage() {
                 <button
                   key={preset.id}
                   type="button"
-                  onClick={() => setSelectedPreset(preset.id)}
+                  onClick={() => {
+                    setSelectedPreset(preset.id)
+                    setIcon(preset.icon)
+                  }}
                   className={`p-3 rounded-lg border-2 text-left transition-all ${
                     selectedPreset === preset.id
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                      ? 'border-accent-500 bg-accent-50 dark:bg-accent-900/30'
                       : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 hover:bg-gray-50 dark:hover:bg-slate-700'
                   }`}
                 >
@@ -405,7 +420,7 @@ export default function NewCollectionPage() {
             <button
               type="submit"
               disabled={loading || !name}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50"
+              className="flex-1 bg-accent-500 text-white py-3 rounded-lg hover:bg-accent-600 transition font-medium disabled:opacity-50"
             >
               {loading ? 'Wird erstellt...' : 'Sammlung erstellen'}
             </button>

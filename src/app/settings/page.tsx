@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useToast } from '@/components/Toast'
+import { useTheme, ACCENT_COLORS } from '@/contexts/ThemeContext'
 
 interface Profile {
   id: string
@@ -40,6 +41,7 @@ export default function SettingsPage() {
   const router = useRouter()
   const supabase = createClient()
   const { showToast } = useToast()
+  const { theme, setTheme: setThemeContext, accentColor, setAccentColor } = useTheme()
 
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -56,14 +58,8 @@ export default function SettingsPage() {
   const [stats, setStats] = useState<Stats>({ collections: 0, items: 0, sharedWithMe: 0, sharedByMe: 0 })
   const [sharedCollections, setSharedCollections] = useState<SharedCollection[]>([])
 
-  // Theme
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
-
   useEffect(() => {
     loadData()
-    // Load theme preference
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null
-    if (savedTheme) setTheme(savedTheme)
   }, [])
 
   async function loadData() {
@@ -201,24 +197,13 @@ export default function SettingsPage() {
   }
 
   function handleThemeChange(newTheme: 'light' | 'dark' | 'system') {
-    setTheme(newTheme)
-    localStorage.setItem('theme', newTheme)
-
-    // Apply theme
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else if (newTheme === 'light') {
-      document.documentElement.classList.remove('dark')
-    } else {
-      // System preference
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
-    }
-
+    setThemeContext(newTheme)
     showToast('Design geändert')
+  }
+
+  function handleAccentChange(color: typeof accentColor) {
+    setAccentColor(color)
+    showToast('Akzentfarbe geändert')
   }
 
   if (loading) {
@@ -321,7 +306,7 @@ export default function SettingsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+                  className="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600 disabled:opacity-50 transition"
                 >
                   {saving ? 'Speichern...' : 'Speichern'}
                 </button>
@@ -334,41 +319,78 @@ export default function SettingsPage() {
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
               <h2 className="text-lg font-semibold dark:text-white">Erscheinungsbild</h2>
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  onClick={() => handleThemeChange('light')}
-                  className={`p-4 rounded-lg border-2 transition ${
-                    theme === 'light'
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                  }`}
-                >
-                  <div className="text-2xl mb-2">☀️</div>
-                  <div className="text-sm font-medium dark:text-white">Hell</div>
-                </button>
-                <button
-                  onClick={() => handleThemeChange('dark')}
-                  className={`p-4 rounded-lg border-2 transition ${
-                    theme === 'dark'
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                  }`}
-                >
-                  <div className="text-2xl mb-2">🌙</div>
-                  <div className="text-sm font-medium dark:text-white">Dunkel</div>
-                </button>
-                <button
-                  onClick={() => handleThemeChange('system')}
-                  className={`p-4 rounded-lg border-2 transition ${
-                    theme === 'system'
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                  }`}
-                >
-                  <div className="text-2xl mb-2">💻</div>
-                  <div className="text-sm font-medium dark:text-white">System</div>
-                </button>
+            <div className="p-6 space-y-6">
+              {/* Light/Dark/System */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                  Modus
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  <button
+                    onClick={() => handleThemeChange('light')}
+                    className={`p-4 rounded-lg border-2 transition ${
+                      theme === 'light'
+                        ? 'border-accent-500 bg-accent-50'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">☀️</div>
+                    <div className="text-sm font-medium dark:text-white">Hell</div>
+                  </button>
+                  <button
+                    onClick={() => handleThemeChange('dark')}
+                    className={`p-4 rounded-lg border-2 transition ${
+                      theme === 'dark'
+                        ? 'border-accent-500 bg-accent-100 dark:bg-accent-900/30'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">🌙</div>
+                    <div className="text-sm font-medium dark:text-white">Dunkel</div>
+                  </button>
+                  <button
+                    onClick={() => handleThemeChange('system')}
+                    className={`p-4 rounded-lg border-2 transition ${
+                      theme === 'system'
+                        ? 'border-accent-500 bg-accent-50 dark:bg-accent-900/30'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">💻</div>
+                    <div className="text-sm font-medium dark:text-white">System</div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Accent Color */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                  Akzentfarbe
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {ACCENT_COLORS.map((color) => (
+                    <button
+                      key={color.value}
+                      onClick={() => handleAccentChange(color.value)}
+                      className={`w-12 h-12 rounded-full transition-all duration-200 flex items-center justify-center ${
+                        accentColor === color.value
+                          ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-500 dark:ring-offset-slate-800 scale-110'
+                          : 'hover:scale-105'
+                      }`}
+                      style={{ backgroundColor: color.color }}
+                      title={color.label}
+                    >
+                      {accentColor === color.value && (
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                  Aktiv: {ACCENT_COLORS.find(c => c.value === accentColor)?.label}
+                </p>
               </div>
             </div>
           </div>
@@ -445,7 +467,7 @@ export default function SettingsPage() {
                 <button
                   type="submit"
                   disabled={saving || !newPassword || !confirmPassword}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+                  className="px-4 py-2 bg-accent-500 text-white rounded-lg hover:bg-accent-600 disabled:opacity-50 transition"
                 >
                   {saving ? 'Ändern...' : 'Passwort ändern'}
                 </button>

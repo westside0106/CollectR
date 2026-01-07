@@ -3,6 +3,152 @@
 /* Dark Mode Configuration */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ========================================
+   ACCENT COLOR SYSTEM
+   ======================================== */
+
+:root {
+  /* Default: Blue */
+  --accent-50: 239 246 255;
+  --accent-100: 219 234 254;
+  --accent-200: 191 219 254;
+  --accent-300: 147 197 253;
+  --accent-400: 96 165 250;
+  --accent-500: 59 130 246;
+  --accent-600: 37 99 235;
+  --accent-700: 29 78 216;
+  --accent-800: 30 64 175;
+  --accent-900: 30 58 138;
+}
+
+/* Green Theme */
+[data-accent="green"] {
+  --accent-50: 240 253 244;
+  --accent-100: 220 252 231;
+  --accent-200: 187 247 208;
+  --accent-300: 134 239 172;
+  --accent-400: 74 222 128;
+  --accent-500: 34 197 94;
+  --accent-600: 22 163 74;
+  --accent-700: 21 128 61;
+  --accent-800: 22 101 52;
+  --accent-900: 20 83 45;
+}
+
+/* Purple Theme */
+[data-accent="purple"] {
+  --accent-50: 250 245 255;
+  --accent-100: 243 232 255;
+  --accent-200: 233 213 255;
+  --accent-300: 216 180 254;
+  --accent-400: 192 132 252;
+  --accent-500: 168 85 247;
+  --accent-600: 147 51 234;
+  --accent-700: 126 34 206;
+  --accent-800: 107 33 168;
+  --accent-900: 88 28 135;
+}
+
+/* Orange Theme */
+[data-accent="orange"] {
+  --accent-50: 255 247 237;
+  --accent-100: 255 237 213;
+  --accent-200: 254 215 170;
+  --accent-300: 253 186 116;
+  --accent-400: 251 146 60;
+  --accent-500: 249 115 22;
+  --accent-600: 234 88 12;
+  --accent-700: 194 65 12;
+  --accent-800: 154 52 18;
+  --accent-900: 124 45 18;
+}
+
+/* Rose/Pink Theme */
+[data-accent="rose"] {
+  --accent-50: 255 241 242;
+  --accent-100: 255 228 230;
+  --accent-200: 254 205 211;
+  --accent-300: 253 164 175;
+  --accent-400: 251 113 133;
+  --accent-500: 244 63 94;
+  --accent-600: 225 29 72;
+  --accent-700: 190 18 60;
+  --accent-800: 159 18 57;
+  --accent-900: 136 19 55;
+}
+
+/* Teal Theme */
+[data-accent="teal"] {
+  --accent-50: 240 253 250;
+  --accent-100: 204 251 241;
+  --accent-200: 153 246 228;
+  --accent-300: 94 234 212;
+  --accent-400: 45 212 191;
+  --accent-500: 20 184 166;
+  --accent-600: 13 148 136;
+  --accent-700: 15 118 110;
+  --accent-800: 17 94 89;
+  --accent-900: 19 78 74;
+}
+
+/* Amber Theme */
+[data-accent="amber"] {
+  --accent-50: 255 251 235;
+  --accent-100: 254 243 199;
+  --accent-200: 253 230 138;
+  --accent-300: 252 211 77;
+  --accent-400: 251 191 36;
+  --accent-500: 245 158 11;
+  --accent-600: 217 119 6;
+  --accent-700: 180 83 9;
+  --accent-800: 146 64 14;
+  --accent-900: 120 53 15;
+}
+
+/* Accent Color Utility Classes */
+.bg-accent-50 { background-color: rgb(var(--accent-50)); }
+.bg-accent-100 { background-color: rgb(var(--accent-100)); }
+.bg-accent-200 { background-color: rgb(var(--accent-200)); }
+.bg-accent-300 { background-color: rgb(var(--accent-300)); }
+.bg-accent-400 { background-color: rgb(var(--accent-400)); }
+.bg-accent-500 { background-color: rgb(var(--accent-500)); }
+.bg-accent-600 { background-color: rgb(var(--accent-600)); }
+.bg-accent-700 { background-color: rgb(var(--accent-700)); }
+.bg-accent-800 { background-color: rgb(var(--accent-800)); }
+.bg-accent-900 { background-color: rgb(var(--accent-900)); }
+
+.text-accent-50 { color: rgb(var(--accent-50)); }
+.text-accent-100 { color: rgb(var(--accent-100)); }
+.text-accent-200 { color: rgb(var(--accent-200)); }
+.text-accent-300 { color: rgb(var(--accent-300)); }
+.text-accent-400 { color: rgb(var(--accent-400)); }
+.text-accent-500 { color: rgb(var(--accent-500)); }
+.text-accent-600 { color: rgb(var(--accent-600)); }
+.text-accent-700 { color: rgb(var(--accent-700)); }
+.text-accent-800 { color: rgb(var(--accent-800)); }
+.text-accent-900 { color: rgb(var(--accent-900)); }
+
+.border-accent-50 { border-color: rgb(var(--accent-50)); }
+.border-accent-100 { border-color: rgb(var(--accent-100)); }
+.border-accent-200 { border-color: rgb(var(--accent-200)); }
+.border-accent-300 { border-color: rgb(var(--accent-300)); }
+.border-accent-400 { border-color: rgb(var(--accent-400)); }
+.border-accent-500 { border-color: rgb(var(--accent-500)); }
+.border-accent-600 { border-color: rgb(var(--accent-600)); }
+.border-accent-700 { border-color: rgb(var(--accent-700)); }
+.border-accent-800 { border-color: rgb(var(--accent-800)); }
+.border-accent-900 { border-color: rgb(var(--accent-900)); }
+
+.ring-accent-500 { --tw-ring-color: rgb(var(--accent-500)); }
+.ring-accent-600 { --tw-ring-color: rgb(var(--accent-600)); }
+
+.hover\:bg-accent-600:hover { background-color: rgb(var(--accent-600)); }
+.hover\:bg-accent-700:hover { background-color: rgb(var(--accent-700)); }
+.hover\:text-accent-600:hover { color: rgb(var(--accent-600)); }
+.hover\:text-accent-700:hover { color: rgb(var(--accent-700)); }
+
+.focus\:ring-accent-500:focus { --tw-ring-color: rgb(var(--accent-500)); }
+
 /* iOS Safe Area Support */
 @supports (padding: env(safe-area-inset-top)) {
   .safe-area-top {

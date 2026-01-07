@@ -8,11 +8,13 @@ import { useToast } from '@/components/Toast'
 import { useRealtimeRefresh, usePullToRefresh } from '@/hooks'
 import { ShareModal } from '@/components/ShareModal'
 import { CollectionCardSkeleton } from '@/components/Skeleton'
+import EmojiPicker from '@/components/EmojiPicker'
 
 interface Collection {
   id: string
   name: string
   description: string | null
+  settings?: { icon?: string } | null
   item_count?: number
   is_shared?: boolean // true wenn geteilte Sammlung
   role?: 'viewer' | 'editor' | 'admin' // Rolle bei geteilten Sammlungen
@@ -21,19 +23,20 @@ interface Collection {
 interface EditModalProps {
   collection: Collection
   onClose: () => void
-  onSave: (id: string, name: string, description: string) => Promise<void>
+  onSave: (id: string, name: string, description: string, icon: string) => Promise<void>
 }
 
 function EditModal({ collection, onClose, onSave }: EditModalProps) {
   const [name, setName] = useState(collection.name)
   const [description, setDescription] = useState(collection.description || '')
+  const [icon, setIcon] = useState(collection.settings?.icon || '📁')
   const [saving, setSaving] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
     setSaving(true)
-    await onSave(collection.id, name.trim(), description.trim())
+    await onSave(collection.id, name.trim(), description.trim(), icon)
     setSaving(false)
     onClose()
   }
@@ -43,24 +46,30 @@ function EditModal({ collection, onClose, onSave }: EditModalProps) {
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={e => e.stopPropagation()}>
         <h2 className="text-xl font-bold mb-4 dark:text-white">Sammlung bearbeiten</h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name *</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
-              placeholder="z.B. Hot Wheels Sammlung"
-              required
-              autoFocus
-            />
+          <div className="mb-4 flex gap-4 items-start">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Icon</label>
+              <EmojiPicker value={icon} onChange={setIcon} />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Name *</label>
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 bg-white dark:bg-slate-700 dark:text-white"
+                placeholder="z.B. Hot Wheels Sammlung"
+                required
+                autoFocus
+              />
+            </div>
           </div>
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Beschreibung</label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none bg-white dark:bg-slate-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 resize-none bg-white dark:bg-slate-700 dark:text-white"
               rows={3}
               placeholder="Optional: Beschreibe deine Sammlung..."
             />
@@ -76,7 +85,7 @@ function EditModal({ collection, onClose, onSave }: EditModalProps) {
             <button
               type="submit"
               disabled={saving || !name.trim()}
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50"
+              className="px-4 py-2 rounded-lg bg-accent-500 text-white hover:bg-accent-600 transition disabled:opacity-50"
             >
               {saving ? 'Speichern...' : 'Speichern'}
             </button>
@@ -185,6 +194,7 @@ export default function CollectionsPage() {
         id,
         name,
         description,
+        settings,
         items(count)
       `)
       .eq('owner_id', user.id)
@@ -199,6 +209,7 @@ export default function CollectionsPage() {
           id,
           name,
           description,
+          settings,
           items(count)
         )
       `)
@@ -208,6 +219,7 @@ export default function CollectionsPage() {
       id: c.id,
       name: c.name,
       description: c.description,
+      settings: c.settings as { icon?: string } | null,
       item_count: (c.items as any)?.[0]?.count || 0,
       is_shared: false
     }))
@@ -218,6 +230,7 @@ export default function CollectionsPage() {
         id: (m.collections as any).id,
         name: (m.collections as any).name,
         description: (m.collections as any).description,
+        settings: (m.collections as any).settings as { icon?: string } | null,
         item_count: ((m.collections as any).items as any)?.[0]?.count || 0,
         is_shared: true,
         role: m.role as 'viewer' | 'editor' | 'admin'
@@ -241,15 +254,20 @@ export default function CollectionsPage() {
     threshold: 80
   })
 
-  async function handleSave(id: string, name: string, description: string) {
+  async function handleSave(id: string, name: string, description: string, icon: string) {
+    // Bestehende settings laden und icon mergen
+    const collection = collections.find(c => c.id === id)
+    const existingSettings = collection?.settings || {}
+    const newSettings = { ...existingSettings, icon }
+
     const { error } = await supabase
       .from('collections')
-      .update({ name, description: description || null })
+      .update({ name, description: description || null, settings: newSettings })
       .eq('id', id)
 
     if (!error) {
       setCollections(prev => prev.map(c =>
-        c.id === id ? { ...c, name, description: description || null } : c
+        c.id === id ? { ...c, name, description: description || null, settings: newSettings } : c
       ))
       showToast('Sammlung gespeichert!')
     } else {
@@ -305,7 +323,7 @@ export default function CollectionsPage() {
             <h1 className="text-2xl font-bold dark:text-white">Meine Sammlungen</h1>
             <Link
               href="/collections/new"
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              className="bg-accent-500 text-white px-4 py-2 rounded-lg hover:bg-accent-600 transition"
             >
               + Neue Sammlung
             </Link>
@@ -410,7 +428,7 @@ export default function CollectionsPage() {
             <p className="text-gray-600 dark:text-slate-400 mb-4">Erstelle deine erste Sammlung, um loszulegen!</p>
             <Link
               href="/collections/new"
-              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+              className="inline-block bg-accent-500 text-white px-6 py-3 rounded-lg hover:bg-accent-600 transition"
             >
               Sammlung erstellen
             </Link>
@@ -490,7 +508,9 @@ export default function CollectionsPage() {
                 )}
 
                 <Link href={`/collections/${collection.id}`}>
-                  <div className="text-3xl mb-2">{collection.is_shared ? '👥' : '📁'}</div>
+                  <div className="text-3xl mb-2">
+                    {collection.is_shared ? '👥' : (collection.settings?.icon || '📁')}
+                  </div>
                   <h3 className="text-lg font-semibold dark:text-white">{collection.name}</h3>
                   {collection.description && (
                     <p className="text-gray-600 dark:text-slate-400 text-sm mt-1 line-clamp-2">{collection.description}</p>

@@ -581,48 +581,48 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
   }, [error, success])
 
   return (
-    <div className="p-4 sm:p-8">
+    <div className="p-4 sm:p-8 min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Header */}
       <div className="mb-8">
-        <Link 
+        <Link
           href={`/collections/${collectionId}`}
-          className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1 mb-2"
+          className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm flex items-center gap-1 mb-2"
         >
           ← Zurück zur Sammlung
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Kategorien verwalten</h1>
-        <p className="text-slate-500 mt-1">Erstelle Kategorien und definiere ihre Attribute</p>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Kategorien verwalten</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1">Erstelle Kategorien und definiere ihre Attribute</p>
       </div>
 
       {/* Error/Success Messages */}
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex justify-between items-center">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-lg flex justify-between items-center">
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700">✕</button>
+          <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-200">✕</button>
         </div>
       )}
       {success && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg flex justify-between items-center">
+        <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-lg flex justify-between items-center">
           <span>{success}</span>
-          <button onClick={() => setSuccess(null)} className="text-green-500 hover:text-green-700">✕</button>
+          <button onClick={() => setSuccess(null)} className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-200">✕</button>
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Kategorien Liste */}
-        <section className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Kategorien</h2>
+            <h2 className="text-lg font-semibold dark:text-white">Kategorien</h2>
             <div className="flex gap-2">
               <button
                 onClick={() => setShowTemplates(true)}
-                className="text-slate-600 hover:text-slate-700 text-sm font-medium"
+                className="text-slate-600 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm font-medium"
               >
                 Vorlagen
               </button>
               <button
                 onClick={() => setShowNewCategory(true)}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-accent-500 hover:text-accent-600 text-sm font-medium"
               >
                 + Neue Kategorie
               </button>
@@ -631,37 +631,37 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
 
           {/* Templates Modal */}
           {showTemplates && (
-            <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+            <div className="mb-4 p-4 bg-gradient-to-r from-accent-50 to-purple-50 dark:from-accent-900/30 dark:to-purple-900/30 rounded-lg border border-accent-200 dark:border-accent-800">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="font-medium text-slate-800">Vorlagen importieren</h3>
-                <button onClick={() => setShowTemplates(false)} className="text-slate-400 hover:text-slate-600">
+                <h3 className="font-medium text-slate-800 dark:text-white">Vorlagen importieren</h3>
+                <button onClick={() => setShowTemplates(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                   ✕
                 </button>
               </div>
-              <p className="text-sm text-slate-600 mb-3">Wähle eine Vorlage um vorkonfigurierte Kategorien mit Attributen zu erstellen:</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">Wähle eine Vorlage um vorkonfigurierte Kategorien mit Attributen zu erstellen:</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {CATEGORY_TEMPLATES.map((template, idx) => (
                   <button
                     key={idx}
                     onClick={() => importTemplate(idx)}
                     disabled={loadingTemplate}
-                    className="text-left p-3 bg-white rounded-lg border border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-colors disabled:opacity-50"
+                    className="text-left p-3 bg-white dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 hover:border-accent-400 dark:hover:border-accent-500 hover:bg-accent-50 dark:hover:bg-accent-900/30 transition-colors disabled:opacity-50"
                   >
-                    <div className="font-medium text-sm">{template.name}</div>
-                    <div className="text-xs text-slate-500">{template.categories.length} Kategorien</div>
+                    <div className="font-medium text-sm dark:text-white">{template.name}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{template.categories.length} Kategorien</div>
                   </button>
                 ))}
               </div>
               {loadingTemplate && (
-                <div className="mt-3 text-center text-sm text-blue-600">Importiere...</div>
+                <div className="mt-3 text-center text-sm text-accent-600 dark:text-accent-400">Importiere...</div>
               )}
             </div>
           )}
 
           {showNewCategory && (
-            <form onSubmit={createCategory} className="mb-4 p-4 bg-slate-50 rounded-lg">
+            <form onSubmit={createCategory} className="mb-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg">
               <div className="flex gap-2 mb-3">
-                <select name="icon" className="px-3 py-2 rounded border border-slate-300" defaultValue="📦">
+                <select name="icon" className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white" defaultValue="📦">
                   {EMOJI_OPTIONS.map(emoji => (
                     <option key={emoji} value={emoji}>{emoji}</option>
                   ))}
@@ -672,18 +672,18 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                   placeholder="Kategorie-Name"
                   required
                   minLength={1}
-                  className="flex-1 px-3 py-2 rounded border border-slate-300"
+                  className="flex-1 px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white"
                 />
               </div>
               <div className="flex gap-2 mb-3">
-                <select name="color" className="px-3 py-2 rounded border border-slate-300 flex-1">
+                <select name="color" className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white flex-1">
                   {COLOR_OPTIONS.map(c => (
                     <option key={c.label} value={c.value || ''} style={{ color: c.color }}>
                       {c.label}
                     </option>
                   ))}
                 </select>
-                <select name="parent_id" className="px-3 py-2 rounded border border-slate-300 flex-1">
+                <select name="parent_id" className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white flex-1">
                   <option value="">Keine Oberkategorie</option>
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>
@@ -694,14 +694,14 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                 <button
                   type="submit"
                   disabled={loadingCategory}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-accent-500 text-white rounded hover:bg-accent-600 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loadingCategory ? 'Erstelle...' : 'Erstellen'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowNewCategory(false)}
-                  className="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50 text-sm"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-100 dark:hover:bg-slate-600 text-sm dark:text-slate-300"
                 >
                   Abbrechen
                 </button>
@@ -711,15 +711,15 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
 
           {/* Edit Category Modal */}
           {editingCategory && (
-            <form onSubmit={updateCategory} className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <form onSubmit={updateCategory} className="mb-4 p-4 bg-accent-50 dark:bg-accent-900/30 rounded-lg border border-accent-200 dark:border-accent-800">
               <div className="flex justify-between items-center mb-3">
-                <span className="font-medium text-sm text-slate-700">Kategorie bearbeiten</span>
-                <button type="button" onClick={() => setEditingCategory(null)} className="text-slate-400 hover:text-slate-600">
+                <span className="font-medium text-sm text-slate-700 dark:text-slate-200">Kategorie bearbeiten</span>
+                <button type="button" onClick={() => setEditingCategory(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                   ✕
                 </button>
               </div>
               <div className="flex gap-2 mb-3">
-                <select name="icon" className="px-3 py-2 rounded border border-slate-300" defaultValue={editingCategory.icon || '📦'}>
+                <select name="icon" className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white" defaultValue={editingCategory.icon || '📦'}>
                   {EMOJI_OPTIONS.map(emoji => (
                     <option key={emoji} value={emoji}>{emoji}</option>
                   ))}
@@ -730,11 +730,11 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                   defaultValue={editingCategory.name}
                   required
                   minLength={1}
-                  className="flex-1 px-3 py-2 rounded border border-slate-300"
+                  className="flex-1 px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white"
                 />
               </div>
               <div className="flex gap-2 mb-3">
-                <select name="color" className="px-3 py-2 rounded border border-slate-300 flex-1" defaultValue={editingCategory.color || ''}>
+                <select name="color" className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white flex-1" defaultValue={editingCategory.color || ''}>
                   {COLOR_OPTIONS.map(c => (
                     <option key={c.label} value={c.value || ''} style={{ color: c.color }}>
                       {c.label}
@@ -743,7 +743,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                 </select>
                 <select
                   name="parent_id"
-                  className="px-3 py-2 rounded border border-slate-300 flex-1"
+                  className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white flex-1"
                   defaultValue={editingCategory.parent_id || ''}
                 >
                   <option value="">Keine Oberkategorie</option>
@@ -756,14 +756,14 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                 <button
                   type="submit"
                   disabled={loadingCategory}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-accent-500 text-white rounded hover:bg-accent-600 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loadingCategory ? 'Speichere...' : 'Speichern'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingCategory(null)}
-                  className="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50 text-sm"
+                  className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-100 dark:hover:bg-slate-600 text-sm dark:text-slate-300"
                 >
                   Abbrechen
                 </button>
@@ -772,7 +772,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
           )}
 
           {categories.length === 0 ? (
-            <p className="text-slate-500 text-center py-8">
+            <p className="text-slate-500 dark:text-slate-400 text-center py-8">
               Noch keine Kategorien. Erstelle deine erste!
             </p>
           ) : (
@@ -784,8 +784,8 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                     onClick={() => setSelectedCategory(cat)}
                     className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
                       selectedCategory?.id === cat.id
-                        ? 'bg-blue-50 border-2 border-blue-500'
-                        : 'bg-slate-50 hover:bg-slate-100 border-2 border-transparent'
+                        ? 'bg-accent-50 dark:bg-accent-900/30 border-2 border-accent-500'
+                        : 'bg-slate-50 dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 border-2 border-transparent'
                     }`}
                     style={cat.color ? { borderLeftColor: cat.color, borderLeftWidth: '4px' } : undefined}
                   >
@@ -797,7 +797,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                         />
                       )}
                       <span className="text-xl">{cat.icon || '📁'}</span>
-                      <span className="font-medium">{cat.name}</span>
+                      <span className="font-medium dark:text-white">{cat.name}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <button
@@ -823,8 +823,8 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                       onClick={() => setSelectedCategory(sub)}
                       className={`flex items-center justify-between p-3 ml-6 mt-1 rounded-lg cursor-pointer transition-colors ${
                         selectedCategory?.id === sub.id
-                          ? 'bg-blue-50 border-2 border-blue-500'
-                          : 'bg-slate-100 hover:bg-slate-200 border-2 border-transparent'
+                          ? 'bg-accent-50 dark:bg-accent-900/30 border-2 border-accent-500'
+                          : 'bg-slate-100 dark:bg-slate-600 hover:bg-slate-200 dark:hover:bg-slate-500 border-2 border-transparent'
                       }`}
                       style={sub.color ? { borderLeftColor: sub.color, borderLeftWidth: '4px' } : undefined}
                     >
@@ -837,7 +837,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                           />
                         )}
                         <span className="text-lg">{sub.icon || '📁'}</span>
-                        <span className="font-medium text-sm">{sub.name}</span>
+                        <span className="font-medium text-sm dark:text-white">{sub.name}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <button
@@ -864,9 +864,9 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
         </section>
 
         {/* Attribute für gewählte Kategorie */}
-        <section className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-semibold dark:text-white">
               {selectedCategory ? `Attribute: ${selectedCategory.name}` : 'Attribute'}
             </h2>
             {selectedCategory && (
@@ -874,14 +874,14 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                 <button
                   onClick={addConditionAttribute}
                   disabled={loadingAttribute || attributes.some(a => a.name === 'zustand')}
-                  className="text-slate-600 hover:text-slate-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="text-slate-600 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Standard Zustand-Attribut hinzufügen"
                 >
                   + Zustand
                 </button>
                 <button
                   onClick={() => setShowNewAttribute(true)}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  className="text-accent-500 hover:text-accent-600 text-sm font-medium"
                 >
                   + Neues Attribut
                 </button>
@@ -890,21 +890,21 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
           </div>
 
           {!selectedCategory ? (
-            <p className="text-slate-500 text-center py-8">
+            <p className="text-slate-500 dark:text-slate-400 text-center py-8">
               Wähle eine Kategorie aus, um ihre Attribute zu bearbeiten
             </p>
           ) : (
             <>
               {showNewAttribute && (
-                <form onSubmit={createAttribute} className="mb-4 p-4 bg-slate-50 rounded-lg space-y-3">
+                <form onSubmit={createAttribute} className="mb-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg space-y-3">
                   <input
                     type="text"
                     name="name"
                     placeholder="Attribut-Name (z.B. Produktionsjahr)"
                     required
-                    className="w-full px-3 py-2 rounded border border-slate-300"
+                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white"
                   />
-                  <select name="type" required className="w-full px-3 py-2 rounded border border-slate-300">
+                  <select name="type" required className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white">
                     {ATTRIBUTE_TYPES.map(t => (
                       <option key={t.value} value={t.value}>{t.label}</option>
                     ))}
@@ -913,14 +913,14 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                     type="text"
                     name="choices"
                     placeholder="Optionen für Auswahl (komma-getrennt)"
-                    className="w-full px-3 py-2 rounded border border-slate-300"
+                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white"
                   />
                   <div className="flex gap-4 flex-wrap">
-                    <label className="flex items-center gap-2">
+                    <label className="flex items-center gap-2 dark:text-slate-300">
                       <input type="checkbox" name="required" className="rounded" />
                       <span className="text-sm">Pflichtfeld</span>
                     </label>
-                    <label className="flex items-center gap-2">
+                    <label className="flex items-center gap-2 dark:text-slate-300">
                       <input type="checkbox" name="show_in_list" defaultChecked className="rounded" />
                       <span className="text-sm">In Liste anzeigen</span>
                     </label>
@@ -929,14 +929,14 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                     <button
                       type="submit"
                       disabled={loadingAttribute}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-accent-500 text-white rounded hover:bg-accent-600 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loadingAttribute ? 'Erstelle...' : 'Erstellen'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowNewAttribute(false)}
-                      className="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50 text-sm"
+                      className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-100 dark:hover:bg-slate-600 text-sm dark:text-slate-300"
                     >
                       Abbrechen
                     </button>
@@ -946,10 +946,10 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
 
               {/* Edit Attribute Form */}
               {editingAttribute && (
-                <form onSubmit={updateAttribute} className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200 space-y-3">
+                <form onSubmit={updateAttribute} className="mb-4 p-4 bg-accent-50 dark:bg-accent-900/30 rounded-lg border border-accent-200 dark:border-accent-800 space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium text-sm text-slate-700">Attribut bearbeiten</span>
-                    <button type="button" onClick={() => setEditingAttribute(null)} className="text-slate-400 hover:text-slate-600">
+                    <span className="font-medium text-sm text-slate-700 dark:text-slate-200">Attribut bearbeiten</span>
+                    <button type="button" onClick={() => setEditingAttribute(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                       ✕
                     </button>
                   </div>
@@ -958,13 +958,13 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                     name="name"
                     defaultValue={editingAttribute.display_name}
                     required
-                    className="w-full px-3 py-2 rounded border border-slate-300"
+                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white"
                   />
                   <select
                     name="type"
                     defaultValue={editingAttribute.type}
                     required
-                    className="w-full px-3 py-2 rounded border border-slate-300"
+                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white"
                   >
                     {ATTRIBUTE_TYPES.map(t => (
                       <option key={t.value} value={t.value}>{t.label}</option>
@@ -975,10 +975,10 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                     name="choices"
                     defaultValue={(editingAttribute.options as any)?.choices?.join(', ') || ''}
                     placeholder="Optionen für Auswahl (komma-getrennt)"
-                    className="w-full px-3 py-2 rounded border border-slate-300"
+                    className="w-full px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white"
                   />
                   <div className="flex gap-4 flex-wrap">
-                    <label className="flex items-center gap-2">
+                    <label className="flex items-center gap-2 dark:text-slate-300">
                       <input
                         type="checkbox"
                         name="required"
@@ -987,7 +987,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                       />
                       <span className="text-sm">Pflichtfeld</span>
                     </label>
-                    <label className="flex items-center gap-2">
+                    <label className="flex items-center gap-2 dark:text-slate-300">
                       <input
                         type="checkbox"
                         name="show_in_list"
@@ -1001,14 +1001,14 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                     <button
                       type="submit"
                       disabled={loadingAttribute}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 py-2 bg-accent-500 text-white rounded hover:bg-accent-600 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loadingAttribute ? 'Speichere...' : 'Speichern'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditingAttribute(null)}
-                      className="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50 text-sm"
+                      className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded hover:bg-slate-100 dark:hover:bg-slate-600 text-sm dark:text-slate-300"
                     >
                       Abbrechen
                     </button>
@@ -1017,7 +1017,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
               )}
 
               {attributes.length === 0 ? (
-                <p className="text-slate-500 text-center py-8">
+                <p className="text-slate-500 dark:text-slate-400 text-center py-8">
                   Noch keine Attribute. Diese erscheinen beim Erstellen von Items.
                 </p>
               ) : (
@@ -1025,20 +1025,20 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
                   {attributes.map((attr) => (
                     <div
                       key={attr.id}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 rounded-lg"
                     >
                       <div>
-                        <span className="font-medium">{attr.display_name}</span>
-                        <span className="text-slate-500 text-sm ml-2">
+                        <span className="font-medium dark:text-white">{attr.display_name}</span>
+                        <span className="text-slate-500 dark:text-slate-400 text-sm ml-2">
                           ({ATTRIBUTE_TYPES.find(t => t.value === attr.type)?.label})
                         </span>
                         {attr.required && (
-                          <span className="ml-2 text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded">
+                          <span className="ml-2 text-xs bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 px-2 py-0.5 rounded">
                             Pflicht
                           </span>
                         )}
                         {attr.show_in_list && (
-                          <span className="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded">
+                          <span className="ml-2 text-xs bg-accent-100 dark:bg-accent-900/50 text-accent-600 dark:text-accent-400 px-2 py-0.5 rounded">
                             Sichtbar
                           </span>
                         )}
