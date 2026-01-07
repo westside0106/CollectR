@@ -297,26 +297,27 @@ UPDATE collections SET owner_id = '3934964a-1bbb-4e24-ba30-73b4d2ec2044' WHERE o
 
 ## 🎯 Phase 3: Nächste Aufgaben (TODO)
 
-### Priorität 1: Themes & Personalisierung
-- [ ] Verschiedene Farbschemas/Themes implementieren
-- [ ] Custom Collection Icons (emoji picker oder upload)
-- [ ] Benutzerdefinierte Felder pro Collection (JSONB settings nutzen)
+### Priorität 1: Themes & Personalisierung ✅ DONE
+- [x] Verschiedene Farbschemas/Themes implementieren (7 Akzentfarben: blau, grün, purple, orange, rose, teal, amber)
+- [x] Custom Collection Icons (Emoji Picker mit 12 Kategorien)
+- [x] Benutzerdefinierte Felder pro Collection (bereits via Kategorien/Attribute implementiert)
+- [x] Dark Mode für alle Seiten (inkl. Kategorien-Verwaltung)
 
 ### Priorität 2: Filter erweitern
 - [ ] Filter nach Tags (UI + Query)
 - [ ] Filter nach benutzerdefinierten Attributen
 - [ ] Kombinierte Filter (Tag + Kategorie + Status)
-- [ ] Filter-State in URL speichern (für Sharing)
+- [x] Filter-State in URL speichern (für Sharing) - bereits implementiert!
 
 ### Priorität 3: Notifications & Reminders
 - [ ] Erinnerungen für Items (z.B. "Ausleihe zurückholen")
 - [ ] Push-Benachrichtigungen (Web Push API)
 - [ ] E-Mail Notifications (Supabase Edge Function)
 
-### Priorität 4: UX Verbesserungen
-- [ ] Drag & Drop für Image-Sortierung
-- [ ] Bulk-Operationen (mehrere Items gleichzeitig bearbeiten)
-- [ ] Advanced Search (Volltext-Suche)
+### Priorität 4: UX Verbesserungen ✅ MOSTLY DONE
+- [x] Drag & Drop für Image-Sortierung (ImageUpload.tsx)
+- [x] Bulk-Operationen (mehrere Items auswählen, bearbeiten, löschen)
+- [x] Advanced Search (Textsuche + Kategorie/Status/Preis Filter + Sortierung)
 - [ ] Item Duplikate erkennen
 
 ---
@@ -376,7 +377,7 @@ WHERE cm.user_id = auth.uid();
 ## 🐛 Bekannte Issues
 
 1. **Image Upload:** Manchmal langsam bei großen Bildern → TODO: Client-side Compression
-2. **Dark Mode:** Manche Komponenten haben inkonsistente dark mode styles
+2. ~~**Dark Mode:** Manche Komponenten haben inkonsistente dark mode styles~~ ✅ Behoben - alle Seiten haben jetzt Dark Mode
 3. **Mobile:** Pull-to-Refresh funktioniert nicht auf allen Browsern perfekt
 4. **Barcode Scanner:** Funktioniert nur mit HTTPS (nicht localhost)
 
@@ -426,6 +427,14 @@ WHERE cm.user_id = auth.uid();
 4. ✅ Owner-ID für alle Collections wiederhergestellt
 5. ✅ ShareModal.tsx implementiert mit Email/Link Einladungen
 6. ✅ Alle Collections und Items sind wieder sichtbar
+
+## 📝 Letzte Änderungen (Session 2026-01-07 - Fortsetzung)
+
+1. ✅ **Akzentfarben-System:** 7 wählbare Farben (globals.css, ThemeContext, Settings)
+2. ✅ **Emoji Picker:** Neue Komponente für Collection-Icons mit 12 Kategorien
+3. ✅ **Dark Mode:** Kategorien-Verwaltungsseite vollständig mit Dark Mode
+4. ✅ **Phase 3 UX Review:** Bulk-Ops, Drag & Drop, Advanced Search waren bereits implementiert
+5. ✅ **Handover.md:** Aktualisiert mit erledigten Features
 
 ---
 
