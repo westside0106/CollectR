@@ -302,25 +302,22 @@ UPDATE collections SET owner_id = '3934964a-1bbb-4e24-ba30-73b4d2ec2044' WHERE o
 - [ ] Custom Collection Icons (emoji picker oder upload)
 - [ ] Benutzerdefinierte Felder pro Collection (JSONB settings nutzen)
 
-### Priorität 2: Filter erweitern ✅ DONE
-- [x] Filter nach Tags (UI + Query)
-- [x] Filter nach benutzerdefinierten Attributen (Text, Zahl, Select, Checkbox, Datum)
-- [x] Kombinierte Filter (Tag + Kategorie + Status + Attribute)
-- [x] Filter-State in URL speichern (für Sharing)
+### Priorität 2: Filter erweitern
+- [ ] Filter nach Tags (UI + Query)
+- [ ] Filter nach benutzerdefinierten Attributen
+- [ ] Kombinierte Filter (Tag + Kategorie + Status)
+- [ ] Filter-State in URL speichern (für Sharing)
 
-### Priorität 3: Notifications & Reminders ✅ DONE
-- [x] Erinnerungen für Items (z.B. "Ausleihe zurückholen")
-- [x] Reminder-Übersichtsseite mit Filtern (Heute, Diese Woche, Überfällig, Erledigt)
-- [x] Erinnerungen direkt am Item verwalten
-- [x] Wiederkehrende Erinnerungen (wöchentlich, monatlich, jährlich)
-- [ ] Push-Benachrichtigungen (Web Push API) - Future Enhancement
-- [ ] E-Mail Notifications (Supabase Edge Function) - Future Enhancement
+### Priorität 3: Notifications & Reminders
+- [ ] Erinnerungen für Items (z.B. "Ausleihe zurückholen")
+- [ ] Push-Benachrichtigungen (Web Push API)
+- [ ] E-Mail Notifications (Supabase Edge Function)
 
-### Priorität 4: UX Verbesserungen ✅ DONE
-- [x] Drag & Drop für Image-Sortierung (ImageUpload.tsx)
-- [x] Bulk-Operationen (mehrere Items auswählen, bearbeiten, löschen)
-- [x] Advanced Search (Textsuche + Kategorie/Status/Preis Filter + Sortierung)
-- [x] Item Duplikate erkennen (Levenshtein-basierte Ähnlichkeitserkennung)
+### Priorität 4: UX Verbesserungen
+- [ ] Drag & Drop für Image-Sortierung
+- [ ] Bulk-Operationen (mehrere Items gleichzeitig bearbeiten)
+- [ ] Advanced Search (Volltext-Suche)
+- [ ] Item Duplikate erkennen
 
 ---
 
@@ -433,91 +430,21 @@ WHERE cm.user_id = auth.uid();
 
 ---
 
-## 📝 Letzte Änderungen (Session 2026-01-11 - Phase 3 Abschluss)
+## 🎯 Empfohlener Start für nächsten Chat
 
-1. ✅ **Tag-Filter:** UI zum Filtern von Items nach Tags implementiert
-2. ✅ **Attribut-Filter:** Dynamische Filter für alle Attribut-Typen (Text, Zahl, Select, Checkbox, Datum)
-3. ✅ **Sharing-Bug Fix:** Fehlende invite_token und expires_at in collection_invitations behoben
-4. ✅ **Erinnerungssystem:** Komplettes Reminder-System mit:
-   - Datenbank-Tabelle `reminders` mit RLS
-   - ReminderModal Komponente zum Erstellen/Bearbeiten
-   - Reminders-Übersichtsseite (/reminders) mit Filtern
-   - ReminderSection in Item-Detail-Seite
-   - Sidebar-Navigation erweitert
-5. ✅ **Duplikat-Erkennung:** DuplicateWarning Komponente mit Levenshtein-Ähnlichkeit
-   - In New Item Page integriert
-   - In Edit Item Page integriert
+**User wird wahrscheinlich sagen:**
+> "Lass uns mit Phase 3 weitermachen: Filter erweitern"
 
-### Neue Dateien
+**Deine Antwort sollte sein:**
+1. Bestätige dass du das Übergabeprotokoll gelesen hast
+2. Prüfe kurz ob die App läuft (User fragen)
+3. Erstelle TodoWrite mit den Filter-Tasks
+4. Starte mit Filter nach Tags (UI + Backend)
+5. Nutze die bestehenden `tags` und `item_tags` Tabellen
 
-- `supabase/migrations/20260111_create_reminders_system.sql` - DB-Migration für Erinnerungen
-- `src/components/ReminderModal.tsx` - Modal für Erinnerungen
-- `src/components/ReminderSection.tsx` - Erinnerungs-UI für Item-Detail
-- `src/components/DuplicateWarning.tsx` - Duplikat-Erkennung
-- `src/app/reminders/page.tsx` - Erinnerungs-Übersichtsseite
-
-### Geänderte Dateien
-
-- `src/types/database.ts` - Reminder Types hinzugefügt
-- `src/components/layout/Sidebar.tsx` - Erinnerungen-Link hinzugefügt
-- `src/app/collections/[id]/items/[itemId]/page.tsx` - ReminderSection integriert
-- `src/app/collections/[id]/items/new/page.tsx` - DuplicateWarning integriert
-- `src/app/collections/[id]/items/[itemId]/edit/page.tsx` - DuplicateWarning integriert
+**Wichtig:** Frage IMMER zuerst ob alles noch funktioniert, bevor du neue Features implementierst!
 
 ---
 
-## 📝 Letzte Änderungen (Session 2026-01-11 - Phase 4.1 Start)
-
-1. ✅ **Dashboard/HUB Redesign:** Komplett neues Tile-basiertes Dashboard mit:
-   - Customizable Tiles (ein-/ausblenden, Größe ändern)
-   - 9 verschiedene Tile-Typen: Stats, Quick Actions, Reminders, Recent Items, Top Items, Collection List, Charts
-   - Dashboard Settings Modal zum Anpassen
-   - localStorage-basierte Konfiguration
-   - Rebranding zu "Collectorssphere"
-2. ✅ **Neue Komponenten:**
-   - `src/components/dashboard/DashboardTile.tsx` - Basis-Tile-Komponente
-   - `src/components/dashboard/DashboardSettings.tsx` - Einstellungs-Modal
-   - `src/components/dashboard/tiles/StatsTile.tsx` - Statistik-Anzeige
-   - `src/components/dashboard/tiles/QuickActionsTile.tsx` - Schnellaktionen
-   - `src/components/dashboard/tiles/RemindersTile.tsx` - Erinnerungen-Widget
-   - `src/components/dashboard/tiles/RecentItemsTile.tsx` - Zuletzt hinzugefügt
-   - `src/components/dashboard/tiles/TopItemsTile.tsx` - Wertvollste Items
-   - `src/components/dashboard/tiles/CollectionListTile.tsx` - Sammlungs-Übersicht
-3. ✅ **Neuer Hook:**
-   - `src/hooks/useDashboardConfig.ts` - Dashboard-Konfiguration verwalten
-
----
-
-## 🎯 Status & Nächste Schritte
-
-**Status:** ✅ Phase 3 abgeschlossen, Phase 4.1 (Dashboard) implementiert!
-
-### Phase 4 Roadmap (Collectorssphere)
-
-**4.1 Dashboard/HUB Redesign** ✅
-- Customizable Tiles
-- Neues Branding "Collectorssphere"
-
-**4.2 Bulk-Upload Verbesserungen** (Nächster Schritt)
-- Collection-Auswahl pro Item beim Batch-Upload
-- Verbesserte AI-Analyse
-
-**4.3 Neue Kategorievertikale**
-- Gaming (Spiele, Konsolen, Controller)
-- Offizielles (Dokumente, Zertifikate)
-- Geologie (Steine, Mineralien)
-
-**4.4 LAYZSSHOP Integration**
-- Shopify API Integration
-- CSV Export für Listings
-- AI-generierte Produktbeschreibungen
-
-**Bekannte Issues:**
-- ANTHROPIC_API_KEY in Supabase muss erneuert werden (invalid x-api-key Error)
-
-**Mögliche zukünftige Erweiterungen:**
-- Push-Benachrichtigungen für Erinnerungen (Web Push API)
-- E-Mail Notifications (Supabase Edge Function)
-- Mehrsprachigkeit (i18n)
-- Mobile App (React Native)
-- API für externe Integrationen
+**Status:** ✅ Alle Systeme funktionieren, ready for Phase 3!
+**Next Steps:** Filter erweitern → Themes → Notifications
