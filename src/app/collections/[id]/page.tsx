@@ -55,6 +55,11 @@ export default function CollectionDetailPage({ params }: PageProps) {
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'created_at:desc')
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '')
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '')
+  const [selectedTags, setSelectedTags] = useState<string[]>(() => {
+    const tagsParam = searchParams.get('tags')
+    return tagsParam ? tagsParam.split(',') : []
+  })
+  const [availableTags, setAvailableTags] = useState<{ id: string; name: string; color: string }[]>([])
 
   // Save view mode preference
   useEffect(() => {
@@ -71,10 +76,11 @@ export default function CollectionDetailPage({ params }: PageProps) {
     if (sortBy !== 'created_at:desc') params.set('sort', sortBy)
     if (minPrice) params.set('minPrice', minPrice)
     if (maxPrice) params.set('maxPrice', maxPrice)
+    if (selectedTags.length > 0) params.set('tags', selectedTags.join(','))
 
     const queryString = params.toString()
     router.replace(`/collections/${id}${queryString ? `?${queryString}` : ''}`, { scroll: false })
-  }, [debouncedSearch, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice, id, router])
+  }, [debouncedSearch, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice, selectedTags, id, router])
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -101,9 +107,26 @@ export default function CollectionDetailPage({ params }: PageProps) {
 
     if (categoriesData) setCategories(categoriesData)
 
+    // Load all tags used in this collection
+    const { data: tagsData } = await supabase
+      .from('item_tags')
+      .select('tag_id, tags(id, name, color), items!inner(collection_id)')
+      .eq('items.collection_id', id)
+
+    if (tagsData) {
+      // Extract unique tags
+      const uniqueTags = new Map<string, { id: string; name: string; color: string }>()
+      tagsData.forEach((it: any) => {
+        if (it.tags && !uniqueTags.has(it.tags.id)) {
+          uniqueTags.set(it.tags.id, it.tags)
+        }
+      })
+      setAvailableTags(Array.from(uniqueTags.values()).sort((a, b) => a.name.localeCompare(b.name)))
+    }
+
     let query = supabase
       .from('items')
-      .select('*, item_images(*)')
+      .select('*, item_images(*), item_tags(tag_id, tags(id, name, color))')
       .eq('collection_id', id)
 
     if (selectedCategory) query = query.eq('category_id', selectedCategory)
@@ -136,16 +159,29 @@ export default function CollectionDetailPage({ params }: PageProps) {
   })
 
   const filteredItems = useMemo(() => {
-    if (!debouncedSearch) return items
+    let result = items
 
-    const query = debouncedSearch.toLowerCase()
-    return items.filter(item =>
-      item.name?.toLowerCase().includes(query) ||
-      item.description?.toLowerCase().includes(query) ||
-      item.notes?.toLowerCase().includes(query) ||
-      item.barcode?.toLowerCase().includes(query)
-    )
-  }, [items, debouncedSearch])
+    // Filter by search query
+    if (debouncedSearch) {
+      const query = debouncedSearch.toLowerCase()
+      result = result.filter(item =>
+        item.name?.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query) ||
+        item.notes?.toLowerCase().includes(query) ||
+        item.barcode?.toLowerCase().includes(query)
+      )
+    }
+
+    // Filter by selected tags (item must have ALL selected tags)
+    if (selectedTags.length > 0) {
+      result = result.filter(item => {
+        const itemTagIds = item.item_tags?.map((it: any) => it.tag_id) || []
+        return selectedTags.every(tagId => itemTagIds.includes(tagId))
+      })
+    }
+
+    return result
+  }, [items, debouncedSearch, selectedTags])
 
   const stats = useMemo(() => {
     const totalItems = filteredItems.length
@@ -515,6 +551,9 @@ export default function CollectionDetailPage({ params }: PageProps) {
                 setMinPrice(min)
                 setMaxPrice(max)
               }}
+              availableTags={availableTags}
+              selectedTags={selectedTags}
+              onTagsChange={setSelectedTags}
             />
 
             {/* View Toggle & Bulk Edit Button */}
@@ -566,12 +605,13 @@ export default function CollectionDetailPage({ params }: PageProps) {
           {loading ? (
             <div className="text-center py-12 text-slate-500 dark:text-slate-400">Laden...</div>
           ) : filteredItems.length === 0 ? (
-            <EmptyState collectionId={id} hasFilters={!!(debouncedSearch || selectedCategory || selectedStatus)} onClearFilters={() => {
+            <EmptyState collectionId={id} hasFilters={!!(debouncedSearch || selectedCategory || selectedStatus || selectedTags.length > 0)} onClearFilters={() => {
               setSearchQuery('')
               setSelectedCategory('')
               setSelectedStatus('')
               setMinPrice('')
               setMaxPrice('')
+              setSelectedTags([])
             }} />
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

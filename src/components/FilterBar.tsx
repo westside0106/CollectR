@@ -2,6 +2,12 @@
 
 import { useState } from 'react'
 
+interface Tag {
+  id: string
+  name: string
+  color: string
+}
+
 interface FilterBarProps {
   categories: { id: string; name: string; icon: string | null }[]
   selectedCategory: string
@@ -13,6 +19,10 @@ interface FilterBarProps {
   minPrice: string
   maxPrice: string
   onPriceChange: (min: string, max: string) => void
+  // Tag filter props (optional for backwards compatibility)
+  availableTags?: Tag[]
+  selectedTags?: string[]
+  onTagsChange?: (tags: string[]) => void
 }
 
 const STATUS_OPTIONS = [
@@ -46,14 +56,27 @@ export function FilterBar({
   minPrice,
   maxPrice,
   onPriceChange,
+  availableTags = [],
+  selectedTags = [],
+  onTagsChange,
 }: FilterBarProps) {
   const [isExpanded, setIsExpanded] = useState(false)
+
+  const toggleTag = (tagId: string) => {
+    if (!onTagsChange) return
+    if (selectedTags.includes(tagId)) {
+      onTagsChange(selectedTags.filter(id => id !== tagId))
+    } else {
+      onTagsChange([...selectedTags, tagId])
+    }
+  }
 
   const activeFilterCount = [
     selectedCategory,
     selectedStatus,
     minPrice,
-    maxPrice
+    maxPrice,
+    selectedTags.length > 0 ? 'tags' : ''
   ].filter(Boolean).length
 
   return (
@@ -166,6 +189,37 @@ export function FilterBar({
             </div>
           </div>
 
+          {/* Tags Filter */}
+          {availableTags.length > 0 && (
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+              <label className="text-xs text-slate-700 dark:text-slate-300 font-medium mb-2 block">Tags</label>
+              <div className="flex flex-wrap gap-2">
+                {availableTags.map((tag) => {
+                  const isSelected = selectedTags.includes(tag.id)
+                  return (
+                    <button
+                      key={tag.id}
+                      onClick={() => toggleTag(tag.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        isSelected
+                          ? 'text-white ring-2 ring-offset-1 ring-slate-400 dark:ring-slate-500'
+                          : 'text-white opacity-60 hover:opacity-100'
+                      }`}
+                      style={{ backgroundColor: tag.color }}
+                    >
+                      {isSelected && (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                      {tag.name}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Aktive Filter Tags */}
           <ActiveFilterTags
             selectedCategory={selectedCategory}
@@ -173,9 +227,12 @@ export function FilterBar({
             selectedStatus={selectedStatus}
             minPrice={minPrice}
             maxPrice={maxPrice}
+            selectedTags={selectedTags}
+            availableTags={availableTags}
             onClearCategory={() => onCategoryChange('')}
             onClearStatus={() => onStatusChange('')}
             onClearPrice={() => onPriceChange('', '')}
+            onClearTag={(tagId) => onTagsChange?.(selectedTags.filter(id => id !== tagId))}
           />
         </div>
       )}
@@ -189,9 +246,12 @@ export function FilterBar({
             selectedStatus={selectedStatus}
             minPrice={minPrice}
             maxPrice={maxPrice}
+            selectedTags={selectedTags}
+            availableTags={availableTags}
             onClearCategory={() => onCategoryChange('')}
             onClearStatus={() => onStatusChange('')}
             onClearPrice={() => onPriceChange('', '')}
+            onClearTag={(tagId) => onTagsChange?.(selectedTags.filter(id => id !== tagId))}
             compact
           />
         </div>
@@ -206,9 +266,12 @@ function ActiveFilterTags({
   selectedStatus,
   minPrice,
   maxPrice,
+  selectedTags = [],
+  availableTags = [],
   onClearCategory,
   onClearStatus,
   onClearPrice,
+  onClearTag,
   compact = false,
 }: {
   selectedCategory: string
@@ -216,12 +279,15 @@ function ActiveFilterTags({
   selectedStatus: string
   minPrice: string
   maxPrice: string
+  selectedTags?: string[]
+  availableTags?: Tag[]
   onClearCategory: () => void
   onClearStatus: () => void
   onClearPrice: () => void
+  onClearTag?: (tagId: string) => void
   compact?: boolean
 }) {
-  const hasFilters = selectedCategory || selectedStatus || minPrice || maxPrice
+  const hasFilters = selectedCategory || selectedStatus || minPrice || maxPrice || selectedTags.length > 0
 
   if (!hasFilters) return null
 
@@ -252,6 +318,22 @@ function ActiveFilterTags({
           <button onClick={onClearPrice} className="hover:text-purple-900 dark:hover:text-purple-100">✕</button>
         </span>
       )}
+
+      {/* Selected Tags */}
+      {selectedTags.map(tagId => {
+        const tag = availableTags.find(t => t.id === tagId)
+        if (!tag) return null
+        return (
+          <span
+            key={tagId}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm text-white"
+            style={{ backgroundColor: tag.color }}
+          >
+            {tag.name}
+            <button onClick={() => onClearTag?.(tagId)} className="hover:bg-white/20 rounded-full">✕</button>
+          </span>
+        )
+      })}
     </div>
   )
 }
