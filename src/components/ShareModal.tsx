@@ -106,13 +106,19 @@ export function ShareModal({ collectionId, collectionName, isOwner, onClose }: S
 
     setCreating(true)
 
+    // Generate unique token and expiry date (7 days)
+    const inviteToken = crypto.randomUUID()
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+
     const { data, error } = await supabase
       .from('collection_invitations')
       .insert({
         collection_id: collectionId,
         invited_email: byEmail ? inviteEmail.trim().toLowerCase() : null,
         role: inviteRole,
-        invited_by: (await supabase.auth.getUser()).data.user?.id
+        invited_by: (await supabase.auth.getUser()).data.user?.id,
+        invite_token: inviteToken,
+        expires_at: expiresAt
       })
       .select()
       .single()
