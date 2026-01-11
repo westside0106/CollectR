@@ -8,6 +8,7 @@ import { use } from 'react'
 import { ImageUpload } from '@/components/ImageUpload'
 import { useToast } from '@/components/Toast'
 import { CategorySelect } from '@/components/CategorySelect'
+import { DuplicateWarning } from '@/components/DuplicateWarning'
 
 interface Category {
   id: string
@@ -37,6 +38,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [item, setItem] = useState<any>(null)
+  const [itemName, setItemName] = useState('')
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [attributes, setAttributes] = useState<AttributeDefinition[]>([])
@@ -55,6 +57,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
 
       if (itemData) {
         setItem(itemData)
+        setItemName(itemData.name || '')
         setSelectedCategory(itemData.category_id || '')
         setAttributeValues(itemData.attributes || {})
         setExistingImages(itemData.item_images || [])
@@ -235,8 +238,14 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 id="name"
                 name="name"
                 required
-                defaultValue={item.name}
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              />
+              <DuplicateWarning
+                itemName={itemName}
+                collectionId={collectionId}
+                currentItemId={itemId}
               />
             </div>
 

@@ -33,6 +33,16 @@ serve(async (req) => {
     const systemPrompt = buildSystemPrompt(collectionType, existingAttributes)
 
     // Claude API Call
+    // Detect media type from base64 string
+    let mediaType = 'image/jpeg'
+    if (imageBase64.startsWith('data:image/png')) {
+      mediaType = 'image/png'
+    } else if (imageBase64.startsWith('data:image/webp')) {
+      mediaType = 'image/webp'
+    } else if (imageBase64.startsWith('data:image/gif')) {
+      mediaType = 'image/gif'
+    }
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -51,7 +61,7 @@ serve(async (req) => {
                 type: 'image',
                 source: {
                   type: 'base64',
-                  media_type: 'image/jpeg',
+                  media_type: mediaType,
                   data: imageBase64.replace(/^data:image\/\w+;base64,/, ''),
                 },
               },

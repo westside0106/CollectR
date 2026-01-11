@@ -6,7 +6,19 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import DashboardCharts, { CHART_COLORS } from '@/components/DashboardCharts'
 import { useRealtimeRefresh, usePullToRefresh } from '@/hooks'
+import { useDashboardConfig } from '@/hooks/useDashboardConfig'
 import { DashboardSkeleton } from '@/components/Skeleton'
+import {
+  DashboardTile,
+  TileSkeleton,
+  DashboardSettings,
+  StatsTile,
+  QuickActionsTile,
+  RemindersTile,
+  RecentItemsTile,
+  TopItemsTile,
+  CollectionListTile,
+} from '@/components/dashboard'
 
 interface ChartData {
   categoryDistribution: { label: string; value: number; color: string }[]
@@ -29,16 +41,27 @@ interface ChartData {
   }[]
 }
 
+interface RecentItem {
+  id: string
+  name: string
+  collection_id: string
+  collection_name: string
+  thumbnail: string | null
+  purchase_price: number | null
+  created_at: string
+}
+
 function DashboardContent() {
   const router = useRouter()
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const [showSettings, setShowSettings] = useState(false)
   const [stats, setStats] = useState({
     totalCollections: 0,
     totalItems: 0,
     totalValue: 0,
-    recentItems: [] as any[]
+    recentItems: [] as RecentItem[]
   })
   const [chartData, setChartData] = useState<ChartData>({
     categoryDistribution: [],
@@ -47,6 +70,16 @@ function DashboardContent() {
     statusDistribution: [],
     collectionFinancials: [],
   })
+
+  // Dashboard config hook
+  const {
+    visibleTiles,
+    hiddenTiles,
+    toggleTile,
+    updateTileSize,
+    resetConfig,
+    isLoaded: configLoaded,
+  } = useDashboardConfig()
 
   const refreshData = useCallback(async () => {
     if (!user) return
@@ -189,7 +222,7 @@ function DashboardContent() {
         const current = financialsMap.get(item.collection_id) || { spent: 0, value: 0, itemCount: 0 }
         financialsMap.set(item.collection_id, {
           spent: current.spent + (item.purchase_price || 0),
-          value: current.value + (item.estimated_value || item.purchase_price || 0),
+          value: current.value + ((item as any).estimated_value || item.purchase_price || 0),
           itemCount: current.itemCount + 1,
         })
       })
@@ -272,16 +305,16 @@ function DashboardContent() {
 
     let totalItems = 0
     let totalValue = 0
-    let recentItems: any[] = []
+    let recentItems: RecentItem[] = []
 
     if (collections && collections.length > 0) {
       const collectionIds = collections.map(c => c.id)
-      
+
       const { count: itemsCount } = await supabase
         .from('items')
         .select('*', { count: 'exact', head: true })
         .in('collection_id', collectionIds)
-      
+
       totalItems = itemsCount || 0
 
       const { data: itemsWithValue } = await supabase
@@ -296,12 +329,20 @@ function DashboardContent() {
 
       const { data: recent } = await supabase
         .from('items')
-        .select('*, collections(name)')
+        .select('id, name, collection_id, thumbnail, purchase_price, created_at, collections(name)')
         .in('collection_id', collectionIds)
         .order('created_at', { ascending: false })
         .limit(5)
 
-      recentItems = recent || []
+      recentItems = (recent || []).map(item => ({
+        id: item.id,
+        name: item.name,
+        collection_id: item.collection_id,
+        collection_name: (item.collections as any)?.name || 'Unbekannt',
+        thumbnail: item.thumbnail,
+        purchase_price: item.purchase_price,
+        created_at: item.created_at,
+      }))
     }
 
     setStats({
@@ -312,7 +353,75 @@ function DashboardContent() {
     })
   }
 
-  if (loading) {
+  // Render tile content based on type
+  function renderTileContent(tileType: string) {
+    switch (tileType) {
+      case 'stats':
+        return (
+          <StatsTile
+            totalCollections={stats.totalCollections}
+            totalItems={stats.totalItems}
+            totalValue={stats.totalValue}
+          />
+        )
+      case 'quick_actions':
+        return <QuickActionsTile />
+      case 'reminders':
+        return <RemindersTile />
+      case 'recent_items':
+        return <RecentItemsTile items={stats.recentItems} />
+      case 'top_items':
+        return <TopItemsTile items={chartData.topItems} />
+      case 'collection_list':
+        return <CollectionListTile />
+      case 'chart_category':
+        return chartData.categoryDistribution.length > 0 ? (
+          <DashboardCharts
+            categoryDistribution={chartData.categoryDistribution}
+            collectionValues={[]}
+            topItems={[]}
+            statusDistribution={[]}
+            collectionFinancials={[]}
+          />
+        ) : (
+          <div className="text-center py-6 text-gray-500 dark:text-gray-400">
+            Keine Kategorien vorhanden
+          </div>
+        )
+      case 'chart_status':
+        return chartData.statusDistribution.length > 0 ? (
+          <DashboardCharts
+            categoryDistribution={[]}
+            collectionValues={[]}
+            topItems={[]}
+            statusDistribution={chartData.statusDistribution}
+            collectionFinancials={[]}
+          />
+        ) : (
+          <div className="text-center py-6 text-gray-500 dark:text-gray-400">
+            Keine Status-Daten vorhanden
+          </div>
+        )
+      case 'chart_financial':
+        return chartData.collectionFinancials.length > 0 ? (
+          <DashboardCharts
+            categoryDistribution={[]}
+            collectionValues={[]}
+            topItems={[]}
+            statusDistribution={[]}
+            collectionFinancials={chartData.collectionFinancials}
+          />
+        ) : (
+          <div className="text-center py-6 text-gray-500 dark:text-gray-400">
+            Keine Finanzdaten vorhanden
+          </div>
+        )
+      default:
+        return null
+    }
+  }
+
+  if (loading || !configLoaded) {
     return <DashboardSkeleton />
   }
 
@@ -351,11 +460,30 @@ function DashboardContent() {
         </div>
       )}
 
+      {/* Header */}
       <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <span className="text-blue-600 dark:text-blue-400">Collectors</span>phere
+            </h1>
+            <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full">
+              HUB
+            </span>
+          </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-300">{user?.email}</span>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200
+                         rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
+              title="Dashboard anpassen"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+              </svg>
+            </button>
+            <span className="text-sm text-gray-600 dark:text-gray-300 hidden sm:block">{user?.email}</span>
             <button
               onClick={async () => {
                 await supabase.auth.signOut()
@@ -369,88 +497,48 @@ function DashboardContent() {
         </div>
       </header>
 
+      {/* Main Content - Tile Grid */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.totalCollections}</div>
-            <div className="text-gray-600 dark:text-gray-400">Sammlungen</div>
-          </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-            <div className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.totalItems}</div>
-            <div className="text-gray-600 dark:text-gray-400">Artikel</div>
-          </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-            <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-              {stats.totalValue.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
-            </div>
-            <div className="text-gray-600 dark:text-gray-400">Gesamtwert</div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {visibleTiles.map(tile => (
+            <DashboardTile
+              key={tile.id}
+              tile={tile}
+            >
+              {renderTileContent(tile.type)}
+            </DashboardTile>
+          ))}
         </div>
 
-        <div className="flex flex-wrap gap-4 mb-8">
-          <Link
-            href="/collections"
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium"
-          >
-            📁 Sammlungen verwalten
-          </Link>
-          <Link
-            href="/collections/new"
-            className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-medium"
-          >
-            ➕ Neue Sammlung
-          </Link>
-        </div>
-
-        {/* Charts Section */}
-        <DashboardCharts
-          categoryDistribution={chartData.categoryDistribution}
-          collectionValues={chartData.collectionValues}
-          topItems={chartData.topItems}
-          statusDistribution={chartData.statusDistribution}
-          collectionFinancials={chartData.collectionFinancials}
-        />
-
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold mb-4 dark:text-white">Kürzlich hinzugefügt</h2>
-          {stats.recentItems.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-400">Noch keine Artikel vorhanden.</p>
-          ) : (
-            <div className="space-y-3">
-              {stats.recentItems.map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/collections/${item.collection_id}/items/${item.id}`}
-                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition"
-                >
-                  {item.images?.[0] ? (
-                    <img
-                      src={item.images[0]}
-                      alt={item.name}
-                      className="w-12 h-12 object-cover rounded"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 bg-gray-200 dark:bg-slate-700 rounded flex items-center justify-center">
-                      📷
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <div className="font-medium dark:text-white">{item.name}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {(item.collections as any)?.name}
-                    </div>
-                  </div>
-                  {item.purchase_price && (
-                    <div className="text-green-600 dark:text-green-400 font-medium">
-                      {item.purchase_price.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
-                    </div>
-                  )}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+        {visibleTiles.length === 0 && (
+          <div className="text-center py-16">
+            <div className="text-5xl mb-4">🎨</div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Dashboard ist leer
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              Alle Kacheln sind ausgeblendet
+            </p>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Dashboard anpassen
+            </button>
+          </div>
+        )}
       </main>
+
+      {/* Settings Modal */}
+      <DashboardSettings
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        visibleTiles={visibleTiles}
+        hiddenTiles={hiddenTiles}
+        onToggleTile={toggleTile}
+        onUpdateSize={updateTileSize}
+        onReset={resetConfig}
+      />
     </div>
   )
 }

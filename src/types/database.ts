@@ -138,3 +138,56 @@ export type CollectionUpdate = Partial<CollectionInsert>
 
 export type ItemInsert = Omit<Item, 'id' | 'created_at' | 'updated_at'>
 export type ItemUpdate = Partial<ItemInsert>
+
+export type ReminderType = 'once' | 'recurring_weekly' | 'recurring_monthly' | 'recurring_yearly'
+
+export interface Reminder {
+  id: string
+  item_id: string | null
+  user_id: string
+  title: string
+  reminder_date: string
+  reminder_type: ReminderType
+  is_completed: boolean
+  completed_at: string | null
+  notes: string | null
+  created_at: string
+  // Joined data
+  item?: Item
+}
+
+export type ReminderInsert = Omit<Reminder, 'id' | 'created_at' | 'item'>
+export type ReminderUpdate = Partial<Omit<ReminderInsert, 'user_id'>>
+
+// ============================================
+// Dashboard Tile System (Phase 4)
+// ============================================
+
+export type TileType =
+  | 'stats'           // Statistik-Kacheln (Sammlungen, Items, Wert)
+  | 'recent_items'    // Kürzlich hinzugefügt
+  | 'top_items'       // Wertvollste Items
+  | 'chart_category'  // Kategorie-Verteilung
+  | 'chart_status'    // Status-Verteilung
+  | 'chart_financial' // Finanzen (Ausgaben/Wert/Gewinn)
+  | 'reminders'       // Anstehende Erinnerungen
+  | 'quick_actions'   // Schnellaktionen
+  | 'collection_list' // Sammlungs-Übersicht
+
+export type TileSize = 'small' | 'medium' | 'large' | 'full'
+
+export interface DashboardTile {
+  id: string
+  type: TileType
+  title: string
+  size: TileSize
+  position: number
+  visible: boolean
+  settings?: Record<string, unknown>
+}
+
+export interface DashboardConfig {
+  tiles: DashboardTile[]
+  layout: 'grid' | 'list'
+  showHeader: boolean
+}

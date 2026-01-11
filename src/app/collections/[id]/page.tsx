@@ -60,6 +60,18 @@ export default function CollectionDetailPage({ params }: PageProps) {
     return tagsParam ? tagsParam.split(',') : []
   })
   const [availableTags, setAvailableTags] = useState<{ id: string; name: string; color: string }[]>([])
+  const [availableAttributes, setAvailableAttributes] = useState<{
+    id: string
+    name: string
+    display_name: string
+    type: string
+    options: any
+    category_id: string
+  }[]>([])
+  const [attributeFilters, setAttributeFilters] = useState<Record<string, any>>(() => {
+    const filtersParam = searchParams.get('attrFilters')
+    return filtersParam ? JSON.parse(decodeURIComponent(filtersParam)) : {}
+  })
 
   // Save view mode preference
   useEffect(() => {
@@ -77,10 +89,13 @@ export default function CollectionDetailPage({ params }: PageProps) {
     if (minPrice) params.set('minPrice', minPrice)
     if (maxPrice) params.set('maxPrice', maxPrice)
     if (selectedTags.length > 0) params.set('tags', selectedTags.join(','))
+    if (Object.keys(attributeFilters).length > 0) {
+      params.set('attrFilters', encodeURIComponent(JSON.stringify(attributeFilters)))
+    }
 
     const queryString = params.toString()
     router.replace(`/collections/${id}${queryString ? `?${queryString}` : ''}`, { scroll: false })
-  }, [debouncedSearch, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice, selectedTags, id, router])
+  }, [debouncedSearch, selectedCategory, selectedStatus, sortBy, minPrice, maxPrice, selectedTags, attributeFilters, id, router])
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -122,6 +137,20 @@ export default function CollectionDetailPage({ params }: PageProps) {
         }
       })
       setAvailableTags(Array.from(uniqueTags.values()).sort((a, b) => a.name.localeCompare(b.name)))
+    }
+
+    // Load all attribute definitions for this collection's categories
+    if (categoriesData && categoriesData.length > 0) {
+      const categoryIds = categoriesData.map(c => c.id)
+      const { data: attributesData } = await supabase
+        .from('attribute_definitions')
+        .select('id, name, display_name, type, options, category_id')
+        .in('category_id', categoryIds)
+        .order('sort_order')
+
+      if (attributesData) {
+        setAvailableAttributes(attributesData)
+      }
     }
 
     let query = supabase
@@ -180,8 +209,73 @@ export default function CollectionDetailPage({ params }: PageProps) {
       })
     }
 
+    // Filter by custom attributes
+    if (Object.keys(attributeFilters).length > 0) {
+      result = result.filter(item => {
+        const itemAttrs = item.attributes || {}
+
+        return Object.entries(attributeFilters).every(([attrName, filterValue]) => {
+          if (filterValue === undefined || filterValue === null || filterValue === '') return true
+
+          const attr = availableAttributes.find(a => a.name === attrName)
+          if (!attr) return true
+
+          const itemValue = itemAttrs[attrName]
+
+          switch (attr.type) {
+            case 'text':
+              // Text: contains search
+              return itemValue && String(itemValue).toLowerCase().includes(String(filterValue).toLowerCase())
+
+            case 'number':
+              // Number: supports min/max
+              if (typeof filterValue === 'object') {
+                const { min, max } = filterValue
+                const numValue = Number(itemValue)
+                if (min !== undefined && min !== '' && numValue < Number(min)) return false
+                if (max !== undefined && max !== '' && numValue > Number(max)) return false
+                return true
+              }
+              return Number(itemValue) === Number(filterValue)
+
+            case 'select':
+              // Select: exact match or array of allowed values
+              if (Array.isArray(filterValue)) {
+                return filterValue.length === 0 || filterValue.includes(itemValue)
+              }
+              return itemValue === filterValue
+
+            case 'checkbox':
+              // Checkbox: boolean match
+              return Boolean(itemValue) === Boolean(filterValue)
+
+            case 'date':
+              // Date: supports from/to range
+              if (typeof filterValue === 'object') {
+                const { from, to } = filterValue
+                if (from && itemValue < from) return false
+                if (to && itemValue > to) return false
+                return true
+              }
+              return itemValue === filterValue
+
+            case 'tags':
+              // Tags: check if any filter tag is in item tags
+              if (Array.isArray(filterValue) && filterValue.length > 0) {
+                const itemTags = Array.isArray(itemValue) ? itemValue : []
+                return filterValue.some(tag => itemTags.includes(tag))
+              }
+              return true
+
+            default:
+              return true
+          }
+        })
+      })
+    }
+
     return result
-  }, [items, debouncedSearch, selectedTags])
+  }, [items, debouncedSearch, selectedTags, attributeFilters, availableAttributes])
 
   const stats = useMemo(() => {
     const totalItems = filteredItems.length
@@ -554,6 +648,9 @@ export default function CollectionDetailPage({ params }: PageProps) {
               availableTags={availableTags}
               selectedTags={selectedTags}
               onTagsChange={setSelectedTags}
+              availableAttributes={availableAttributes}
+              attributeFilters={attributeFilters}
+              onAttributeFiltersChange={setAttributeFilters}
             />
 
             {/* View Toggle & Bulk Edit Button */}
@@ -605,13 +702,14 @@ export default function CollectionDetailPage({ params }: PageProps) {
           {loading ? (
             <div className="text-center py-12 text-slate-500 dark:text-slate-400">Laden...</div>
           ) : filteredItems.length === 0 ? (
-            <EmptyState collectionId={id} hasFilters={!!(debouncedSearch || selectedCategory || selectedStatus || selectedTags.length > 0)} onClearFilters={() => {
+            <EmptyState collectionId={id} hasFilters={!!(debouncedSearch || selectedCategory || selectedStatus || selectedTags.length > 0 || Object.keys(attributeFilters).length > 0)} onClearFilters={() => {
               setSearchQuery('')
               setSelectedCategory('')
               setSelectedStatus('')
               setMinPrice('')
               setMaxPrice('')
               setSelectedTags([])
+              setAttributeFilters({})
             }} />
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
