@@ -8,6 +8,15 @@ interface Tag {
   color: string
 }
 
+interface AttributeDefinition {
+  id: string
+  name: string
+  display_name: string
+  type: string
+  options: any
+  category_id: string
+}
+
 interface FilterBarProps {
   categories: { id: string; name: string; icon: string | null }[]
   selectedCategory: string
@@ -23,6 +32,10 @@ interface FilterBarProps {
   availableTags?: Tag[]
   selectedTags?: string[]
   onTagsChange?: (tags: string[]) => void
+  // Attribute filter props
+  availableAttributes?: AttributeDefinition[]
+  attributeFilters?: Record<string, any>
+  onAttributeFiltersChange?: (filters: Record<string, any>) => void
 }
 
 const STATUS_OPTIONS = [
@@ -59,6 +72,9 @@ export function FilterBar({
   availableTags = [],
   selectedTags = [],
   onTagsChange,
+  availableAttributes = [],
+  attributeFilters = {},
+  onAttributeFiltersChange,
 }: FilterBarProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -71,12 +87,25 @@ export function FilterBar({
     }
   }
 
+  const updateAttributeFilter = (attrName: string, value: any) => {
+    if (!onAttributeFiltersChange) return
+    const newFilters = { ...attributeFilters }
+    if (value === undefined || value === null || value === '' ||
+        (typeof value === 'object' && Object.values(value).every(v => v === '' || v === undefined))) {
+      delete newFilters[attrName]
+    } else {
+      newFilters[attrName] = value
+    }
+    onAttributeFiltersChange(newFilters)
+  }
+
   const activeFilterCount = [
     selectedCategory,
     selectedStatus,
     minPrice,
     maxPrice,
-    selectedTags.length > 0 ? 'tags' : ''
+    selectedTags.length > 0 ? 'tags' : '',
+    Object.keys(attributeFilters).length > 0 ? 'attrs' : ''
   ].filter(Boolean).length
 
   return (
@@ -220,6 +249,25 @@ export function FilterBar({
             </div>
           )}
 
+          {/* Attribute Filters */}
+          {availableAttributes.length > 0 && (
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+              <label className="text-xs text-slate-700 dark:text-slate-300 font-medium mb-2 block">
+                Attribute ({availableAttributes.length})
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {availableAttributes.map((attr) => (
+                  <AttributeFilterField
+                    key={attr.id}
+                    attribute={attr}
+                    value={attributeFilters[attr.name]}
+                    onChange={(value) => updateAttributeFilter(attr.name, value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Aktive Filter Tags */}
           <ActiveFilterTags
             selectedCategory={selectedCategory}
@@ -336,4 +384,115 @@ function ActiveFilterTags({
       })}
     </div>
   )
+}
+
+// Attribute Filter Field Component
+function AttributeFilterField({
+  attribute,
+  value,
+  onChange
+}: {
+  attribute: AttributeDefinition
+  value: any
+  onChange: (value: any) => void
+}) {
+  const inputClasses = "w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-sm text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+  const labelClasses = "text-xs text-slate-600 dark:text-slate-400 mb-1 block"
+
+  switch (attribute.type) {
+    case 'text':
+      return (
+        <div>
+          <label className={labelClasses}>{attribute.display_name}</label>
+          <input
+            type="text"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={`${attribute.display_name} enthält...`}
+            className={inputClasses}
+          />
+        </div>
+      )
+
+    case 'number':
+      return (
+        <div>
+          <label className={labelClasses}>{attribute.display_name}</label>
+          <div className="flex gap-1">
+            <input
+              type="number"
+              value={value?.min || ''}
+              onChange={(e) => onChange({ ...value, min: e.target.value })}
+              placeholder="Min"
+              className={inputClasses}
+            />
+            <input
+              type="number"
+              value={value?.max || ''}
+              onChange={(e) => onChange({ ...value, max: e.target.value })}
+              placeholder="Max"
+              className={inputClasses}
+            />
+          </div>
+        </div>
+      )
+
+    case 'select':
+      const choices = attribute.options?.choices || []
+      return (
+        <div>
+          <label className={labelClasses}>{attribute.display_name}</label>
+          <select
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            className={inputClasses}
+          >
+            <option value="">Alle</option>
+            {choices.map((choice: string) => (
+              <option key={choice} value={choice}>{choice}</option>
+            ))}
+          </select>
+        </div>
+      )
+
+    case 'checkbox':
+      return (
+        <div>
+          <label className={labelClasses}>{attribute.display_name}</label>
+          <select
+            value={value === undefined ? '' : value ? 'true' : 'false'}
+            onChange={(e) => onChange(e.target.value === '' ? undefined : e.target.value === 'true')}
+            className={inputClasses}
+          >
+            <option value="">Alle</option>
+            <option value="true">Ja</option>
+            <option value="false">Nein</option>
+          </select>
+        </div>
+      )
+
+    case 'date':
+      return (
+        <div>
+          <label className={labelClasses}>{attribute.display_name}</label>
+          <div className="flex gap-1">
+            <input
+              type="date"
+              value={value?.from || ''}
+              onChange={(e) => onChange({ ...value, from: e.target.value })}
+              className={inputClasses}
+            />
+            <input
+              type="date"
+              value={value?.to || ''}
+              onChange={(e) => onChange({ ...value, to: e.target.value })}
+              className={inputClasses}
+            />
+          </div>
+        </div>
+      )
+
+    default:
+      return null
+  }
 }
