@@ -36,6 +36,7 @@ export function Sidebar() {
   const mainLinks = [
     { href: '/', label: 'Dashboard', icon: '📊' },
     { href: '/collections', label: 'Sammlungen', icon: '📦' },
+    { href: '/reminders', label: 'Erinnerungen', icon: '🔔' },
   ]
 
   const toolLinks = [

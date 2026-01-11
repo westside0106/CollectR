@@ -303,22 +303,25 @@ UPDATE collections SET owner_id = '3934964a-1bbb-4e24-ba30-73b4d2ec2044' WHERE o
 - [x] Benutzerdefinierte Felder pro Collection (bereits via Kategorien/Attribute implementiert)
 - [x] Dark Mode für alle Seiten (inkl. Kategorien-Verwaltung)
 
-### Priorität 2: Filter erweitern
-- [ ] Filter nach Tags (UI + Query)
-- [ ] Filter nach benutzerdefinierten Attributen
-- [ ] Kombinierte Filter (Tag + Kategorie + Status)
-- [x] Filter-State in URL speichern (für Sharing) - bereits implementiert!
+### Priorität 2: Filter erweitern ✅ DONE
+- [x] Filter nach Tags (UI + Query)
+- [x] Filter nach benutzerdefinierten Attributen (Text, Zahl, Select, Checkbox, Datum)
+- [x] Kombinierte Filter (Tag + Kategorie + Status + Attribute)
+- [x] Filter-State in URL speichern (für Sharing)
 
-### Priorität 3: Notifications & Reminders
-- [ ] Erinnerungen für Items (z.B. "Ausleihe zurückholen")
-- [ ] Push-Benachrichtigungen (Web Push API)
-- [ ] E-Mail Notifications (Supabase Edge Function)
+### Priorität 3: Notifications & Reminders ✅ DONE
+- [x] Erinnerungen für Items (z.B. "Ausleihe zurückholen")
+- [x] Reminder-Übersichtsseite mit Filtern (Heute, Diese Woche, Überfällig, Erledigt)
+- [x] Erinnerungen direkt am Item verwalten
+- [x] Wiederkehrende Erinnerungen (wöchentlich, monatlich, jährlich)
+- [ ] Push-Benachrichtigungen (Web Push API) - Future Enhancement
+- [ ] E-Mail Notifications (Supabase Edge Function) - Future Enhancement
 
-### Priorität 4: UX Verbesserungen ✅ MOSTLY DONE
+### Priorität 4: UX Verbesserungen ✅ DONE
 - [x] Drag & Drop für Image-Sortierung (ImageUpload.tsx)
 - [x] Bulk-Operationen (mehrere Items auswählen, bearbeiten, löschen)
 - [x] Advanced Search (Textsuche + Kategorie/Status/Preis Filter + Sortierung)
-- [ ] Item Duplikate erkennen
+- [x] Item Duplikate erkennen (Levenshtein-basierte Ähnlichkeitserkennung)
 
 ---
 
@@ -438,21 +441,46 @@ WHERE cm.user_id = auth.uid();
 
 ---
 
-## 🎯 Empfohlener Start für nächsten Chat
+## 📝 Letzte Änderungen (Session 2026-01-11 - Phase 3 Abschluss)
 
-**User wird wahrscheinlich sagen:**
-> "Lass uns mit Phase 3 weitermachen: Filter erweitern"
+1. ✅ **Tag-Filter:** UI zum Filtern von Items nach Tags implementiert
+2. ✅ **Attribut-Filter:** Dynamische Filter für alle Attribut-Typen (Text, Zahl, Select, Checkbox, Datum)
+3. ✅ **Sharing-Bug Fix:** Fehlende invite_token und expires_at in collection_invitations behoben
+4. ✅ **Erinnerungssystem:** Komplettes Reminder-System mit:
+   - Datenbank-Tabelle `reminders` mit RLS
+   - ReminderModal Komponente zum Erstellen/Bearbeiten
+   - Reminders-Übersichtsseite (/reminders) mit Filtern
+   - ReminderSection in Item-Detail-Seite
+   - Sidebar-Navigation erweitert
+5. ✅ **Duplikat-Erkennung:** DuplicateWarning Komponente mit Levenshtein-Ähnlichkeit
+   - In New Item Page integriert
+   - In Edit Item Page integriert
 
-**Deine Antwort sollte sein:**
-1. Bestätige dass du das Übergabeprotokoll gelesen hast
-2. Prüfe kurz ob die App läuft (User fragen)
-3. Erstelle TodoWrite mit den Filter-Tasks
-4. Starte mit Filter nach Tags (UI + Backend)
-5. Nutze die bestehenden `tags` und `item_tags` Tabellen
+### Neue Dateien
 
-**Wichtig:** Frage IMMER zuerst ob alles noch funktioniert, bevor du neue Features implementierst!
+- `supabase/migrations/20260111_create_reminders_system.sql` - DB-Migration für Erinnerungen
+- `src/components/ReminderModal.tsx` - Modal für Erinnerungen
+- `src/components/ReminderSection.tsx` - Erinnerungs-UI für Item-Detail
+- `src/components/DuplicateWarning.tsx` - Duplikat-Erkennung
+- `src/app/reminders/page.tsx` - Erinnerungs-Übersichtsseite
+
+### Geänderte Dateien
+
+- `src/types/database.ts` - Reminder Types hinzugefügt
+- `src/components/layout/Sidebar.tsx` - Erinnerungen-Link hinzugefügt
+- `src/app/collections/[id]/items/[itemId]/page.tsx` - ReminderSection integriert
+- `src/app/collections/[id]/items/new/page.tsx` - DuplicateWarning integriert
+- `src/app/collections/[id]/items/[itemId]/edit/page.tsx` - DuplicateWarning integriert
 
 ---
 
-**Status:** ✅ Alle Systeme funktionieren, ready for Phase 3!
-**Next Steps:** Filter erweitern → Themes → Notifications
+## 🎯 Status & Nächste Schritte
+
+**Status:** ✅ Phase 3 komplett abgeschlossen!
+
+**Mögliche zukünftige Erweiterungen:**
+- Push-Benachrichtigungen für Erinnerungen (Web Push API)
+- E-Mail Notifications (Supabase Edge Function)
+- Mehrsprachigkeit (i18n)
+- Mobile App (React Native)
+- API für externe Integrationen

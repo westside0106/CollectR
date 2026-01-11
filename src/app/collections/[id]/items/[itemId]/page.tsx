@@ -5,6 +5,7 @@ import { DeleteItemButton } from './DeleteItemButton'
 import { ShareItemButton } from './ShareItemButton'
 import { ImageGallery } from '@/components/ImageGallery'
 import { TagSection } from '@/components/TagSection'
+import { ReminderSection } from '@/components/ReminderSection'
 
 interface PageProps {
   params: Promise<{ id: string; itemId: string }>
@@ -127,6 +128,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
 
           {/* Tags */}
           <TagSection itemId={itemId} userId={user.id} />
+
+          {/* Reminders */}
+          <ReminderSection itemId={itemId} itemName={item.name} />
 
           {/* Purchase Info & Value */}
           <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">

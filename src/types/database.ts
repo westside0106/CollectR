@@ -138,3 +138,23 @@ export type CollectionUpdate = Partial<CollectionInsert>
 
 export type ItemInsert = Omit<Item, 'id' | 'created_at' | 'updated_at'>
 export type ItemUpdate = Partial<ItemInsert>
+
+export type ReminderType = 'once' | 'recurring_weekly' | 'recurring_monthly' | 'recurring_yearly'
+
+export interface Reminder {
+  id: string
+  item_id: string | null
+  user_id: string
+  title: string
+  reminder_date: string
+  reminder_type: ReminderType
+  is_completed: boolean
+  completed_at: string | null
+  notes: string | null
+  created_at: string
+  // Joined data
+  item?: Item
+}
+
+export type ReminderInsert = Omit<Reminder, 'id' | 'created_at' | 'item'>
+export type ReminderUpdate = Partial<Omit<ReminderInsert, 'user_id'>>

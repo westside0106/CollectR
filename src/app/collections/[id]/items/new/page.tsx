@@ -10,6 +10,7 @@ import { useToast } from '@/components/Toast'
 import { AIAnalyzeButton, AIAnalysisResult } from '@/components/AIAnalyzeButton'
 import { AIResultModal } from '@/components/AIResultModal'
 import { CategorySelect } from '@/components/CategorySelect'
+import { DuplicateWarning } from '@/components/DuplicateWarning'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -269,6 +270,10 @@ export default function NewItemPage({ params }: PageProps) {
                 required
                 placeholder="z.B. '67 Camaro"
                 className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+              <DuplicateWarning
+                itemName={name}
+                collectionId={collectionId}
               />
             </div>
 
