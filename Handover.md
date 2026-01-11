@@ -474,9 +474,54 @@ WHERE cm.user_id = auth.uid();
 
 ---
 
+## 📝 Letzte Änderungen (Session 2026-01-11 - Phase 4.1 Start)
+
+1. ✅ **Dashboard/HUB Redesign:** Komplett neues Tile-basiertes Dashboard mit:
+   - Customizable Tiles (ein-/ausblenden, Größe ändern)
+   - 9 verschiedene Tile-Typen: Stats, Quick Actions, Reminders, Recent Items, Top Items, Collection List, Charts
+   - Dashboard Settings Modal zum Anpassen
+   - localStorage-basierte Konfiguration
+   - Rebranding zu "Collectorssphere"
+2. ✅ **Neue Komponenten:**
+   - `src/components/dashboard/DashboardTile.tsx` - Basis-Tile-Komponente
+   - `src/components/dashboard/DashboardSettings.tsx` - Einstellungs-Modal
+   - `src/components/dashboard/tiles/StatsTile.tsx` - Statistik-Anzeige
+   - `src/components/dashboard/tiles/QuickActionsTile.tsx` - Schnellaktionen
+   - `src/components/dashboard/tiles/RemindersTile.tsx` - Erinnerungen-Widget
+   - `src/components/dashboard/tiles/RecentItemsTile.tsx` - Zuletzt hinzugefügt
+   - `src/components/dashboard/tiles/TopItemsTile.tsx` - Wertvollste Items
+   - `src/components/dashboard/tiles/CollectionListTile.tsx` - Sammlungs-Übersicht
+3. ✅ **Neuer Hook:**
+   - `src/hooks/useDashboardConfig.ts` - Dashboard-Konfiguration verwalten
+
+---
+
 ## 🎯 Status & Nächste Schritte
 
-**Status:** ✅ Phase 3 komplett abgeschlossen!
+**Status:** ✅ Phase 3 abgeschlossen, Phase 4.1 (Dashboard) implementiert!
+
+### Phase 4 Roadmap (Collectorssphere)
+
+**4.1 Dashboard/HUB Redesign** ✅
+- Customizable Tiles
+- Neues Branding "Collectorssphere"
+
+**4.2 Bulk-Upload Verbesserungen** (Nächster Schritt)
+- Collection-Auswahl pro Item beim Batch-Upload
+- Verbesserte AI-Analyse
+
+**4.3 Neue Kategorievertikale**
+- Gaming (Spiele, Konsolen, Controller)
+- Offizielles (Dokumente, Zertifikate)
+- Geologie (Steine, Mineralien)
+
+**4.4 LAYZSSHOP Integration**
+- Shopify API Integration
+- CSV Export für Listings
+- AI-generierte Produktbeschreibungen
+
+**Bekannte Issues:**
+- ANTHROPIC_API_KEY in Supabase muss erneuert werden (invalid x-api-key Error)
 
 **Mögliche zukünftige Erweiterungen:**
 - Push-Benachrichtigungen für Erinnerungen (Web Push API)

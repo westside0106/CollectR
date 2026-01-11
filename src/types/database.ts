@@ -158,3 +158,36 @@ export interface Reminder {
 
 export type ReminderInsert = Omit<Reminder, 'id' | 'created_at' | 'item'>
 export type ReminderUpdate = Partial<Omit<ReminderInsert, 'user_id'>>
+
+// ============================================
+// Dashboard Tile System (Phase 4)
+// ============================================
+
+export type TileType =
+  | 'stats'           // Statistik-Kacheln (Sammlungen, Items, Wert)
+  | 'recent_items'    // Kürzlich hinzugefügt
+  | 'top_items'       // Wertvollste Items
+  | 'chart_category'  // Kategorie-Verteilung
+  | 'chart_status'    // Status-Verteilung
+  | 'chart_financial' // Finanzen (Ausgaben/Wert/Gewinn)
+  | 'reminders'       // Anstehende Erinnerungen
+  | 'quick_actions'   // Schnellaktionen
+  | 'collection_list' // Sammlungs-Übersicht
+
+export type TileSize = 'small' | 'medium' | 'large' | 'full'
+
+export interface DashboardTile {
+  id: string
+  type: TileType
+  title: string
+  size: TileSize
+  position: number
+  visible: boolean
+  settings?: Record<string, unknown>
+}
+
+export interface DashboardConfig {
+  tiles: DashboardTile[]
+  layout: 'grid' | 'list'
+  showHeader: boolean
+}
