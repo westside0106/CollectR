@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { use } from 'react'
 import { parseCSV, parseJSON } from '@/utils/exportImport'
+import { autoCreateAttributeDefinitions } from '@/lib/autoCreateAttributes'
 
 interface MappedField {
   source: string
@@ -53,14 +54,16 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
   const [attributes, setAttributes] = useState<AttributeDefinition[]>([])
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+  const [autoCreateAttrs, setAutoCreateAttrs] = useState(true) // Auto-create new attributes
 
-  // Dynamische Target-Fields (Basis + Attribute)
+  // Dynamische Target-Fields (Basis + Attribute + Neues Attribut)
   const TARGET_FIELDS = [
     ...BASE_TARGET_FIELDS,
     ...attributes.map(attr => ({
       value: `attr:${attr.name}`,
       label: `📋 ${attr.display_name}`,
-    }))
+    })),
+    { value: 'new_attr', label: '✨ Neues Attribut erstellen' }
   ]
 
   useEffect(() => {
@@ -233,6 +236,41 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
     setStep('importing')
     setImportProgress({ current: 0, total: fileData.length, errors: 0 })
 
+    // Step 0: Auto-create attributes for "new_attr" mappings
+    const newAttrMappings = mappings.filter(m => m.target === 'new_attr')
+    const createdAttrNames: Record<string, string> = {} // source -> attrName mapping
+
+    if (newAttrMappings.length > 0 && selectedCategoryId) {
+      // Build sample values from first row to infer types
+      const sampleRow = fileData[0]
+      const sampleAttributes: Record<string, unknown> = {}
+
+      newAttrMappings.forEach(m => {
+        sampleAttributes[m.source] = sampleRow[m.source]
+      })
+
+      // Create the attributes
+      await autoCreateAttributeDefinitions(supabase, selectedCategoryId, sampleAttributes)
+
+      // Refresh attributes list
+      const { data: refreshedAttrs } = await supabase
+        .from('attribute_definitions')
+        .select('id, name, display_name, type, category_id')
+        .eq('category_id', selectedCategoryId)
+        .order('sort_order')
+
+      if (refreshedAttrs) {
+        setAttributes(refreshedAttrs)
+
+        // Map source columns to created attribute names
+        newAttrMappings.forEach(m => {
+          // Convert source column name to attribute name format
+          const attrName = m.source.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
+          createdAttrNames[m.source] = attrName
+        })
+      }
+    }
+
     let successCount = 0
     let errorCount = 0
 
@@ -273,6 +311,12 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
             }
 
             itemData.attributes[attrName] = value
+          } else if (m.target === 'new_attr') {
+            // Use the auto-created attribute name
+            const attrName = createdAttrNames[m.source]
+            if (attrName) {
+              itemData.attributes[attrName] = value
+            }
           } else {
             // Standard-Felder
             if (m.target === 'purchase_price') {
@@ -290,17 +334,17 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
       }
 
       const { error } = await supabase.from('items').insert(itemData)
-      
+
       if (error) {
         errorCount++
       } else {
         successCount++
       }
 
-      setImportProgress({ 
-        current: i + 1, 
-        total: fileData.length, 
-        errors: errorCount 
+      setImportProgress({
+        current: i + 1,
+        total: fileData.length,
+        errors: errorCount
       })
     }
 

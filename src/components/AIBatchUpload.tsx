@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { AIAnalysisResult } from './AIAnalyzeButton'
 import Image from 'next/image'
+import { autoCreateAttributeDefinitions } from '@/lib/autoCreateAttributes'
 
 interface Category {
   id: string
@@ -266,6 +267,15 @@ export function AIBatchUpload({
 
       for (const item of batchItems) {
         if (!item.result) continue
+
+        // 0. Auto-create attribute definitions for this category if attributes detected
+        if (item.selectedCategory && item.result.attributes) {
+          await autoCreateAttributeDefinitions(
+            supabase,
+            item.selectedCategory,
+            item.result.attributes
+          )
+        }
 
         // 1. Create Item
         const { data: newItem, error: itemError } = await supabase

@@ -11,6 +11,7 @@ import { AIAnalyzeButton, AIAnalysisResult } from '@/components/AIAnalyzeButton'
 import { AIResultModal } from '@/components/AIResultModal'
 import { CategorySelect } from '@/components/CategorySelect'
 import { DuplicateWarning } from '@/components/DuplicateWarning'
+import { autoCreateAttributesWithMessage } from '@/lib/autoCreateAttributes'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -64,7 +65,7 @@ export default function NewItemPage({ params }: PageProps) {
   }
 
   // KI-Ergebnisse anwenden
-  function applyAiResult(result: Partial<AIAnalysisResult>) {
+  async function applyAiResult(result: Partial<AIAnalysisResult>) {
     if (result.name) setName(result.name)
     if (result.description) setDescription(result.description)
     if (result.estimatedValue) {
@@ -74,6 +75,16 @@ export default function NewItemPage({ params }: PageProps) {
     }
     if (result.attributes) {
       setAttributeValues(prev => ({ ...prev, ...result.attributes }))
+
+      // Auto-create attribute definitions for the category if one is selected
+      if (categoryId) {
+        const message = await autoCreateAttributesWithMessage(supabase, categoryId, result.attributes)
+        if (message) {
+          showToast(message)
+          // Reload attributes to show the new ones
+          loadAttributesForCategory(categoryId)
+        }
+      }
     }
     setAiApplied(true)
     showToast('KI-Vorschläge übernommen!')
@@ -121,33 +132,35 @@ export default function NewItemPage({ params }: PageProps) {
     loadData()
   }, [collectionId])
 
+  // Funktion zum Laden der Attribute (kann auch manuell aufgerufen werden)
+  async function loadAttributesForCategory(catId: string) {
+    if (!catId) {
+      setAttributes([])
+      return
+    }
+
+    // Finde die gewählte Kategorie
+    const selectedCategory = categories.find(cat => cat.id === catId)
+    const categoryIds = [catId]
+
+    // Wenn Kategorie einen Parent hat, füge Parent-ID hinzu
+    if (selectedCategory?.parent_id) {
+      categoryIds.push(selectedCategory.parent_id)
+    }
+
+    // Lade Attribute von gewählter Kategorie UND Parent (falls vorhanden)
+    const { data } = await supabase
+      .from('attribute_definitions')
+      .select('*, attribute_options(*)')
+      .in('category_id', categoryIds)
+      .order('sort_order')
+
+    setAttributes(data || [])
+  }
+
   // Attribute laden wenn Kategorie gewählt (inkl. Parent-Kategorie)
   useEffect(() => {
-    async function loadAttributes() {
-      if (!categoryId) {
-        setAttributes([])
-        return
-      }
-
-      // Finde die gewählte Kategorie
-      const selectedCategory = categories.find(cat => cat.id === categoryId)
-      const categoryIds = [categoryId]
-
-      // Wenn Kategorie einen Parent hat, füge Parent-ID hinzu
-      if (selectedCategory?.parent_id) {
-        categoryIds.push(selectedCategory.parent_id)
-      }
-
-      // Lade Attribute von gewählter Kategorie UND Parent (falls vorhanden)
-      const { data } = await supabase
-        .from('attribute_definitions')
-        .select('*, attribute_options(*)')
-        .in('category_id', categoryIds)
-        .order('sort_order')
-
-      setAttributes(data || [])
-    }
-    loadAttributes()
+    loadAttributesForCategory(categoryId)
   }, [categoryId, categories])
 
   async function handleSubmit(e: React.FormEvent) {
