@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { AIAnalysisResult } from './AIAnalyzeButton'
 import Image from 'next/image'
@@ -10,6 +10,13 @@ interface Category {
   name: string
   icon: string | null
   parent_id: string | null
+  collection_id?: string
+}
+
+interface Collection {
+  id: string
+  name: string
+  cover_image: string | null
 }
 
 interface BatchItem {
@@ -21,6 +28,7 @@ interface BatchItem {
   result: AIAnalysisResult | null
   error: string | null
   selectedCategory: string | null
+  selectedCollection: string
 }
 
 interface AIBatchUploadProps {
@@ -41,16 +49,72 @@ export function AIBatchUpload({
   const [batchItems, setBatchItems] = useState<BatchItem[]>([])
   const [analyzing, setAnalyzing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [collections, setCollections] = useState<Collection[]>([])
+  const [allCategories, setAllCategories] = useState<Map<string, Category[]>>(new Map())
   const supabase = createClient()
+
+  // Load all user collections on mount
+  useEffect(() => {
+    loadCollections()
+  }, [])
+
+  async function loadCollections() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    // Load all collections
+    const { data: collectionsData } = await supabase
+      .from('collections')
+      .select('id, name, cover_image')
+      .eq('owner_id', user.id)
+      .order('name')
+
+    if (collectionsData) {
+      setCollections(collectionsData)
+
+      // Load categories for all collections
+      const collectionIds = collectionsData.map(c => c.id)
+      const { data: categoriesData } = await supabase
+        .from('categories')
+        .select('id, name, icon, parent_id, collection_id')
+        .in('collection_id', collectionIds)
+        .order('name')
+
+      if (categoriesData) {
+        const categoryMap = new Map<string, Category[]>()
+        categoriesData.forEach(cat => {
+          const existing = categoryMap.get(cat.collection_id!) || []
+          existing.push(cat)
+          categoryMap.set(cat.collection_id!, existing)
+        })
+        // Add current collection's categories if not already loaded
+        if (!categoryMap.has(collectionId) && categories.length > 0) {
+          categoryMap.set(collectionId, categories)
+        }
+        setAllCategories(categoryMap)
+      }
+    }
+  }
+
+  // Get categories for a specific collection
+  function getCategoriesForCollection(colId: string): Category[] {
+    if (colId === collectionId) {
+      return categories
+    }
+    return allCategories.get(colId) || []
+  }
 
   // File Upload Handler
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || [])
-    const MAX_FILES = 5
+    const MAX_FILES = 10
     const MAX_SIZE = 5 * 1024 * 1024 // 5MB
     const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 
-    const validFiles = files.slice(0, MAX_FILES).filter(file => {
+    const currentCount = batchItems.length
+    const remainingSlots = MAX_FILES - currentCount
+
+    const validFiles = files.slice(0, remainingSlots).filter(file => {
       if (!ALLOWED_TYPES.includes(file.type)) {
         alert(`Ungültiger Dateityp: ${file.name}`)
         return false
@@ -70,7 +134,8 @@ export function AIBatchUpload({
       analyzed: false,
       result: null,
       error: null,
-      selectedCategory: null
+      selectedCategory: null,
+      selectedCollection: collectionId
     }))
 
     setBatchItems(prev => [...prev, ...newItems])
@@ -83,6 +148,17 @@ export function AIBatchUpload({
       if (item) URL.revokeObjectURL(item.preview)
       return prev.filter(i => i.id !== id)
     })
+  }
+
+  // Update collection for an item
+  function updateItemCollection(itemId: string, newCollectionId: string) {
+    setBatchItems(prev =>
+      prev.map(item =>
+        item.id === itemId
+          ? { ...item, selectedCollection: newCollectionId, selectedCategory: null }
+          : item
+      )
+    )
   }
 
   // Analyze All Images with AI
@@ -112,8 +188,9 @@ export function AIBatchUpload({
         if (error) throw new Error(error.message)
         if (data.error) throw new Error(data.error)
 
-        // Find matching category
-        const matchedCategory = findMatchingCategory(data.category, categories)
+        // Find matching category in the selected collection
+        const itemCategories = getCategoriesForCollection(item.selectedCollection)
+        const matchedCategory = findMatchingCategory(data.category, itemCategories)
 
         setBatchItems(prev =>
           prev.map(i =>
@@ -174,15 +251,16 @@ export function AIBatchUpload({
 
     try {
       let successCount = 0
+      const collectionsUpdated = new Set<string>()
 
       for (const item of batchItems) {
-        if (!item.result || !item.selectedCategory) continue
+        if (!item.result) continue
 
         // 1. Create Item
         const { data: newItem, error: itemError } = await supabase
           .from('items')
           .insert({
-            collection_id: collectionId,
+            collection_id: item.selectedCollection,
             created_by: user.id,
             name: item.result.name || 'Unbekannt',
             description: item.result.description,
@@ -201,6 +279,8 @@ export function AIBatchUpload({
           console.error('Error creating item:', itemError)
           continue
         }
+
+        collectionsUpdated.add(item.selectedCollection)
 
         // 2. Upload Image
         const fileName = `${newItem.id}/${Date.now()}-${item.file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
@@ -252,6 +332,8 @@ export function AIBatchUpload({
     }
   }
 
+  const MAX_FILES = 10
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="w-full max-w-5xl max-h-[90vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
@@ -262,7 +344,7 @@ export function AIBatchUpload({
               ✨ KI Batch-Upload
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Lade bis zu 5 Bilder hoch und lass die KI sie analysieren
+              Lade bis zu {MAX_FILES} Bilder hoch und weise sie verschiedenen Sammlungen zu
             </p>
           </div>
           <button
@@ -276,7 +358,7 @@ export function AIBatchUpload({
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           {/* Upload Area */}
-          {batchItems.length < 5 && (
+          {batchItems.length < MAX_FILES && (
             <div className="mb-6">
               <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 transition-colors">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -287,7 +369,7 @@ export function AIBatchUpload({
                     <span className="font-semibold">Klicken zum Hochladen</span> oder Drag & Drop
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                    JPEG, PNG, WebP (max. 5MB, {5 - batchItems.length} verbleibend)
+                    JPEG, PNG, WebP (max. 5MB, {MAX_FILES - batchItems.length} verbleibend)
                   </p>
                 </div>
                 <input
@@ -304,99 +386,120 @@ export function AIBatchUpload({
           {/* Batch Items */}
           {batchItems.length > 0 && (
             <div className="space-y-4">
-              {batchItems.map(item => (
-                <div
-                  key={item.id}
-                  className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800"
-                >
-                  <div className="flex gap-4">
-                    {/* Image Preview */}
-                    <div className="flex-shrink-0 w-24 h-24 relative rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700">
-                      <Image
-                        src={item.preview}
-                        alt="Preview"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
+              {batchItems.map(item => {
+                const itemCategories = getCategoriesForCollection(item.selectedCollection)
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
-                            {item.file.name}
-                          </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            {(item.file.size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="ml-2 p-1 text-slate-400 hover:text-red-600 transition-colors"
-                        >
-                          ✕
-                        </button>
+                return (
+                  <div
+                    key={item.id}
+                    className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 bg-white dark:bg-slate-800"
+                  >
+                    <div className="flex gap-4">
+                      {/* Image Preview */}
+                      <div className="flex-shrink-0 w-24 h-24 relative rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700">
+                        <Image
+                          src={item.preview}
+                          alt="Preview"
+                          fill
+                          className="object-cover"
+                        />
                       </div>
 
-                      {/* Status */}
-                      {item.analyzing && (
-                        <div className="mt-2 flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
-                          <span className="w-3 h-3 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
-                          <span>Analysiere...</span>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                              {item.result?.name || item.file.name}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                              {(item.file.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            className="ml-2 p-1 text-slate-400 hover:text-red-600 transition-colors"
+                          >
+                            ✕
+                          </button>
                         </div>
-                      )}
 
-                      {item.error && (
-                        <div className="mt-2 text-xs text-red-600 dark:text-red-400">
-                          {item.error}
-                        </div>
-                      )}
+                        {/* Status */}
+                        {item.analyzing && (
+                          <div className="mt-2 flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400">
+                            <span className="w-3 h-3 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
+                            <span>Analysiere...</span>
+                          </div>
+                        )}
 
-                      {item.analyzed && item.result && (
-                        <div className="mt-3 space-y-2">
-                          <div className="text-sm">
-                            <span className="font-medium text-slate-700 dark:text-slate-300">
-                              {item.result.name || 'Unbekannt'}
-                            </span>
+                        {item.error && (
+                          <div className="mt-2 text-xs text-red-600 dark:text-red-400">
+                            {item.error}
+                          </div>
+                        )}
+
+                        {/* Selection Dropdowns - Always show */}
+                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {/* Collection Selection */}
+                          <div>
+                            <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1">
+                              Sammlung
+                            </label>
+                            <select
+                              value={item.selectedCollection}
+                              onChange={(e) => updateItemCollection(item.id, e.target.value)}
+                              className="w-full px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                            >
+                              {collections.map(col => (
+                                <option key={col.id} value={col.id}>
+                                  {col.name}
+                                </option>
+                              ))}
+                            </select>
                           </div>
 
                           {/* Category Selection */}
                           <div>
                             <label className="block text-xs text-slate-600 dark:text-slate-400 mb-1">
-                              Kategorie
+                              Kategorie {!item.analyzed && <span className="text-slate-400">(nach Analyse)</span>}
                             </label>
                             <select
                               value={item.selectedCategory || ''}
                               onChange={(e) => {
                                 setBatchItems(prev =>
                                   prev.map(i =>
-                                    i.id === item.id ? { ...i, selectedCategory: e.target.value } : i
+                                    i.id === item.id ? { ...i, selectedCategory: e.target.value || null } : i
                                   )
                                 )
                               }}
-                              className="w-full px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white"
+                              disabled={!item.analyzed && itemCategories.length === 0}
+                              className="w-full px-3 py-1.5 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white disabled:opacity-50"
                             >
-                              <option value="">-- Auswählen --</option>
-                              {categories.map(cat => (
+                              <option value="">-- Optional --</option>
+                              {itemCategories.map(cat => (
                                 <option key={cat.id} value={cat.id}>
                                   {cat.icon} {cat.name}
                                 </option>
                               ))}
                             </select>
                           </div>
-
-                          {item.result.estimatedValue && (
-                            <div className="text-xs text-slate-600 dark:text-slate-400">
-                              Geschätzter Wert: {item.result.estimatedValue.min} - {item.result.estimatedValue.max} {item.result.estimatedValue.currency}
-                            </div>
-                          )}
                         </div>
-                      )}
+
+                        {/* Analysis Results */}
+                        {item.analyzed && item.result && (
+                          <div className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                            {item.result.estimatedValue && (
+                              <span>
+                                Geschätzter Wert: {item.result.estimatedValue.min} - {item.result.estimatedValue.max} {item.result.estimatedValue.currency}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -406,6 +509,11 @@ export function AIBatchUpload({
           <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
             <div className="text-sm text-slate-600 dark:text-slate-400">
               {batchItems.length} Bild{batchItems.length !== 1 ? 'er' : ''} hochgeladen
+              {batchItems.some(i => i.analyzed) && (
+                <span className="ml-2 text-green-600 dark:text-green-400">
+                  • {batchItems.filter(i => i.analyzed).length} analysiert
+                </span>
+              )}
             </div>
             <div className="flex gap-2">
               {!batchItems.every(i => i.analyzed) && (
@@ -418,13 +526,13 @@ export function AIBatchUpload({
                 </button>
               )}
 
-              {batchItems.some(i => i.analyzed && i.selectedCategory) && (
+              {batchItems.some(i => i.analyzed) && (
                 <button
                   onClick={saveAllItems}
                   disabled={saving}
                   className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                 >
-                  {saving ? 'Speichere...' : `✓ ${batchItems.filter(i => i.selectedCategory).length} Items erstellen`}
+                  {saving ? 'Speichere...' : `✓ ${batchItems.filter(i => i.analyzed).length} Items erstellen`}
                 </button>
               )}
             </div>
