@@ -11,6 +11,7 @@ import { AIAnalyzeButton, AIAnalysisResult } from '@/components/AIAnalyzeButton'
 import { AIResultModal } from '@/components/AIResultModal'
 import { CategorySelect } from '@/components/CategorySelect'
 import { DuplicateWarning } from '@/components/DuplicateWarning'
+import { autoCreateAttributesWithMessage } from '@/lib/autoCreateAttributes'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -46,6 +47,7 @@ export default function NewItemPage({ params }: PageProps) {
   // KI-Analyse State
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null)
   const [showAiModal, setShowAiModal] = useState(false)
+  const [aiApplied, setAiApplied] = useState(false)
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -63,7 +65,7 @@ export default function NewItemPage({ params }: PageProps) {
   }
 
   // KI-Ergebnisse anwenden
-  function applyAiResult(result: Partial<AIAnalysisResult>) {
+  async function applyAiResult(result: Partial<AIAnalysisResult>) {
     if (result.name) setName(result.name)
     if (result.description) setDescription(result.description)
     if (result.estimatedValue) {
@@ -73,8 +75,25 @@ export default function NewItemPage({ params }: PageProps) {
     }
     if (result.attributes) {
       setAttributeValues(prev => ({ ...prev, ...result.attributes }))
+
+      // Auto-create attribute definitions for the category if one is selected
+      if (categoryId) {
+        const message = await autoCreateAttributesWithMessage(supabase, categoryId, result.attributes)
+        if (message) {
+          showToast(message)
+          // Reload attributes to show the new ones
+          loadAttributesForCategory(categoryId)
+        }
+      }
     }
+    setAiApplied(true)
     showToast('KI-Vorschläge übernommen!')
+  }
+
+  // KI neu analysieren
+  function handleReanalyze() {
+    setAiResult(null)
+    setAiApplied(false)
   }
 
   // Handler für KI-Analyse Ergebnis
@@ -113,33 +132,35 @@ export default function NewItemPage({ params }: PageProps) {
     loadData()
   }, [collectionId])
 
+  // Funktion zum Laden der Attribute (kann auch manuell aufgerufen werden)
+  async function loadAttributesForCategory(catId: string) {
+    if (!catId) {
+      setAttributes([])
+      return
+    }
+
+    // Finde die gewählte Kategorie
+    const selectedCategory = categories.find(cat => cat.id === catId)
+    const categoryIds = [catId]
+
+    // Wenn Kategorie einen Parent hat, füge Parent-ID hinzu
+    if (selectedCategory?.parent_id) {
+      categoryIds.push(selectedCategory.parent_id)
+    }
+
+    // Lade Attribute von gewählter Kategorie UND Parent (falls vorhanden)
+    const { data } = await supabase
+      .from('attribute_definitions')
+      .select('*, attribute_options(*)')
+      .in('category_id', categoryIds)
+      .order('sort_order')
+
+    setAttributes(data || [])
+  }
+
   // Attribute laden wenn Kategorie gewählt (inkl. Parent-Kategorie)
   useEffect(() => {
-    async function loadAttributes() {
-      if (!categoryId) {
-        setAttributes([])
-        return
-      }
-
-      // Finde die gewählte Kategorie
-      const selectedCategory = categories.find(cat => cat.id === categoryId)
-      const categoryIds = [categoryId]
-
-      // Wenn Kategorie einen Parent hat, füge Parent-ID hinzu
-      if (selectedCategory?.parent_id) {
-        categoryIds.push(selectedCategory.parent_id)
-      }
-
-      // Lade Attribute von gewählter Kategorie UND Parent (falls vorhanden)
-      const { data } = await supabase
-        .from('attribute_definitions')
-        .select('*, attribute_options(*)')
-        .in('category_id', categoryIds)
-        .order('sort_order')
-
-      setAttributes(data || [])
-    }
-    loadAttributes()
+    loadAttributesForCategory(categoryId)
   }, [categoryId, categories])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -163,7 +184,8 @@ export default function NewItemPage({ params }: PageProps) {
           description: description || null,
           status,
           purchase_price: purchasePrice ? parseFloat(purchasePrice) : null,
-          estimated_value: estimatedValue ? parseFloat(estimatedValue) : null,
+          _computed_value: estimatedValue ? parseFloat(estimatedValue) : null,
+          _value_currency: 'EUR',
           purchase_date: purchaseDate || null,
           purchase_location: purchaseLocation || null,
           barcode: barcode || null,
@@ -240,7 +262,7 @@ export default function NewItemPage({ params }: PageProps) {
           {/* KI-Analyse Button - nur wenn Bild vorhanden */}
           {pendingImages.length > 0 && (
             <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <AIAnalyzeButton
                   imageUrl={pendingImages[0].url}
                   imageFile={pendingImages[0].file}
@@ -248,8 +270,20 @@ export default function NewItemPage({ params }: PageProps) {
                   existingAttributes={attributes.map(a => a.display_name)}
                   onResult={handleAiResult}
                 />
+                {aiApplied && (
+                  <button
+                    type="button"
+                    onClick={handleReanalyze}
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Ändern
+                  </button>
+                )}
                 <span className="text-xs text-slate-500 dark:text-slate-400">
-                  KI analysiert das Bild und füllt Felder automatisch aus
+                  {aiApplied ? 'KI-Ergebnisse wurden übernommen' : 'KI analysiert das Bild und füllt Felder automatisch aus'}
                 </span>
               </div>
             </div>
@@ -379,6 +413,47 @@ export default function NewItemPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+
+        {/* KI-generierte Attribute (falls vorhanden) */}
+        {aiApplied && aiResult?.attributes && Object.keys(aiResult.attributes).length > 0 && (
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-6 shadow-sm border border-purple-200 dark:border-purple-800">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-lg">✨</span>
+              <h2 className="font-semibold dark:text-white">KI-erkannte Attribute</h2>
+              <span className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full">
+                Automatisch erkannt
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Object.entries(aiResult.attributes).map(([key, value]) => (
+                <div key={key}>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 capitalize">
+                    {key.replace(/_/g, ' ')}
+                  </label>
+                  {typeof value === 'boolean' ? (
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={attributeValues[key] ?? value}
+                        onChange={(e) => setAttributeValues({...attributeValues, [key]: e.target.checked})}
+                        className="w-5 h-5 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700"
+                      />
+                      <span className="text-slate-600 dark:text-slate-300">{value ? 'Ja' : 'Nein'}</span>
+                    </label>
+                  ) : (
+                    <input
+                      type="text"
+                      value={attributeValues[key] ?? value}
+                      onChange={(e) => setAttributeValues({...attributeValues, [key]: e.target.value})}
+                      className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Dynamische Attribute */}
         {attributes.length > 0 && (
