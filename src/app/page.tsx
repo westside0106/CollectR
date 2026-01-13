@@ -18,6 +18,7 @@ import {
   RecentItemsTile,
   TopItemsTile,
   CollectionListTile,
+  TCGHighlightsTile,
 } from '@/components/dashboard'
 
 interface ChartData {
@@ -374,6 +375,8 @@ function DashboardContent() {
         return <TopItemsTile items={chartData.topItems} />
       case 'collection_list':
         return <CollectionListTile />
+      case 'tcg_highlights':
+        return <TCGHighlightsTile />
       case 'chart_category':
         return chartData.categoryDistribution.length > 0 ? (
           <DashboardCharts

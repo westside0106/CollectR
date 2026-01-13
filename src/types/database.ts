@@ -173,6 +173,7 @@ export type TileType =
   | 'reminders'       // Anstehende Erinnerungen
   | 'quick_actions'   // Schnellaktionen
   | 'collection_list' // Sammlungs-Übersicht
+  | 'tcg_highlights'  // TCG Top-Karten nach Grade (Phase 5)
 
 export type TileSize = 'small' | 'medium' | 'large' | 'full'
 

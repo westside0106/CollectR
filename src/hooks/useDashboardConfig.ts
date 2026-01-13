@@ -10,11 +10,12 @@ const DEFAULT_TILES: DashboardTile[] = [
   { id: 'stats', type: 'stats', title: 'Übersicht', size: 'full', position: 0, visible: true },
   { id: 'quick_actions', type: 'quick_actions', title: 'Schnellaktionen', size: 'medium', position: 1, visible: true },
   { id: 'reminders', type: 'reminders', title: 'Erinnerungen', size: 'medium', position: 2, visible: true },
-  { id: 'chart_category', type: 'chart_category', title: 'Kategorien', size: 'medium', position: 3, visible: true },
-  { id: 'chart_financial', type: 'chart_financial', title: 'Finanzen', size: 'medium', position: 4, visible: true },
-  { id: 'recent_items', type: 'recent_items', title: 'Kürzlich hinzugefügt', size: 'medium', position: 5, visible: true },
-  { id: 'top_items', type: 'top_items', title: 'Wertvollste Items', size: 'medium', position: 6, visible: true },
-  { id: 'collection_list', type: 'collection_list', title: 'Sammlungen', size: 'large', position: 7, visible: true },
+  { id: 'tcg_highlights', type: 'tcg_highlights', title: 'TCG Highlights', size: 'medium', position: 3, visible: false },
+  { id: 'chart_category', type: 'chart_category', title: 'Kategorien', size: 'medium', position: 4, visible: true },
+  { id: 'chart_financial', type: 'chart_financial', title: 'Finanzen', size: 'medium', position: 5, visible: true },
+  { id: 'recent_items', type: 'recent_items', title: 'Kürzlich hinzugefügt', size: 'medium', position: 6, visible: true },
+  { id: 'top_items', type: 'top_items', title: 'Wertvollste Items', size: 'medium', position: 7, visible: true },
+  { id: 'collection_list', type: 'collection_list', title: 'Sammlungen', size: 'large', position: 8, visible: true },
 ]
 
 const DEFAULT_CONFIG: DashboardConfig = {
@@ -150,6 +151,7 @@ export function getTileIcon(type: TileType): string {
     reminders: '🔔',
     quick_actions: '⚡',
     collection_list: '📦',
+    tcg_highlights: '🃏',
   }
   return icons[type] || '📋'
 }
@@ -166,6 +168,7 @@ export function getTileDescription(type: TileType): string {
     reminders: 'Anstehende und überfällige Erinnerungen',
     quick_actions: 'Schnellzugriff auf häufige Aktionen',
     collection_list: 'Übersicht aller Sammlungen',
+    tcg_highlights: 'Top Trading Cards nach Grading (PSA/BGS/CGC/SGC)',
   }
   return descriptions[type] || ''
 }
