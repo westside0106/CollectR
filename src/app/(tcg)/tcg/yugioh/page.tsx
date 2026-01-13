@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTCGStats } from '@/hooks/useTCGStats'
 
 type CardType = 'monster' | 'spell' | 'trap' | 'fusion' | 'synchro' | 'xyz' | 'pendulum' | 'link'
 
 export default function YuGiOhPage() {
   const router = useRouter()
   const [selectedType, setSelectedType] = useState<CardType | null>(null)
+  const { stats, loading } = useTCGStats('yugioh')
 
   const cardTypes: Record<CardType, { emoji: string; color: string; description: string }> = {
     monster: { emoji: '👾', color: 'from-orange-600 to-amber-600', description: 'Normal, Effect & Ritual' },
@@ -196,19 +198,27 @@ export default function YuGiOhPage() {
         {/* Quick Stats */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-purple-400 mb-1">
+              {loading ? '...' : stats.totalCards}
+            </div>
             <div className="text-sm text-slate-400">Yu-Gi-Oh! Cards</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-green-400 mb-1">0.00 €</div>
+            <div className="text-3xl font-bold text-green-400 mb-1">
+              {loading ? '...' : `${stats.totalValue.toFixed(2)} €`}
+            </div>
             <div className="text-sm text-slate-400">Collection Value</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-blue-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-blue-400 mb-1">
+              {loading ? '...' : stats.totalDecks}
+            </div>
             <div className="text-sm text-slate-400">Decks Built</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-pink-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-pink-400 mb-1">
+              {loading ? '...' : stats.hotCards}
+            </div>
             <div className="text-sm text-slate-400">Rare Cards</div>
           </div>
         </div>

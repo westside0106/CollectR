@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SPHERE_THEMES } from '@/lib/themes/sphere-themes'
 import Link from 'next/link'
+import { useTCGStats } from '@/hooks/useTCGStats'
 
 type TCGGame = 'pokemon' | 'yugioh' | 'magic'
 
@@ -11,6 +12,7 @@ export default function TCGLandingPage() {
   const router = useRouter()
   const theme = SPHERE_THEMES.tcg
   const [selectedGame, setSelectedGame] = useState<TCGGame | null>(null)
+  const { stats, loading } = useTCGStats('all')
 
   const games = [
     {
@@ -173,19 +175,27 @@ export default function TCGLandingPage() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-red-400 mb-1">0</div>
+                <div className="text-3xl font-bold text-red-400 mb-1">
+                  {loading ? '...' : stats.totalCards}
+                </div>
                 <div className="text-sm text-slate-400">Total Cards</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-400 mb-1">0.00 €</div>
+                <div className="text-3xl font-bold text-green-400 mb-1">
+                  {loading ? '...' : `${stats.totalValue.toFixed(2)} €`}
+                </div>
                 <div className="text-sm text-slate-400">Collection Value</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-1">0</div>
+                <div className="text-3xl font-bold text-blue-400 mb-1">
+                  {loading ? '...' : stats.totalDecks}
+                </div>
                 <div className="text-sm text-slate-400">Decks</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
+                <div className="text-3xl font-bold text-purple-400 mb-1">
+                  {loading ? '...' : stats.hotCards}
+                </div>
                 <div className="text-sm text-slate-400">Hot Cards</div>
               </div>
             </div>

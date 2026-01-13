@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTCGStats } from '@/hooks/useTCGStats'
 
 type ManaColor = 'white' | 'blue' | 'black' | 'red' | 'green' | 'colorless'
 
 export default function MagicPage() {
   const router = useRouter()
   const [selectedColor, setSelectedColor] = useState<ManaColor | null>(null)
+  const { stats, loading } = useTCGStats('magic')
 
   const manaColors: Record<ManaColor, { emoji: string; color: string; description: string; philosophy: string }> = {
     white: { emoji: '☀️', color: 'from-yellow-100 to-amber-200', description: 'Plains', philosophy: 'Law, Order, Structure' },
@@ -212,19 +214,27 @@ export default function MagicPage() {
         {/* Quick Stats */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-blue-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-blue-400 mb-1">
+              {loading ? '...' : stats.totalCards}
+            </div>
             <div className="text-sm text-slate-400">Magic Cards</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-green-400 mb-1">0.00 €</div>
+            <div className="text-3xl font-bold text-green-400 mb-1">
+              {loading ? '...' : `${stats.totalValue.toFixed(2)} €`}
+            </div>
             <div className="text-sm text-slate-400">Collection Value</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-purple-400 mb-1">
+              {loading ? '...' : stats.totalDecks}
+            </div>
             <div className="text-sm text-slate-400">Commander Decks</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-pink-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-pink-400 mb-1">
+              {loading ? '...' : stats.hotCards}
+            </div>
             <div className="text-sm text-slate-400">Reserved List Cards</div>
           </div>
         </div>

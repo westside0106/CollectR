@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTCGStats } from '@/hooks/useTCGStats'
 
 type PokemonType = 'fire' | 'water' | 'grass' | 'electric' | 'psychic' | 'fighting' | 'dark' | 'steel' | 'dragon' | 'fairy'
 
 export default function PokemonTCGPage() {
   const router = useRouter()
   const [selectedType, setSelectedType] = useState<PokemonType | null>(null)
+  const { stats, loading } = useTCGStats('pokemon')
 
   const typeChart: Record<PokemonType, { emoji: string; color: string; weakTo: string[]; strongVs: string[] }> = {
     fire: { emoji: '🔥', color: 'from-red-500 to-orange-500', weakTo: ['Water', 'Ground', 'Rock'], strongVs: ['Grass', 'Ice', 'Bug', 'Steel'] },
@@ -207,19 +209,27 @@ export default function PokemonTCGPage() {
         {/* Quick Stats */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-red-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-red-400 mb-1">
+              {loading ? '...' : stats.totalCards}
+            </div>
             <div className="text-sm text-slate-400">Pokémon Cards</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-green-400 mb-1">0.00 €</div>
+            <div className="text-3xl font-bold text-green-400 mb-1">
+              {loading ? '...' : `${stats.totalValue.toFixed(2)} €`}
+            </div>
             <div className="text-sm text-slate-400">Collection Value</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-blue-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-blue-400 mb-1">
+              {loading ? '...' : stats.totalDecks}
+            </div>
             <div className="text-sm text-slate-400">Decks Built</div>
           </div>
           <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-purple-400 mb-1">
+              {loading ? '...' : stats.hotCards}
+            </div>
             <div className="text-sm text-slate-400">Graded Cards</div>
           </div>
         </div>
