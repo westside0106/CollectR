@@ -113,7 +113,7 @@ export function TCGPriceLookupButton({
         // Log to price history if this is for an existing item
         // Note: The database trigger will automatically log when _computed_value changes
       } else {
-        showToast('Keine Preisdaten verfügbar', 'warning')
+        showToast('Keine Preisdaten verfügbar', 'info')
       }
 
     } catch (error: any) {

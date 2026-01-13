@@ -51,7 +51,7 @@ export function TCGBulkPriceUpdate({ collectionId, onComplete }: TCGBulkPriceUpd
       )
 
       if (tcgItems.length === 0) {
-        showToast('Keine Trading Cards gefunden', 'warning')
+        showToast('Keine Trading Cards gefunden', 'info')
         setLoading(false)
         setProgress(null)
         return
@@ -141,7 +141,7 @@ export function TCGBulkPriceUpdate({ collectionId, onComplete }: TCGBulkPriceUpd
       if (updated > 0) {
         showToast(`${updated} von ${tcgItems.length} Preisen aktualisiert!`, 'success')
       } else {
-        showToast('Keine Preise aktualisiert', 'warning')
+        showToast('Keine Preise aktualisiert', 'info')
       }
 
       if (onComplete) {
