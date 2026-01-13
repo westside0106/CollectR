@@ -191,6 +191,72 @@ Extrahiere wenn möglich:
 - Zustand
 - Box & Papiere vorhanden?
 - Geschätzter Sammlerwert in EUR`,
+
+    'tcg': `
+Du analysierst eine Trading Card (Sammelkarte).
+Extrahiere wenn möglich:
+- Kartenname (exakt wie auf der Karte)
+- Spiel (Pokémon, Yu-Gi-Oh!, Magic: The Gathering, etc.)
+- Set/Edition (z.B. "Base Set", "Legendary Collection", "1st Edition")
+- Kartennummer (z.B. "25/102", "LOB-005")
+- Seltenheit (Common, Rare, Holo Rare, Ultra Rare, Secret Rare, etc.)
+- Sprache der Karte
+- Zustand (Mint, Near Mint, Lightly Played, etc.)
+- Grading: Falls sichtbar erkenne PSA/BGS/CGC/SGC Grading:
+  * Company (PSA, BGS, CGC, oder SGC)
+  * Grade (z.B. "10", "9.5")
+  * Zertifikatsnummer falls lesbar
+- Besonderheiten (1st Edition, Shadowless, Reverse Holo, Full Art, etc.)
+- Geschätzter Marktwert in EUR (ungraded RAW value)
+
+WICHTIG für Grading:
+- Wenn die Karte in einem PSA/BGS/CGC/SGC Case ist, erkenne das Grading
+- Format: { "company": "PSA", "grade": "10", "certNumber": "82364721" }
+- Wenn kein Grading sichtbar: null
+
+Bekannte Sets bei Pokémon: Base Set, Jungle, Fossil, Team Rocket, Gym Heroes, Neo Genesis, Legendary Collection, EX Ruby & Sapphire, Diamond & Pearl, Black & White, XY, Sun & Moon, Sword & Shield, Scarlet & Violet
+
+Bekannte Sets bei Yu-Gi-Oh: Legend of Blue Eyes White Dragon (LOB), Metal Raiders (MRD), Pharaoh's Servant (PSV), Labyrinth of Nightmare (LON)
+
+Bekannte Sets bei Magic: Alpha, Beta, Unlimited, Revised, Arabian Nights, Legends, The Dark, Fallen Empires`,
+
+    'pokemon': `
+Du analysierst eine Pokémon Trading Card.
+Extrahiere wenn möglich:
+- Pokémon-Name
+- Set/Edition (z.B. "Base Set 1st Edition", "Jungle Unlimited")
+- Kartennummer (z.B. "4/102")
+- Seltenheit (Circle ●, Diamond ◆, Star ★, Holo ✦)
+- Sprache (Englisch, Deutsch, Japanisch, etc.)
+- Zustand (Mint 10, Near Mint 9, Excellent 8, etc.)
+- 1st Edition Badge sichtbar?
+- Shadowless (nur Base Set)?
+- Grading falls vorhanden (PSA/BGS/CGC)
+- Geschätzter Marktwert in EUR`,
+
+    'yugioh': `
+Du analysierst eine Yu-Gi-Oh! Karte.
+Extrahiere wenn möglich:
+- Kartenname
+- Set-Code (z.B. "LOB-005", "MRD-094")
+- Edition (1st Edition, Unlimited)
+- Seltenheit (Common, Rare, Super Rare, Ultra Rare, Secret Rare, Ghost Rare)
+- Sprache
+- Zustand
+- Grading falls vorhanden
+- Geschätzter Marktwert in EUR`,
+
+    'magic': `
+Du analysierst eine Magic: The Gathering Karte.
+Extrahiere wenn möglich:
+- Kartenname
+- Set/Edition
+- Seltenheit (Common, Uncommon, Rare, Mythic Rare)
+- Foil/Non-Foil
+- Sprache
+- Zustand
+- Grading falls vorhanden
+- Geschätzter Marktwert in EUR`,
   }
 
   let prompt = basePrompt

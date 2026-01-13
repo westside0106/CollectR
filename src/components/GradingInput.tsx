@@ -6,6 +6,12 @@ export interface GradingValue {
   company: 'PSA' | 'BGS' | 'CGC' | 'SGC' | 'RAW' | ''
   grade: string // z.B. "10", "9.5", "BGS 9.5 (9.5/10/9.5/9)"
   certNumber: string
+  subgrades?: {
+    centering?: string
+    corners?: string
+    edges?: string
+    surface?: string
+  } // Nur für BGS
 }
 
 interface GradingInputProps {
@@ -101,6 +107,13 @@ export default function GradingInput({ value, onChange, required, className = ''
   const [company, setCompany] = useState<GradingValue['company']>(currentValue.company || '')
   const [grade, setGrade] = useState(currentValue.grade || '')
   const [certNumber, setCertNumber] = useState(currentValue.certNumber || '')
+  const [showSubgrades, setShowSubgrades] = useState(false)
+  const [subgrades, setSubgrades] = useState({
+    centering: currentValue.subgrades?.centering || '',
+    corners: currentValue.subgrades?.corners || '',
+    edges: currentValue.subgrades?.edges || '',
+    surface: currentValue.subgrades?.surface || '',
+  })
 
   const handleCompanyChange = (newCompany: GradingValue['company']) => {
     setCompany(newCompany)
@@ -115,7 +128,23 @@ export default function GradingInput({ value, onChange, required, className = ''
 
   const handleCertNumberChange = (newCert: string) => {
     setCertNumber(newCert)
-    onChange({ company, grade, certNumber: newCert })
+    onChange({
+      company,
+      grade,
+      certNumber: newCert,
+      subgrades: company === 'BGS' && showSubgrades ? subgrades : undefined
+    })
+  }
+
+  const handleSubgradeChange = (field: keyof typeof subgrades, value: string) => {
+    const newSubgrades = { ...subgrades, [field]: value }
+    setSubgrades(newSubgrades)
+    onChange({
+      company,
+      grade,
+      certNumber,
+      subgrades: newSubgrades
+    })
   }
 
   const getGradeOptions = () => {
@@ -174,6 +203,89 @@ export default function GradingInput({ value, onChange, required, className = ''
         </div>
       )}
 
+      {/* BGS Subgrades (optional) */}
+      {company === 'BGS' && grade && (
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-medium text-slate-600 dark:text-slate-400">
+              BGS Subgrades (optional)
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowSubgrades(!showSubgrades)}
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              {showSubgrades ? '- Verstecken' : '+ Hinzufügen'}
+            </button>
+          </div>
+
+          {showSubgrades && (
+            <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <div>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+                  Centering
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  max="10"
+                  value={subgrades.centering}
+                  onChange={(e) => handleSubgradeChange('centering', e.target.value)}
+                  placeholder="9.5"
+                  className="w-full px-2 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+                  Corners
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  max="10"
+                  value={subgrades.corners}
+                  onChange={(e) => handleSubgradeChange('corners', e.target.value)}
+                  placeholder="10"
+                  className="w-full px-2 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+                  Edges
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  max="10"
+                  value={subgrades.edges}
+                  onChange={(e) => handleSubgradeChange('edges', e.target.value)}
+                  placeholder="9.5"
+                  className="w-full px-2 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">
+                  Surface
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="1"
+                  max="10"
+                  value={subgrades.surface}
+                  onChange={(e) => handleSubgradeChange('surface', e.target.value)}
+                  placeholder="9"
+                  className="w-full px-2 py-1.5 text-sm rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-1 focus:ring-blue-500 outline-none"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Cert Number (only if company selected) */}
       {company && company !== 'RAW' && (
         <div>
@@ -198,14 +310,37 @@ export default function GradingInput({ value, onChange, required, className = ''
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: selectedCompany?.color }}
             />
-            <span className="text-sm font-semibold dark:text-white">
-              {company} {grade}
-            </span>
-            {certNumber && (
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                #{certNumber}
-              </span>
-            )}
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold dark:text-white">
+                  {company} {grade}
+                </span>
+                {certNumber && (
+                  <>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
+                      #{certNumber}
+                    </span>
+                    {/* PSA Registry Link */}
+                    {company === 'PSA' && certNumber && (
+                      <a
+                        href={`https://www.psacard.com/cert/${certNumber}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        title="PSA Registry aufrufen"
+                      >
+                        🔗 Registry
+                      </a>
+                    )}
+                  </>
+                )}
+              </div>
+              {company === 'BGS' && showSubgrades && (subgrades.centering || subgrades.corners || subgrades.edges || subgrades.surface) && (
+                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-mono">
+                  ({subgrades.centering || '?'}/{subgrades.corners || '?'}/{subgrades.edges || '?'}/{subgrades.surface || '?'})
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
