@@ -11,6 +11,7 @@ import { AIAnalyzeButton, AIAnalysisResult } from '@/components/AIAnalyzeButton'
 import { AIResultModal } from '@/components/AIResultModal'
 import { CategorySelect } from '@/components/CategorySelect'
 import { DuplicateWarning } from '@/components/DuplicateWarning'
+import GradingInput, { type GradingValue } from '@/components/GradingInput'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -393,7 +394,7 @@ export default function NewItemPage({ params }: PageProps) {
                     {attr.required && <span className="text-red-500 ml-1">*</span>}
                   </label>
 
-                  {attr.type === 'text' && (
+                  {attr.type === 'text' && !(attr.name === 'grading' || attr.display_name?.toLowerCase().includes('grading')) && (
                     <input
                       type="text"
                       value={attributeValues[attr.name] || ''}
@@ -461,6 +462,15 @@ export default function NewItemPage({ params }: PageProps) {
                       onChange={(e) => setAttributeValues({...attributeValues, [attr.name]: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})}
                       placeholder="Komma-getrennt"
                       className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  )}
+
+                  {/* TCG Grading Input - spezielle Behandlung für "grading" Attribut */}
+                  {(attr.name === 'grading' || attr.display_name?.toLowerCase().includes('grading')) && (
+                    <GradingInput
+                      value={attributeValues[attr.name]}
+                      onChange={(val) => setAttributeValues({...attributeValues, [attr.name]: val})}
+                      required={attr.required}
                     />
                   )}
                 </div>

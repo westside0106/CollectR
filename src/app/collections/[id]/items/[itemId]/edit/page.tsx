@@ -9,6 +9,7 @@ import { ImageUpload } from '@/components/ImageUpload'
 import { useToast } from '@/components/Toast'
 import { CategorySelect } from '@/components/CategorySelect'
 import { DuplicateWarning } from '@/components/DuplicateWarning'
+import GradingInput, { type GradingValue } from '@/components/GradingInput'
 
 interface Category {
   id: string
@@ -432,6 +433,22 @@ function DynamicField({
 
   switch (type) {
     case 'text':
+      // Spezielle Behandlung für Grading-Attribute
+      if (name === 'grading' || display_name?.toLowerCase().includes('grading')) {
+        return (
+          <div>
+            <label className={labelClasses}>
+              {display_name} {required && '*'}
+            </label>
+            <GradingInput
+              value={value}
+              onChange={onChange}
+              required={required}
+            />
+          </div>
+        )
+      }
+
       return (
         <div>
           <label className={labelClasses}>
