@@ -30,6 +30,8 @@ function DeckBuilderContent() {
   const [mainDeck, setMainDeck] = useState<Card[]>([])
   const [sideDeck, setSideDeck] = useState<Card[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
   useEffect(() => {
     const game = searchParams.get('game') as GameType
@@ -37,6 +39,31 @@ function DeckBuilderContent() {
       setSelectedGame(game)
     }
   }, [searchParams])
+
+  // Search cards when query changes
+  useEffect(() => {
+    if (!searchQuery || searchQuery.length < 2) {
+      setSearchResults([])
+      return
+    }
+
+    const searchCards = async () => {
+      setIsSearching(true)
+      try {
+        const { searchCards: searchFn } = await import('@/lib/card-search-api')
+        const results = await searchFn(selectedGame, searchQuery)
+        setSearchResults(results)
+      } catch (error) {
+        console.error('Card search error:', error)
+        setSearchResults([])
+      } finally {
+        setIsSearching(false)
+      }
+    }
+
+    const timeoutId = setTimeout(searchCards, 500)
+    return () => clearTimeout(timeoutId)
+  }, [searchQuery, selectedGame])
 
   const deckConstraints: Record<GameType, DeckConstraints> = {
     pokemon: { min: 60, max: 60, maxCopies: 4, allowsExtraDeck: false },
@@ -47,6 +74,30 @@ function DeckBuilderContent() {
   const getCurrentConstraints = () => deckConstraints[selectedGame]
   const totalCards = mainDeck.reduce((sum, card) => sum + card.count, 0)
   const extraCards = sideDeck.reduce((sum, card) => sum + card.count, 0)
+
+  const addCardToDeck = (card: any) => {
+    const existingCard = mainDeck.find(c => c.id === card.id)
+
+    if (existingCard) {
+      // Increment count if below maxCopies
+      if (existingCard.count < getCurrentConstraints().maxCopies) {
+        setMainDeck(mainDeck.map(c =>
+          c.id === card.id ? { ...c, count: c.count + 1 } : c
+        ))
+      }
+    } else {
+      // Add new card
+      setMainDeck([...mainDeck, { id: card.id, name: card.name, count: 1 }])
+    }
+  }
+
+  const removeCardFromDeck = (cardId: string) => {
+    setMainDeck(mainDeck.filter(c => c.id !== cardId))
+  }
+
+  const removeCardFromSideDeck = (cardId: string) => {
+    setSideDeck(sideDeck.filter(c => c.id !== cardId))
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
@@ -113,11 +164,54 @@ function DeckBuilderContent() {
               />
 
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {searchQuery.length > 0 ? (
+                {isSearching ? (
+                  <div className="text-center py-8 text-slate-400">
+                    <div className="animate-spin text-4xl mb-2">🔄</div>
+                    <p>Suche...</p>
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  searchResults.map((card) => (
+                    <button
+                      key={card.id}
+                      onClick={() => addCardToDeck(card)}
+                      className="w-full p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-600 hover:border-purple-500 transition-all text-left group"
+                    >
+                      <div className="flex gap-3">
+                        {card.imageUrl && (
+                          <img
+                            src={card.imageUrl}
+                            alt={card.name}
+                            className="w-16 h-20 object-cover rounded"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-white text-sm truncate group-hover:text-purple-300">
+                            {card.name}
+                          </div>
+                          {card.rarity && (
+                            <div className="text-xs text-yellow-400 mt-1">
+                              ⭐ {card.rarity}
+                            </div>
+                          )}
+                          {card.set && (
+                            <div className="text-xs text-slate-400 mt-1 truncate">
+                              {card.set}
+                            </div>
+                          )}
+                          {card.type && (
+                            <div className="text-xs text-slate-500 mt-1 truncate">
+                              {card.type}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                ) : searchQuery.length > 0 ? (
                   <div className="text-center py-8 text-slate-400">
                     <p className="text-4xl mb-2">🔍</p>
-                    <p>Suche nach "{searchQuery}"...</p>
-                    <p className="text-sm mt-2">Feature coming soon!</p>
+                    <p>Keine Karten gefunden</p>
+                    <p className="text-sm mt-2">Versuche eine andere Suche</p>
                   </div>
                 ) : (
                   <div className="text-center py-8 text-slate-400">
@@ -197,7 +291,10 @@ function DeckBuilderContent() {
                       <span className="text-white font-medium">{card.name}</span>
                       <div className="flex items-center gap-3">
                         <span className="text-slate-400">x{card.count}</span>
-                        <button className="text-red-400 hover:text-red-300">
+                        <button
+                          onClick={() => removeCardFromDeck(card.id)}
+                          className="text-red-400 hover:text-red-300"
+                        >
                           ✕
                         </button>
                       </div>
@@ -226,7 +323,10 @@ function DeckBuilderContent() {
                         <span className="text-white font-medium">{card.name}</span>
                         <div className="flex items-center gap-3">
                           <span className="text-slate-400">x{card.count}</span>
-                          <button className="text-red-400 hover:text-red-300">
+                          <button
+                            onClick={() => removeCardFromSideDeck(card.id)}
+                            className="text-red-400 hover:text-red-300"
+                          >
                             ✕
                           </button>
                         </div>
