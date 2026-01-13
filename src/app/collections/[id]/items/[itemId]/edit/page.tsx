@@ -121,7 +121,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         name: formData.get('name') as string,
         description: formData.get('description') as string || null,
         purchase_price: formData.get('purchase_price') ? parseFloat(formData.get('purchase_price') as string) : null,
-        estimated_value: formData.get('estimated_value') ? parseFloat(formData.get('estimated_value') as string) : null,
+        _computed_value: formData.get('estimated_value') ? parseFloat(formData.get('estimated_value') as string) : null,
         purchase_date: formData.get('purchase_date') as string || null,
         purchase_location: formData.get('purchase_location') as string || null,
         notes: formData.get('notes') as string || null,
@@ -328,7 +328,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
                 name="estimated_value"
                 step="0.01"
                 min="0"
-                defaultValue={item.estimated_value || ''}
+                defaultValue={item._computed_value || ''}
                 className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
               />
             </div>
