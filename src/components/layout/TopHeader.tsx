@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { UserMenu } from '@/components/UserMenu'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { SphereNavigation } from '@/components/shared/SphereNavigation'
 
 export function TopHeader() {
   const pathname = usePathname()
@@ -61,9 +62,14 @@ export function TopHeader() {
               className="rounded-lg"
             />
             <div className="hidden sm:block">
-              <h1 className="text-lg font-bold text-slate-900 dark:text-white">CollectR</h1>
+              <h1 className="text-lg font-bold text-slate-900 dark:text-white">Collectorssphere</h1>
             </div>
           </Link>
+
+          {/* Sphere Navigation - Desktop */}
+          <div className="hidden lg:block flex-shrink-0">
+            <SphereNavigation />
+          </div>
 
           {/* Desktop Navigation - Mitte */}
           <nav className="hidden lg:flex items-center gap-1 flex-1 max-w-2xl">
@@ -163,6 +169,14 @@ export function TopHeader() {
             className="lg:hidden fixed top-16 right-0 bottom-0 z-50 w-80 max-w-[85vw] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-2xl overflow-y-auto"
           >
             <nav className="p-4">
+              {/* Sphere Navigation - Mobile */}
+              <div className="mb-6 pb-6 border-b border-slate-200 dark:border-slate-700">
+                <p className="px-4 mb-3 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Spheres
+                </p>
+                <SphereNavigation />
+              </div>
+
               {/* Main Links */}
               <div className="space-y-1 mb-6">
                 <p className="px-4 mb-2 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
