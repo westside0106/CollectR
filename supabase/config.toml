@@ -23,3 +23,15 @@ verify_jwt = false
 
 [realtime]
 enabled = true
+
+[functions.tcg-price-lookup]
+enabled = true
+verify_jwt = false
+import_map = "./functions/tcg-price-lookup/deno.json"
+entrypoint = "./functions/tcg-price-lookup/index.ts"
+
+[functions.tcg-price-updater]
+enabled = true
+verify_jwt = false
+import_map = "./functions/tcg-price-updater/deno.json"
+entrypoint = "./functions/tcg-price-updater/index.ts"

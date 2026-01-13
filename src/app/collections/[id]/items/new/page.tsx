@@ -12,6 +12,7 @@ import { AIResultModal } from '@/components/AIResultModal'
 import { CategorySelect } from '@/components/CategorySelect'
 import { DuplicateWarning } from '@/components/DuplicateWarning'
 import GradingInput, { type GradingValue } from '@/components/GradingInput'
+import { TCGPriceLookupButton, PriceResultDisplay } from '@/components/TCGPriceLookupButton'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -47,6 +48,9 @@ export default function NewItemPage({ params }: PageProps) {
   // KI-Analyse State
   const [aiResult, setAiResult] = useState<AIAnalysisResult | null>(null)
   const [showAiModal, setShowAiModal] = useState(false)
+
+  // TCG Price Lookup State
+  const [priceResult, setPriceResult] = useState<any | null>(null)
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -348,14 +352,47 @@ export default function NewItemPage({ params }: PageProps) {
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Geschätzter Wert / VK (€)</label>
-              <input
-                type="number"
-                step="0.01"
-                value={estimatedValue}
-                onChange={(e) => setEstimatedValue(e.target.value)}
-                placeholder="0.00"
-                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-              />
+              <div className="space-y-2">
+                <input
+                  type="number"
+                  step="0.01"
+                  value={estimatedValue}
+                  onChange={(e) => setEstimatedValue(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+
+                {/* TCG Price Lookup Button - nur bei Trading Cards mit Grading */}
+                {attributes.some(attr => attr.name === 'grading' || attr.display_name?.toLowerCase().includes('grading')) && name && (
+                  <div className="space-y-2">
+                    <TCGPriceLookupButton
+                      cardName={name}
+                      setName={attributeValues['set'] || attributeValues['edition'] || ''}
+                      cardNumber={attributeValues['card_number'] || attributeValues['number'] || ''}
+                      grading={
+                        attributeValues['grading'] && typeof attributeValues['grading'] === 'object'
+                          ? {
+                              company: attributeValues['grading'].company,
+                              grade: attributeValues['grading'].grade
+                            }
+                          : undefined
+                      }
+                      onPriceFound={(price, result) => {
+                        setEstimatedValue(price.toFixed(2))
+                        setPriceResult(result)
+                      }}
+                      disabled={!name}
+                    />
+
+                    {priceResult && (
+                      <PriceResultDisplay
+                        result={priceResult}
+                        onDismiss={() => setPriceResult(null)}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>

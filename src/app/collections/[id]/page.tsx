@@ -13,6 +13,7 @@ import { ShareModal } from '@/components/ShareModal'
 import { AIBatchUpload } from '@/components/AIBatchUpload'
 import { useToast } from '@/components/Toast'
 import { ItemCardSkeleton } from '@/components/Skeleton'
+import { TCGBulkPriceUpdate } from '@/components/TCGBulkPriceUpdate'
 
 type ViewMode = 'grid' | 'list'
 type TabMode = 'items' | 'goals'
@@ -512,6 +513,10 @@ export default function CollectionDetailPage({ params }: PageProps) {
           >
             ✨ KI Batch-Upload
           </button>
+          <TCGBulkPriceUpdate
+            collectionId={id}
+            onComplete={() => loadData()}
+          />
           <Link
             href={`/collections/${id}/items/new`}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"

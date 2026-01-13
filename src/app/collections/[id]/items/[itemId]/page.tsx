@@ -6,6 +6,9 @@ import { ShareItemButton } from './ShareItemButton'
 import { ImageGallery } from '@/components/ImageGallery'
 import { TagSection } from '@/components/TagSection'
 import { ReminderSection } from '@/components/ReminderSection'
+import { TCGPriceRefreshButton } from '@/components/TCGPriceRefreshButton'
+import { PriceHistoryChart } from '@/components/PriceHistoryChart'
+import { PriceAlertManager } from '@/components/PriceAlertManager'
 
 interface PageProps {
   params: Promise<{ id: string; itemId: string }>
@@ -225,6 +228,14 @@ export default async function ItemDetailPage({ params }: PageProps) {
                 </p>
               )}
             </div>
+
+            {/* TCG Price Refresh Button */}
+            <TCGPriceRefreshButton
+              itemId={itemId}
+              itemName={item.name}
+              attributes={item.attributes || {}}
+              currentValue={item._computed_value}
+            />
           </section>
 
           {/* Dynamic Attributes */}
@@ -249,6 +260,17 @@ export default async function ItemDetailPage({ params }: PageProps) {
               </div>
             </section>
           )}
+
+          {/* Price History - nur für Items mit Preisdaten */}
+          <PriceHistoryChart itemId={itemId} itemName={item.name} />
+
+          {/* Price Alerts - nur für Items mit Preisdaten */}
+          <PriceAlertManager
+            itemId={itemId}
+            itemName={item.name}
+            currentPrice={item._computed_value}
+            currency={item.purchase_currency || 'EUR'}
+          />
 
           {/* Notes */}
           {item.notes && (
