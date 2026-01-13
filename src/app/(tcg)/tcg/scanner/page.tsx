@@ -172,17 +172,18 @@ export default function TCGScannerPage() {
               setSelectedMode(null)
               setDetectedCard(null)
             }}
-            prefillData={{
+            itemData={{
               name: detectedCard.name,
               description: detectedCard.aiDescription,
-              images: detectedCard.imageUrl ? [detectedCard.imageUrl] : [],
-              _computed_value: detectedCard.price,
+              coverUrl: detectedCard.imageUrl,
               attributes: {
                 game: detectedCard.game,
                 set: detectedCard.set,
-                rarity: detectedCard.rarity
+                rarity: detectedCard.rarity,
+                estimatedPrice: detectedCard.price
               }
             }}
+            itemType="book"
           />
         )}
 
