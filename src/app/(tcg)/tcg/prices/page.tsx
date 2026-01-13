@@ -37,11 +37,45 @@ function TCGPricesContent() {
     if (!searchQuery.trim()) return
 
     setIsSearching(true)
-    // TODO: Implement actual API call to tcg-price-lookup function
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/tcg-price-lookup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cardName: searchQuery,
+          game: selectedGame
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Price lookup failed')
+      }
+
+      const data = await response.json()
+
+      // Transform API response to PriceResult format
+      const result: PriceResult = {
+        cardName: data.cardName || searchQuery,
+        setName: data.setName,
+        prices: {
+          market: data.rawPrice?.market || data.rawPrice?.avg || data.gradedPrice?.estimated,
+          low: data.rawPrice?.low,
+          mid: data.rawPrice?.mid,
+          high: data.rawPrice?.high
+        },
+        trending: 'stable', // TODO: Implement trending logic from price history
+        lastUpdated: new Date().toISOString()
+      }
+
+      setSearchResults([result])
+    } catch (error) {
+      console.error('Error fetching price:', error)
+      alert('Fehler beim Abrufen der Preise. Bitte versuche es erneut.')
+    } finally {
       setIsSearching(false)
-      alert('Price Lookup Feature - Coming Soon!\n\nDies wird die tcg-price-lookup Supabase Function aufrufen.')
-    }, 1000)
+    }
   }
 
   const trendingCards = [
@@ -142,29 +176,71 @@ function TCGPricesContent() {
         {searchResults.length > 0 ? (
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
             <h2 className="text-2xl font-bold text-white mb-4">Suchergebnisse</h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {searchResults.map((result, index) => (
                 <div
                   key={index}
-                  className="p-4 rounded-lg bg-slate-900/50 border border-slate-600 flex items-center justify-between"
+                  className="p-6 rounded-lg bg-slate-900/50 border border-slate-600"
                 >
-                  <div>
-                    <h3 className="font-semibold text-white mb-1">{result.cardName}</h3>
-                    {result.setName && (
-                      <p className="text-sm text-slate-400">{result.setName}</p>
-                    )}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold text-white mb-1">{result.cardName}</h3>
+                      {result.setName && (
+                        <p className="text-sm text-slate-400">{result.setName}</p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-green-400">
+                        {result.prices.market?.toFixed(2)} €
+                      </div>
+                      <div className={`text-sm font-semibold ${
+                        result.trending === 'up' ? 'text-green-400' :
+                        result.trending === 'down' ? 'text-red-400' :
+                        'text-slate-400'
+                      }`}>
+                        {result.trending === 'up' ? '↗ Steigend' : result.trending === 'down' ? '↘ Fallend' : '→ Stabil'}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-green-400">
-                      {result.prices.market?.toFixed(2)} €
+
+                  {/* Price Details */}
+                  {(result.prices.low || result.prices.mid || result.prices.high) && (
+                    <div className="grid grid-cols-3 gap-4 mb-4 py-4 border-y border-slate-700">
+                      {result.prices.low && (
+                        <div className="text-center">
+                          <div className="text-xs text-slate-500 mb-1">LOW</div>
+                          <div className="text-lg font-semibold text-slate-300">{result.prices.low.toFixed(2)} €</div>
+                        </div>
+                      )}
+                      {result.prices.mid && (
+                        <div className="text-center">
+                          <div className="text-xs text-slate-500 mb-1">MID</div>
+                          <div className="text-lg font-semibold text-slate-300">{result.prices.mid.toFixed(2)} €</div>
+                        </div>
+                      )}
+                      {result.prices.high && (
+                        <div className="text-center">
+                          <div className="text-xs text-slate-500 mb-1">HIGH</div>
+                          <div className="text-lg font-semibold text-slate-300">{result.prices.high.toFixed(2)} €</div>
+                        </div>
+                      )}
                     </div>
-                    <div className={`text-sm ${
-                      result.trending === 'up' ? 'text-green-400' :
-                      result.trending === 'down' ? 'text-red-400' :
-                      'text-slate-400'
-                    }`}>
-                      {result.trending === 'up' ? '↗' : result.trending === 'down' ? '↘' : '→'} {result.trending}
-                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-3">
+                    <Link
+                      href={`/collections/new?prefill=${encodeURIComponent(JSON.stringify({ name: result.cardName, price: result.prices.market }))}`}
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-center"
+                    >
+                      ➕ Zu Sammlung hinzufügen
+                    </Link>
+                    <button
+                      onClick={() => alert('Price Alert Feature - Coming Soon!')}
+                      className="px-4 py-2 bg-slate-700 text-white rounded-lg font-semibold hover:bg-slate-600 transition-all"
+                    >
+                      🔔 Alert setzen
+                    </button>
                   </div>
                 </div>
               ))}
