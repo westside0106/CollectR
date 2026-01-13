@@ -133,17 +133,16 @@ export function TCGCardScanner({ mode, game, onCardDetected, onClose }: TCGCardS
       const aiTags = data?.tags || []
 
       // Try to extract card info from AI response
-      const cardData = {
+      const cardData: any = {
         name: extractCardName(aiDescription, aiTags),
         set: extractSet(aiDescription),
         rarity: extractRarity(aiDescription, aiTags),
         game: game,
         imageUrl: publicUrl,
         aiDescription,
-        aiTags
+        aiTags,
+        price: null
       }
-
-      setDetectedCard(cardData)
 
       // Also try to get price
       try {
@@ -166,6 +165,7 @@ export function TCGCardScanner({ mode, game, onCardDetected, onClose }: TCGCardS
         // Non-critical, continue without price
       }
 
+      setDetectedCard(cardData)
       showToast('Karte erkannt!', 'success')
       onCardDetected(cardData)
 
