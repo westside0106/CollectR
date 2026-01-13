@@ -89,7 +89,7 @@ export function TCGPriceLookupButton({
 
       // Check if we got a price
       if (!result.rawPrice && !result.gradedPrice) {
-        showToast(result.message || 'Keine Preisdaten verfügbar', 'warning')
+        showToast(result.message || 'Keine Preisdaten verfügbar', 'info')
         return
       }
 
