@@ -5,3 +5,5 @@ export { useDashboardConfig, getTileIcon, getTileDescription } from './useDashbo
 export { useTCGStats } from './useTCGStats'
 export { useGamingStats } from './useGamingStats'
 export { useGeoStats } from './useGeoStats'
+export { useShopStats } from './useShopStats'
+export { useOfficialStats } from './useOfficialStats'
