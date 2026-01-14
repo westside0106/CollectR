@@ -42,6 +42,10 @@ export default function NewItemPage({ params }: PageProps) {
   const [barcode, setBarcode] = useState('')
   const [notes, setNotes] = useState('')
   const [attributeValues, setAttributeValues] = useState<Record<string, any>>({})
+
+  // Sphere-specific attributes
+  const [geoType, setGeoType] = useState('')
+  const [officialType, setOfficialType] = useState('')
   
   // NEU: State für Bilder (vor dem Upload)
   const [pendingImages, setPendingImages] = useState<{ url: string; file?: File }[]>([])
@@ -179,6 +183,16 @@ export default function NewItemPage({ params }: PageProps) {
     setError(null)
 
     try {
+      // Sphere-specific attributes zusammenführen
+      const finalAttributes = { ...attributeValues }
+      if (geoType) {
+        finalAttributes.geoType = geoType
+      }
+      if (officialType) {
+        finalAttributes.officialType = officialType
+        finalAttributes.documentType = officialType // Alias für compatibility
+      }
+
       // 1. Item erstellen
       const { data, error: insertError } = await supabase
         .from('items')
@@ -195,7 +209,7 @@ export default function NewItemPage({ params }: PageProps) {
           purchase_location: purchaseLocation || null,
           barcode: barcode || null,
           notes: notes || null,
-          attributes: Object.keys(attributeValues).length > 0 ? attributeValues : null,
+          attributes: Object.keys(finalAttributes).length > 0 ? finalAttributes : null,
           created_by: userId,
         })
         .select()
@@ -346,10 +360,50 @@ export default function NewItemPage({ params }: PageProps) {
                   className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                 >
                   <option value="in_collection">📦 In Sammlung</option>
+                  <option value="for_sale">🏪 Zu verkaufen</option>
                   <option value="wishlist">⭐ Wunschliste</option>
                   <option value="ordered">📬 Bestellt</option>
                   <option value="sold">💰 Verkauft</option>
                   <option value="lost">❌ Verloren</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Sphere-Spezifische Felder */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Geo Sphere Type <span className="text-xs text-slate-500">(optional)</span>
+                </label>
+                <select
+                  value={geoType}
+                  onChange={(e) => setGeoType(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                >
+                  <option value="">-- Keine Zuordnung --</option>
+                  <option value="minerals">💎 Mineralien</option>
+                  <option value="fossils">🦴 Fossilien</option>
+                  <option value="crystals">💠 Kristalle</option>
+                  <option value="meteorites">☄️ Meteoriten</option>
+                  <option value="artifacts">🏺 Artefakte</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                  Official Sphere Type <span className="text-xs text-slate-500">(optional)</span>
+                </label>
+                <select
+                  value={officialType}
+                  onChange={(e) => setOfficialType(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                >
+                  <option value="">-- Keine Zuordnung --</option>
+                  <option value="certificates">📜 Zertifikate</option>
+                  <option value="autographs">✍️ Autogramme</option>
+                  <option value="documents">📄 Dokumente</option>
+                  <option value="tickets">🎫 Tickets</option>
+                  <option value="memorabilia">🏆 Memorabilia</option>
                 </select>
               </div>
             </div>

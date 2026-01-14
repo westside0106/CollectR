@@ -133,6 +133,7 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
           >
             <option value="">Alle Status ({items.length} Items)</option>
             <option value="in_collection">📦 In Sammlung ({items.filter(i => i.status === 'in_collection').length})</option>
+            <option value="for_sale">🏪 Zu verkaufen ({items.filter(i => i.status === 'for_sale').length})</option>
             <option value="wishlist">⭐ Wunschliste ({items.filter(i => i.status === 'wishlist').length})</option>
             <option value="sold">💰 Verkauft ({items.filter(i => i.status === 'sold').length})</option>
             <option value="ordered">📬 Bestellt ({items.filter(i => i.status === 'ordered').length})</option>
