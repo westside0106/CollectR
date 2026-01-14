@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SPHERE_THEMES } from '@/lib/themes/sphere-themes'
 import Link from 'next/link'
+import { useGamingStats } from '@/hooks/useGamingStats'
 
 type GamePlatform = 'playstation' | 'xbox' | 'nintendo' | 'pc' | 'retro'
 
@@ -11,6 +12,7 @@ export default function GamingLandingPage() {
   const router = useRouter()
   const theme = SPHERE_THEMES.gaming
   const [selectedPlatform, setSelectedPlatform] = useState<GamePlatform | null>(null)
+  const { stats, loading } = useGamingStats('all')
 
   const platforms = [
     {
@@ -189,19 +191,27 @@ export default function GamingLandingPage() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
+                <div className="text-3xl font-bold text-purple-400 mb-1">
+                  {loading ? '...' : stats.totalGames}
+                </div>
                 <div className="text-sm text-slate-400">Total Games</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-400 mb-1">0.00 €</div>
+                <div className="text-3xl font-bold text-green-400 mb-1">
+                  {loading ? '...' : `${stats.totalValue.toFixed(2)} €`}
+                </div>
                 <div className="text-sm text-slate-400">Collection Value</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-1">0</div>
+                <div className="text-3xl font-bold text-blue-400 mb-1">
+                  {loading ? '...' : stats.platforms}
+                </div>
                 <div className="text-sm text-slate-400">Platforms</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-amber-400 mb-1">0</div>
+                <div className="text-3xl font-bold text-amber-400 mb-1">
+                  {loading ? '...' : stats.wishlistCount}
+                </div>
                 <div className="text-sm text-slate-400">Wishlist</div>
               </div>
             </div>
