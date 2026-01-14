@@ -193,7 +193,7 @@ export default function GamingScannerPage() {
                 </div>
 
                 <BarcodeScanner
-                  onBarcodeDetected={handleBarcodeScanned}
+                  onScan={handleBarcodeScanned}
                   onClose={() => setShowBarcodeScanner(false)}
                 />
               </div>
