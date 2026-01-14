@@ -120,7 +120,7 @@ export default function GamingPricesPage() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="text-sm text-slate-400">Schnellsuche:</span>
-            {['Zelda', 'FIFA 24', 'GTA 6', 'Pokemon'].map((term) => (
+            {['Zelda', 'FIFA 24', 'GTA 6', 'Elden Ring'].map((term) => (
               <button
                 key={term}
                 onClick={() => {
