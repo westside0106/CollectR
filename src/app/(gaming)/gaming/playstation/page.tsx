@@ -66,14 +66,18 @@ export default function PlayStationPage() {
 
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">🏆</div>
-            <div className="text-3xl font-bold text-amber-400 mb-1">0</div>
-            <div className="text-sm text-slate-400">Platin-Trophäen</div>
+            <div className="text-3xl font-bold text-amber-400 mb-1">
+              {loading ? '...' : stats.topGames.length}
+            </div>
+            <div className="text-sm text-slate-400">Top Spiele</div>
           </div>
 
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">⭐</div>
-            <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
-            <div className="text-sm text-slate-400">Exclusives</div>
+            <div className="text-3xl font-bold text-purple-400 mb-1">
+              {loading ? '...' : stats.recentGames.length}
+            </div>
+            <div className="text-sm text-slate-400">Kürzlich hinzugefügt</div>
           </div>
         </div>
 

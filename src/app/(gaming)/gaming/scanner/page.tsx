@@ -53,21 +53,10 @@ export default function GamingScannerPage() {
     setShowBarcodeScanner(false)
 
     // TODO: Lookup game by barcode in database/API
-    // For now, show a toast
-    showToast(`Barcode gescannt: ${barcode}. Datenbank-Lookup wird in Kürze implementiert.`, 'info')
+    showToast(`Barcode gescannt: ${barcode}. Barcode-Datenbank wird in Kürze implementiert.`, 'info')
 
-    // Placeholder game data
-    const gameData: GameData = {
-      name: 'Beispiel Spiel',
-      platform: 'PlayStation 5',
-      releaseYear: 2024,
-      publisher: 'Unknown',
-      barcode: barcode,
-      estimatedPrice: 0
-    }
-
-    setDetectedGame(gameData)
-    setShowAddModal(true)
+    // Skip placeholder - just show info toast
+    // Barcode lookup will be implemented when gaming database API is integrated
   }
 
   const handleCoverUpload = async (images: Array<{ file: File; url: string }>) => {

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 interface WishlistItem {
   id: string
@@ -14,8 +15,40 @@ interface WishlistItem {
 }
 
 export default function GamingWishlistPage() {
-  const [wishlistItems] = useState<WishlistItem[]>([])
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([])
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'release'>('release')
+  const [loading, setLoading] = useState(true)
+  const [totalValue, setTotalValue] = useState(0)
+  const supabase = createClient()
+
+  useEffect(() => {
+    async function fetchWishlist() {
+      setLoading(true)
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          setLoading(false)
+          return
+        }
+
+        // TODO: Fetch actual wishlist items when wishlist feature is implemented
+        // For now, calculate based on user's collections
+        const { data: items } = await supabase
+          .from('items')
+          .select('estimated_value')
+          .eq('owner_id', user.id)
+          .not('attributes->platform', 'is', null)
+
+        const total = items?.reduce((sum, item) => sum + (item.estimated_value || 0), 0) || 0
+        setTotalValue(total)
+      } catch (error) {
+        console.error('Error fetching wishlist:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchWishlist()
+  }, [supabase])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
@@ -92,19 +125,25 @@ export default function GamingWishlistPage() {
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">📋</div>
-            <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-purple-400 mb-1">
+              {loading ? '...' : wishlistItems.length}
+            </div>
             <div className="text-sm text-slate-400">Spiele auf Wishlist</div>
           </div>
 
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">💰</div>
-            <div className="text-3xl font-bold text-green-400 mb-1">0.00 €</div>
-            <div className="text-sm text-slate-400">Gesamtwert Wishlist</div>
+            <div className="text-3xl font-bold text-green-400 mb-1">
+              {loading ? '...' : `${totalValue.toFixed(2)} €`}
+            </div>
+            <div className="text-sm text-slate-400">Sammlungswert (Gaming)</div>
           </div>
 
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">🔔</div>
-            <div className="text-3xl font-bold text-amber-400 mb-1">0</div>
+            <div className="text-3xl font-bold text-amber-400 mb-1">
+              {loading ? '...' : wishlistItems.filter(i => i.priceAlert).length}
+            </div>
             <div className="text-sm text-slate-400">Aktive Preis-Alerts</div>
           </div>
         </div>

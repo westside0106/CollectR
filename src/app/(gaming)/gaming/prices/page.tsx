@@ -38,6 +38,7 @@ export default function GamingPricesPage() {
     }, 1000)
   }
 
+  // TODO: Replace with real-time trending data from API
   const trendingGames = [
     { name: 'The Legend of Zelda: Tears of the Kingdom', platform: 'Nintendo Switch', price: 59.99, trend: '+5%' },
     { name: 'Baldur\'s Gate 3', platform: 'PC', price: 59.99, trend: '+2%' },
