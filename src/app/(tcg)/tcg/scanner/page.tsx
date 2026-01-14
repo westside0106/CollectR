@@ -7,6 +7,7 @@ import { TCGCardScanner } from '@/components/TCGCardScanner'
 import { BarcodeScanner } from '@/components/BarcodeScanner'
 import { AddToCollectionModal } from '@/components/AddToCollectionModal'
 import { useToast } from '@/components/Toast'
+import { DetectedCard, TCGGame } from '@/types/tcg'
 
 type ScanMode = 'camera' | 'upload' | 'barcode'
 
@@ -14,8 +15,8 @@ export default function TCGScannerPage() {
   const router = useRouter()
   const { showToast } = useToast()
   const [selectedMode, setSelectedMode] = useState<ScanMode | null>(null)
-  const [selectedGame, setSelectedGame] = useState<'pokemon' | 'yugioh' | 'magic'>('pokemon')
-  const [detectedCard, setDetectedCard] = useState<any>(null)
+  const [selectedGame, setSelectedGame] = useState<TCGGame>('pokemon')
+  const [detectedCard, setDetectedCard] = useState<DetectedCard | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false)
 
