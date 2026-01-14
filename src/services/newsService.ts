@@ -58,38 +58,28 @@ export async function getCollectionNews(
   language: string = 'en'
 ): Promise<NewsArticle[]> {
   const cacheKey = `${category}-${limit}-${language}`
-  
+
   const cached = newsCache.get(cacheKey)
   if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
     return cached.data
   }
 
-  const apiKey = process.env.NEXT_PUBLIC_GNEWS_API_KEY
-  
-  if (!apiKey) {
-    return getMockNews()
-  }
-
   try {
-    const query = COLLECTION_KEYWORDS[category]
-    const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=${language}&max=${limit}&apikey=${apiKey}`
-    
-    const response = await fetch(url, {
-      next: { revalidate: 900 }
-    })
+    const url = `/api/news?category=${category}&limit=${limit}&language=${language}`
+    const response = await fetch(url)
 
     if (!response.ok) {
       return getMockNews()
     }
 
-    const data: GNewsResponse = await response.json()
+    const data: NewsArticle[] = await response.json()
 
     newsCache.set(cacheKey, {
-      data: data.articles,
+      data: data,
       timestamp: Date.now()
     })
 
-    return data.articles
+    return data
   } catch (error) {
     return getMockNews()
   }
@@ -99,18 +89,12 @@ export async function searchNews(
   keywords: string,
   limit: number = 10
 ): Promise<NewsArticle[]> {
-  const apiKey = process.env.NEXT_PUBLIC_GNEWS_API_KEY
-  
-  if (!apiKey) {
-    return []
-  }
-
   try {
-    const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(keywords)}&max=${limit}&apikey=${apiKey}`
+    const url = `/api/news?query=${encodeURIComponent(keywords)}&limit=${limit}`
     const response = await fetch(url)
     if (!response.ok) return []
-    const data: GNewsResponse = await response.json()
-    return data.articles
+    const data: NewsArticle[] = await response.json()
+    return data
   } catch (error) {
     return []
   }

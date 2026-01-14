@@ -6,11 +6,13 @@ import Link from 'next/link'
 import { TCGCardScanner } from '@/components/TCGCardScanner'
 import { BarcodeScanner } from '@/components/BarcodeScanner'
 import { AddToCollectionModal } from '@/components/AddToCollectionModal'
+import { useToast } from '@/components/Toast'
 
 type ScanMode = 'camera' | 'upload' | 'barcode'
 
 export default function TCGScannerPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [selectedMode, setSelectedMode] = useState<ScanMode | null>(null)
   const [selectedGame, setSelectedGame] = useState<'pokemon' | 'yugioh' | 'magic'>('pokemon')
   const [detectedCard, setDetectedCard] = useState<any>(null)
@@ -45,10 +47,9 @@ export default function TCGScannerPage() {
   }
 
   const handleBarcodeScanned = (barcode: string) => {
-    console.log('Barcode scanned:', barcode)
     setShowBarcodeScanner(false)
     // TODO: Look up card by barcode
-    alert(`Barcode gescannt: ${barcode}\n\nBarcode-Datenbank-Lookup wird in zukünftiger Version implementiert.`)
+    showToast(`Barcode gescannt: ${barcode}. Barcode-Datenbank-Lookup wird in zukünftiger Version implementiert.`, 'info')
   }
 
   const handleAddToCollection = () => {
