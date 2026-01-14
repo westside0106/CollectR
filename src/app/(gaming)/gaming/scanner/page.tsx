@@ -73,9 +73,9 @@ export default function GamingScannerPage() {
 
     if (mode === 'barcode') {
       setShowBarcodeScanner(true)
-    } else if (mode === 'manual') {
-      router.push('/collections')
     }
+    // For 'manual' mode, just set the selected mode to show the form
+    // For 'cover' mode, it's already handled by selectedMode
   }
 
   return (
@@ -157,6 +157,59 @@ export default function GamingScannerPage() {
                   <ImageUpload
                     onImagesChange={handleCoverUpload}
                   />
+
+                  <button
+                    onClick={() => setSelectedMode(null)}
+                    className="w-full mt-6 px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-colors"
+                  >
+                    Abbrechen
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Manual Input Mode */}
+            {selectedMode === 'manual' && (
+              <div className="max-w-2xl mx-auto">
+                <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700">
+                  <h2 className="text-2xl font-bold text-white mb-6 text-center">
+                    ✍️ Spieldetails manuell eingeben
+                  </h2>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Spielname *
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="z.B. The Legend of Zelda: Tears of the Kingdom"
+                        className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                            const gameName = e.currentTarget.value.trim()
+                            setDetectedGame({
+                              name: gameName,
+                              platform: undefined,
+                              releaseYear: undefined,
+                              publisher: undefined,
+                              imageUrl: undefined,
+                              barcode: undefined,
+                              estimatedPrice: undefined
+                            })
+                            setShowAddModal(true)
+                            setSelectedMode(null)
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                      <p className="text-sm text-blue-300">
+                        💡 <strong>Tipp:</strong> Gib den Spielnamen ein und drücke Enter. Weitere Details kannst du nach dem Hinzufügen ergänzen.
+                      </p>
+                    </div>
+                  </div>
 
                   <button
                     onClick={() => setSelectedMode(null)}
