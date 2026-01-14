@@ -71,7 +71,12 @@ export default function CollectionDetailPage({ params }: PageProps) {
   }[]>([])
   const [attributeFilters, setAttributeFilters] = useState<Record<string, any>>(() => {
     const filtersParam = searchParams.get('attrFilters')
-    return filtersParam ? JSON.parse(decodeURIComponent(filtersParam)) : {}
+    if (!filtersParam) return {}
+    try {
+      return JSON.parse(decodeURIComponent(filtersParam))
+    } catch {
+      return {}
+    }
   })
 
   // Save view mode preference

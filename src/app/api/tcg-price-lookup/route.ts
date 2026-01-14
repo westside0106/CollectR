@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { USD_TO_EUR } from '@/lib/constants'
 
 const POKEMON_TCG_API_BASE = 'https://api.pokemontcg.io/v2'
 const YUGIOH_API_BASE = 'https://db.ygoprodeck.com/api/v7'
 const SCRYFALL_API_BASE = 'https://api.scryfall.com'
-const USD_TO_EUR = 0.92
 
 interface PriceResult {
   cardName: string
