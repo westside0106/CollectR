@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SPHERE_THEMES } from '@/lib/themes/sphere-themes'
 import Link from 'next/link'
+import { useShopStats } from '@/hooks/useShopStats'
 
 type ShopFeature = 'marketplace' | 'inventory' | 'orders' | 'analytics' | 'integration'
 
@@ -11,6 +12,7 @@ export default function ShopLandingPage() {
   const router = useRouter()
   const theme = SPHERE_THEMES.shop
   const [selectedFeature, setSelectedFeature] = useState<ShopFeature | null>(null)
+  const { stats, loading } = useShopStats()
 
   const features = [
     {
@@ -232,24 +234,43 @@ export default function ShopLandingPage() {
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700">
             <h2 className="text-2xl font-bold text-white mb-6">Quick Stats</h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Active Listings</div>
+            {loading ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 animate-pulse">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="text-center">
+                    <div className="h-8 bg-slate-700 rounded mb-2 mx-auto w-16"></div>
+                    <div className="h-4 bg-slate-700 rounded mx-auto w-24"></div>
+                  </div>
+                ))}
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-1">0.00 €</div>
-                <div className="text-sm text-slate-400">Revenue (30d)</div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-400 mb-1">
+                    {stats.activeListings}
+                  </div>
+                  <div className="text-sm text-slate-400">Active Listings</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-400 mb-1">
+                    {stats.revenue30d.toFixed(2)} €
+                  </div>
+                  <div className="text-sm text-slate-400">Revenue (30d)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-400 mb-1">
+                    {stats.totalOrders}
+                  </div>
+                  <div className="text-sm text-slate-400">Orders</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-amber-400 mb-1">
+                    {stats.itemsInStock}
+                  </div>
+                  <div className="text-sm text-slate-400">Items in Stock</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Orders</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amber-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Items in Stock</div>
-              </div>
-            </div>
+            )}
 
             <div className="mt-6 text-center">
               <Link

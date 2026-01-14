@@ -230,6 +230,7 @@ export default function NewCollectionPage() {
   const [description, setDescription] = useState('')
   const [icon, setIcon] = useState('📦')
   const [selectedPreset, setSelectedPreset] = useState('custom')
+  const [enableTCGPriceUpdates, setEnableTCGPriceUpdates] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
@@ -254,14 +255,17 @@ export default function NewCollectionPage() {
     setError('')
 
     try {
-      // 1. Collection erstellen mit Icon in settings
+      // 1. Collection erstellen mit Icon und TCG settings
       const { data: collection, error: collectionError } = await supabase
         .from('collections')
         .insert({
           name,
           description,
           owner_id: userId,
-          settings: { icon }
+          settings: {
+            icon,
+            tcgPriceUpdates: enableTCGPriceUpdates
+          }
         })
         .select()
         .single()
@@ -381,6 +385,27 @@ export default function NewCollectionPage() {
               className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-700 dark:text-white"
               placeholder="Optional: Beschreibe deine Sammlung..."
             />
+          </div>
+
+          {/* TCG Price Updates Option */}
+          <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 border border-slate-200 dark:border-slate-600">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={enableTCGPriceUpdates}
+                onChange={(e) => setEnableTCGPriceUpdates(e.target.checked)}
+                className="mt-1 w-4 h-4 text-accent-500 border-slate-300 dark:border-slate-500 rounded focus:ring-2 focus:ring-accent-500"
+              />
+              <div className="flex-1">
+                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  TCG Preis-Updates aktivieren
+                </span>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">
+                  Aktiviere diese Option, wenn du Trading Card Game Karten (Pokémon, Yu-Gi-Oh!, Magic) sammelst.
+                  Du kannst dann automatische Preis-Updates für deine Karten durchführen.
+                </p>
+              </div>
+            </label>
           </div>
 
           {/* Preset-Auswahl */}

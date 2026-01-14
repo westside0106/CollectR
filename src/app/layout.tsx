@@ -7,6 +7,7 @@ import { InstallPrompt } from '@/components/InstallPrompt'
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { ToastProvider } from '@/components/Toast'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Analytics } from '@vercel/analytics/next'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -140,12 +141,14 @@ export default function RootLayout({
       <body className={`${inter.className} bg-slate-50 dark:bg-slate-950 transition-colors`}>
         <ThemeProvider>
           <ToastProvider>
-            <ServiceWorkerRegistration />
-            <TopHeader />
-            <main className="min-h-screen min-h-[100dvh]">
-              {children}
-            </main>
-            <InstallPrompt />
+            <ErrorBoundary>
+              <ServiceWorkerRegistration />
+              <TopHeader />
+              <main className="min-h-screen min-h-[100dvh]">
+                {children}
+              </main>
+              <InstallPrompt />
+            </ErrorBoundary>
           </ToastProvider>
         </ThemeProvider>
         <Analytics />

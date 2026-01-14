@@ -44,7 +44,7 @@ let cacheTimestamp: number = 0
 const CACHE_DURATION = 60 * 60 * 1000 // 1 Stunde in ms
 
 /**
- * Holt aktuelle Wechselkurse von currencylayer
+ * Holt aktuelle Wechselkurse über Server API
  */
 export async function getExchangeRates(): Promise<ExchangeRates | null> {
   // Cache prüfen
@@ -52,46 +52,20 @@ export async function getExchangeRates(): Promise<ExchangeRates | null> {
     return cachedRates
   }
 
-  const apiKey = process.env.NEXT_PUBLIC_CURRENCYLAYER_API_KEY
-  
-  if (!apiKey) {
-    console.warn('CURRENCYLAYER_API_KEY nicht gesetzt')
-    return null
-  }
-
   try {
-    const currencies = SUPPORTED_CURRENCIES.map(c => c.code).join(',')
-    const response = await fetch(
-      `https://api.currencylayer.com/live?access_key=${apiKey}&currencies=${currencies}`,
-      { next: { revalidate: 3600 } } // Next.js Cache: 1 Stunde
-    )
+    const response = await fetch('/api/currency')
 
-    const data: CurrencyLayerResponse = await response.json()
-
-    if (!data.success) {
-      console.error('Currencylayer Error:', data.error)
+    if (!response.ok) {
       return null
     }
 
-    // Umwandeln in einfacheres Format
-    // currencylayer gibt "USDEUR" zurück, wir wollen nur "EUR"
-    const rates: Record<string, number> = {}
-    for (const [key, value] of Object.entries(data.quotes)) {
-      const currency = key.replace('USD', '')
-      rates[currency] = value
-    }
-    rates['USD'] = 1 // USD ist immer 1 (Basis)
+    const data: ExchangeRates = await response.json()
 
-    cachedRates = {
-      base: 'USD',
-      timestamp: data.timestamp,
-      rates
-    }
+    cachedRates = data
     cacheTimestamp = Date.now()
 
     return cachedRates
   } catch (error) {
-    console.error('Fehler beim Abrufen der Wechselkurse:', error)
     return null
   }
 }

@@ -265,7 +265,7 @@ export default function MagicFormatCheckerPage() {
           <ul className="space-y-2 text-sm text-slate-300">
             <li>• <strong>Rotation:</strong> Nur Standard hat Rotation (jährlich)</li>
             <li>• <strong>Banlist Updates:</strong> Mehrmals pro Jahr je nach Format</li>
-            <li>• <strong>Power Level:</strong> Vintage > Legacy > Modern > Pioneer > Standard</li>
+            <li>• <strong>Power Level:</strong> Vintage &gt; Legacy &gt; Modern &gt; Pioneer &gt; Standard</li>
             <li>• <strong>Commander:</strong> Eigene Banlist, optimiert für Multiplayer</li>
             <li>• Für genaue Legalität nutze <a href="https://scryfall.com" target="_blank" rel="noopener" className="text-blue-400 hover:underline">Scryfall.com</a></li>
           </ul>

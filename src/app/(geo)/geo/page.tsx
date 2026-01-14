@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SPHERE_THEMES } from '@/lib/themes/sphere-themes'
+import { useGeoStats } from '@/hooks/useGeoStats'
 import Link from 'next/link'
 
 type GeoCategory = 'minerals' | 'fossils' | 'crystals' | 'meteorites' | 'artifacts'
@@ -11,6 +12,7 @@ export default function GeoLandingPage() {
   const router = useRouter()
   const theme = SPHERE_THEMES.geo
   const [selectedCategory, setSelectedCategory] = useState<GeoCategory | null>(null)
+  const { stats, loading } = useGeoStats('all')
 
   const categories = [
     {
@@ -187,24 +189,43 @@ export default function GeoLandingPage() {
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700">
             <h2 className="text-2xl font-bold text-white mb-6">Quick Stats</h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-emerald-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Total Specimens</div>
+            {loading ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 animate-pulse">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="text-center">
+                    <div className="h-8 bg-slate-700 rounded mb-2 mx-auto w-16"></div>
+                    <div className="h-4 bg-slate-700 rounded mx-auto w-24"></div>
+                  </div>
+                ))}
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amber-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Rare Finds</div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-emerald-400 mb-1">
+                    {stats.totalSpecimens}
+                  </div>
+                  <div className="text-sm text-slate-400">Total Specimens</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-amber-400 mb-1">
+                    {stats.rareFinds}
+                  </div>
+                  <div className="text-sm text-slate-400">Rare Finds</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-400 mb-1">
+                    {stats.locations}
+                  </div>
+                  <div className="text-sm text-slate-400">Locations</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-400 mb-1">
+                    {stats.totalValue.toFixed(2)} €
+                  </div>
+                  <div className="text-sm text-slate-400">Collection Value</div>
+                </div>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Locations</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400 mb-1">0.00 €</div>
-                <div className="text-sm text-slate-400">Collection Value</div>
-              </div>
-            </div>
+            )}
 
             <div className="mt-6 text-center">
               <Link

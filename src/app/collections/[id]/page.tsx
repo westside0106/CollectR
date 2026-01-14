@@ -71,13 +71,23 @@ export default function CollectionDetailPage({ params }: PageProps) {
   }[]>([])
   const [attributeFilters, setAttributeFilters] = useState<Record<string, any>>(() => {
     const filtersParam = searchParams.get('attrFilters')
-    return filtersParam ? JSON.parse(decodeURIComponent(filtersParam)) : {}
+    if (!filtersParam) return {}
+    try {
+      return JSON.parse(decodeURIComponent(filtersParam))
+    } catch {
+      return {}
+    }
   })
 
   // Save view mode preference
   useEffect(() => {
     localStorage.setItem('collectionViewMode', viewMode)
   }, [viewMode])
+
+  // Check if TCG price updates are enabled for this collection
+  const tcgPriceUpdatesEnabled = useMemo(() => {
+    return collection?.settings?.tcgPriceUpdates === true
+  }, [collection])
 
   const debouncedSearch = useDebounce(searchQuery, 300)
 
@@ -513,10 +523,12 @@ export default function CollectionDetailPage({ params }: PageProps) {
           >
             ✨ KI Batch-Upload
           </button>
-          <TCGBulkPriceUpdate
-            collectionId={id}
-            onComplete={() => loadData()}
-          />
+          {tcgPriceUpdatesEnabled && (
+            <TCGBulkPriceUpdate
+              collectionId={id}
+              onComplete={() => loadData()}
+            />
+          )}
           <Link
             href={`/collections/${id}/items/new`}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"

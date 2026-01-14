@@ -6,14 +6,17 @@ import Link from 'next/link'
 import { TCGCardScanner } from '@/components/TCGCardScanner'
 import { BarcodeScanner } from '@/components/BarcodeScanner'
 import { AddToCollectionModal } from '@/components/AddToCollectionModal'
+import { useToast } from '@/components/Toast'
+import { DetectedCard, TCGGame } from '@/types/tcg'
 
 type ScanMode = 'camera' | 'upload' | 'barcode'
 
 export default function TCGScannerPage() {
   const router = useRouter()
+  const { showToast } = useToast()
   const [selectedMode, setSelectedMode] = useState<ScanMode | null>(null)
-  const [selectedGame, setSelectedGame] = useState<'pokemon' | 'yugioh' | 'magic'>('pokemon')
-  const [detectedCard, setDetectedCard] = useState<any>(null)
+  const [selectedGame, setSelectedGame] = useState<TCGGame>('pokemon')
+  const [detectedCard, setDetectedCard] = useState<DetectedCard | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false)
 
@@ -45,10 +48,9 @@ export default function TCGScannerPage() {
   }
 
   const handleBarcodeScanned = (barcode: string) => {
-    console.log('Barcode scanned:', barcode)
     setShowBarcodeScanner(false)
     // TODO: Look up card by barcode
-    alert(`Barcode gescannt: ${barcode}\n\nBarcode-Datenbank-Lookup wird in zukünftiger Version implementiert.`)
+    showToast(`Barcode gescannt: ${barcode}. Barcode-Datenbank-Lookup wird in zukünftiger Version implementiert.`, 'info')
   }
 
   const handleAddToCollection = () => {
@@ -172,17 +174,18 @@ export default function TCGScannerPage() {
               setSelectedMode(null)
               setDetectedCard(null)
             }}
-            prefillData={{
+            itemData={{
               name: detectedCard.name,
               description: detectedCard.aiDescription,
-              images: detectedCard.imageUrl ? [detectedCard.imageUrl] : [],
-              _computed_value: detectedCard.price,
+              coverUrl: detectedCard.imageUrl,
               attributes: {
                 game: detectedCard.game,
                 set: detectedCard.set,
-                rarity: detectedCard.rarity
+                rarity: detectedCard.rarity,
+                estimatedPrice: detectedCard.price
               }
             }}
+            itemType="book"
           />
         )}
 

@@ -133,17 +133,50 @@ export function TCGCardScanner({ mode, game, onCardDetected, onClose }: TCGCardS
       const aiTags = data?.tags || []
 
       // Try to extract card info from AI response
-      const cardData = {
+      const cardData: any = {
         name: extractCardName(aiDescription, aiTags),
         set: extractSet(aiDescription),
         rarity: extractRarity(aiDescription, aiTags),
         game: game,
-        imageUrl: publicUrl,
+        imageUrl: publicUrl, // Default to scanned image
         aiDescription,
-        aiTags
+        aiTags,
+        price: null
       }
 
-      setDetectedCard(cardData)
+      // Try to get official card image from Card Search API
+      try {
+        const searchResponse = await fetch(`/api/card-search?game=${game}&query=${encodeURIComponent(cardData.name)}`)
+
+        if (searchResponse.ok) {
+          const searchResults = await searchResponse.json()
+
+          // Find best match (prefer exact name match)
+          if (searchResults && searchResults.length > 0) {
+            const exactMatch = searchResults.find((card: any) =>
+              card.name.toLowerCase() === cardData.name.toLowerCase()
+            )
+            const bestMatch = exactMatch || searchResults[0]
+
+            // Use official card image and additional data
+            if (bestMatch.imageUrl) {
+              cardData.imageUrl = bestMatch.imageUrl
+              console.log('[TCG Scanner] Using official card image from API')
+            }
+
+            // Update with more accurate data from API if available
+            if (!cardData.set && bestMatch.set) {
+              cardData.set = bestMatch.set
+            }
+            if (!cardData.rarity && bestMatch.rarity) {
+              cardData.rarity = bestMatch.rarity
+            }
+          }
+        }
+      } catch (searchError) {
+        console.error('Card search failed:', searchError)
+        // Non-critical, continue with scanned image
+      }
 
       // Also try to get price
       try {
@@ -166,6 +199,7 @@ export function TCGCardScanner({ mode, game, onCardDetected, onClose }: TCGCardS
         // Non-critical, continue without price
       }
 
+      setDetectedCard(cardData)
       showToast('Karte erkannt!', 'success')
       onCardDetected(cardData)
 
