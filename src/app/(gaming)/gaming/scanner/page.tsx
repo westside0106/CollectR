@@ -59,7 +59,7 @@ export default function GamingScannerPage() {
     // Barcode lookup will be implemented when gaming database API is integrated
   }
 
-  const handleCoverUpload = async (images: Array<{ file: File; url: string }>) => {
+  const handleCoverUpload = async (images: Array<{ url: string; file?: File }>) => {
     if (images.length === 0) return
 
     showToast('Cover-Analyse wird in Kürze implementiert.', 'info')
