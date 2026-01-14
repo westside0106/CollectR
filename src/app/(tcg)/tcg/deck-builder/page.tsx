@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useToast } from '@/components/Toast'
 
 type GameType = 'pokemon' | 'yugioh' | 'magic'
 
@@ -25,6 +26,7 @@ interface DeckConstraints {
 function DeckBuilderContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { showToast } = useToast()
   const [selectedGame, setSelectedGame] = useState<GameType>('pokemon')
   const [deckName, setDeckName] = useState('')
   const [mainDeck, setMainDeck] = useState<Card[]>([])
@@ -32,6 +34,7 @@ function DeckBuilderContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<any[]>([])
   const [isSearching, setIsSearching] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
 
   useEffect(() => {
     const game = searchParams.get('game') as GameType
@@ -44,18 +47,27 @@ function DeckBuilderContent() {
   useEffect(() => {
     if (!searchQuery || searchQuery.length < 2) {
       setSearchResults([])
+      setSearchError(null)
       return
     }
 
     const searchCards = async () => {
       setIsSearching(true)
+      setSearchError(null)
       try {
         const { searchCards: searchFn } = await import('@/lib/card-search-api')
         const results = await searchFn(selectedGame, searchQuery)
         setSearchResults(results)
+
+        if (results.length === 0) {
+          setSearchError('Keine Karten gefunden. Versuche eine andere Suche.')
+        }
       } catch (error) {
         console.error('Card search error:', error)
         setSearchResults([])
+        const errorMsg = `Kartensuchfehler: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`
+        setSearchError(errorMsg)
+        showToast(errorMsg, 'error')
       } finally {
         setIsSearching(false)
       }
@@ -63,7 +75,7 @@ function DeckBuilderContent() {
 
     const timeoutId = setTimeout(searchCards, 500)
     return () => clearTimeout(timeoutId)
-  }, [searchQuery, selectedGame])
+  }, [searchQuery, selectedGame, showToast])
 
   const deckConstraints: Record<GameType, DeckConstraints> = {
     pokemon: { min: 60, max: 60, maxCopies: 4, allowsExtraDeck: false },
@@ -208,10 +220,27 @@ function DeckBuilderContent() {
                     </button>
                   ))
                 ) : searchQuery.length > 0 ? (
-                  <div className="text-center py-8 text-slate-400">
-                    <p className="text-4xl mb-2">🔍</p>
-                    <p>Keine Karten gefunden</p>
-                    <p className="text-sm mt-2">Versuche eine andere Suche</p>
+                  <div className="text-center py-8">
+                    <p className="text-4xl mb-2">{searchError ? '⚠️' : '🔍'}</p>
+                    {searchError ? (
+                      <>
+                        <p className="text-red-400 font-semibold mb-2">Fehler</p>
+                        <p className="text-sm text-slate-300">{searchError}</p>
+                        <div className="mt-4 text-xs text-slate-400 bg-slate-800/50 rounded-lg p-3">
+                          <p className="font-semibold mb-2">Mögliche Ursachen:</p>
+                          <ul className="text-left space-y-1">
+                            <li>• API-Verbindung fehlgeschlagen</li>
+                            <li>• Kartenname falsch geschrieben</li>
+                            <li>• Probiere Yu-Gi-Oh! oder Magic (funktionieren ohne API Key)</li>
+                          </ul>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-slate-400">Keine Karten gefunden</p>
+                        <p className="text-sm text-slate-500 mt-2">Versuche eine andere Suche</p>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <div className="text-center py-8 text-slate-400">
