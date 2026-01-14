@@ -163,8 +163,6 @@ export default function GamingScannerPage() {
 
                   <ImageUpload
                     onImagesChange={handleCoverUpload}
-                    maxImages={1}
-                    existingImages={[]}
                   />
 
                   <button
