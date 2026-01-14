@@ -23,6 +23,7 @@ export type AttributeType =
 
 export type ItemStatus =
   | 'in_collection'
+  | 'for_sale'
   | 'sold'
   | 'wishlist'
   | 'ordered'

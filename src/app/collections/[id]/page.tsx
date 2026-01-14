@@ -949,10 +949,13 @@ function ItemCard({ item, collectionId, bulkEditMode, isSelected, onToggleSelect
         {item.status !== 'in_collection' && (
           <span className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium ${
             item.status === 'sold' ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400' :
+            item.status === 'for_sale' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400' :
             item.status === 'wishlist' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400' :
             'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
           }`}>
-            {item.status === 'sold' ? 'Verkauft' : item.status === 'wishlist' ? 'Wunschliste' : item.status}
+            {item.status === 'sold' ? 'Verkauft' :
+             item.status === 'for_sale' ? 'Zu verkaufen' :
+             item.status === 'wishlist' ? 'Wunschliste' : item.status}
           </span>
         )}
         {item.barcode && (
@@ -1006,6 +1009,7 @@ function ItemRow({ item, collectionId, bulkEditMode, isSelected, onToggleSelect 
 
   const statusLabels: Record<string, string> = {
     'in_collection': 'In Sammlung',
+    'for_sale': 'Zu verkaufen',
     'sold': 'Verkauft',
     'wishlist': 'Wunschliste',
     'ordered': 'Bestellt',
@@ -1074,7 +1078,8 @@ function ItemRow({ item, collectionId, bulkEditMode, isSelected, onToggleSelect 
       <td className="px-4 py-3 hidden sm:table-cell">
         <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
           item.status === 'in_collection' ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400' :
-          item.status === 'sold' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400' :
+          item.status === 'for_sale' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400' :
+          item.status === 'sold' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400' :
           item.status === 'wishlist' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-400' :
           'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
         }`}>
