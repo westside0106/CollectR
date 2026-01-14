@@ -68,13 +68,6 @@ export default function GamingScannerPage() {
     setSelectedMode(null)
   }
 
-  const handleAddToCollection = () => {
-    setShowAddModal(false)
-    setSelectedMode(null)
-    setDetectedGame(null)
-    showToast('Spiel zur Sammlung hinzugefügt!', 'success')
-  }
-
   const startScanning = (mode: ScanMode) => {
     setSelectedMode(mode)
 
@@ -222,7 +215,6 @@ export default function GamingScannerPage() {
               }
             }}
             itemType="book"
-            onSuccess={handleAddToCollection}
           />
         )}
       </div>
