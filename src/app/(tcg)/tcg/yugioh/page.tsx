@@ -262,7 +262,7 @@ export default function YuGiOhCollectionPage() {
   }
 
   const uniqueRarities = Array.from(new Set(cards.map(c => c.attributes.tcgRarity).filter(Boolean)))
-  const uniqueLevels = Array.from(new Set(cards.map(c => c.attributes.yugiohLevel || c.attributes.yugiohRank).filter(Boolean))).sort((a, b) => a - b)
+  const uniqueLevels = Array.from(new Set(cards.map(c => c.attributes.yugiohLevel || c.attributes.yugiohRank).filter((l): l is number => l !== undefined))).sort((a, b) => a - b)
   const uniqueSets = Array.from(new Set(cards.map(c => c.attributes.tcgSet).filter(Boolean)))
 
   if (isLoading) {
