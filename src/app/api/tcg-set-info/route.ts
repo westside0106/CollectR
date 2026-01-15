@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
     if (game === 'magic') {
       // If specific set requested
       if (setId || setName) {
-        const searchCode = setId || setName
+        const searchCode = (setId || setName) as string
         const response = await fetch(
           `https://api.scryfall.com/sets/${encodeURIComponent(searchCode)}`
         )
