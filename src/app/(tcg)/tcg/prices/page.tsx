@@ -9,13 +9,15 @@ type GameType = 'pokemon' | 'yugioh' | 'magic'
 interface PriceResult {
   cardName: string
   setName?: string
+  imageUrl?: string
   prices: {
     market?: number
     low?: number
     mid?: number
     high?: number
   }
-  trending: 'up' | 'down' | 'stable'
+  currency: string
+  source: string
   lastUpdated: string
 }
 
@@ -33,49 +35,44 @@ function TCGPricesContent() {
     }
   }, [searchParams])
 
+  // Clear search when game changes
+  useEffect(() => {
+    setSearchQuery('')
+    setSearchResults([])
+  }, [selectedGame])
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) return
 
     setIsSearching(true)
+    setSearchResults([])
+
     try {
-      const response = await fetch('/api/tcg-price-lookup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          cardName: searchQuery,
-          game: selectedGame
-        })
-      })
+      const response = await fetch(
+        `/api/card-prices?game=${selectedGame}&query=${encodeURIComponent(searchQuery)}`
+      )
 
       if (!response.ok) {
-        throw new Error('Price lookup failed')
+        throw new Error('Failed to fetch prices')
       }
 
-      const data = await response.json()
+      const data: PriceResult[] = await response.json()
+      setSearchResults(data)
 
-      // Transform API response to PriceResult format
-      const result: PriceResult = {
-        cardName: data.cardName || searchQuery,
-        setName: data.setName,
-        prices: {
-          market: data.rawPrice?.market || data.rawPrice?.avg || data.gradedPrice?.estimated,
-          low: data.rawPrice?.low,
-          mid: data.rawPrice?.mid,
-          high: data.rawPrice?.high
-        },
-        trending: 'stable', // TODO: Implement trending logic from price history
-        lastUpdated: new Date().toISOString()
+      if (data.length === 0) {
+        alert(`❌ Keine Preise gefunden für "${searchQuery}".\n\nTipps:\n• Versuche verschiedene Schreibweisen\n• Prüfe die Rechtschreibung\n• Nicht alle Karten haben verfügbare Preisdaten`)
       }
-
-      setSearchResults([result])
     } catch (error) {
-      console.error('Error fetching price:', error)
-      alert('Fehler beim Abrufen der Preise. Bitte versuche es erneut.')
+      console.error('Price search error:', error)
+      alert('❌ Fehler beim Laden der Preise. Bitte versuche es erneut.')
     } finally {
       setIsSearching(false)
     }
+  }
+
+  const openEbaySoldListings = (cardName: string) => {
+    const ebayUrl = `https://www.ebay.de/sch/i.html?_nkw=${encodeURIComponent(cardName)}&_sacat=0&LH_Complete=1&LH_Sold=1`
+    window.open(ebayUrl, '_blank')
   }
 
   const trendingCards = [
@@ -157,12 +154,36 @@ function TCGPricesContent() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="text-sm text-slate-400">Schnellsuche:</span>
-            {['Charizard', 'Pikachu', 'Mewtwo'].map((term) => (
+            {selectedGame === 'pokemon' && ['Charizard', 'Pikachu', 'Mewtwo'].map((term) => (
               <button
                 key={term}
                 onClick={() => {
                   setSearchQuery(term)
-                  handleSearch()
+                  setTimeout(() => handleSearch(), 100)
+                }}
+                className="px-3 py-1 rounded-lg bg-slate-700/50 text-slate-300 text-sm hover:bg-slate-700 transition-all"
+              >
+                {term}
+              </button>
+            ))}
+            {selectedGame === 'yugioh' && ['Dark Magician', 'Blue-Eyes', 'Red-Eyes'].map((term) => (
+              <button
+                key={term}
+                onClick={() => {
+                  setSearchQuery(term)
+                  setTimeout(() => handleSearch(), 100)
+                }}
+                className="px-3 py-1 rounded-lg bg-slate-700/50 text-slate-300 text-sm hover:bg-slate-700 transition-all"
+              >
+                {term}
+              </button>
+            ))}
+            {selectedGame === 'magic' && ['Lightning Bolt', 'Counterspell', 'Sol Ring'].map((term) => (
+              <button
+                key={term}
+                onClick={() => {
+                  setSearchQuery(term)
+                  setTimeout(() => handleSearch(), 100)
                 }}
                 className="px-3 py-1 rounded-lg bg-slate-700/50 text-slate-300 text-sm hover:bg-slate-700 transition-all"
               >
@@ -182,23 +203,33 @@ function TCGPricesContent() {
                   key={index}
                   className="p-6 rounded-lg bg-slate-900/50 border border-slate-600"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-white mb-1">{result.cardName}</h3>
-                      {result.setName && (
-                        <p className="text-sm text-slate-400">{result.setName}</p>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="text-3xl font-bold text-green-400">
-                        {result.prices.market?.toFixed(2)} €
+                  <div className="flex gap-4 mb-4">
+                    {result.imageUrl && (
+                      <div className="flex-shrink-0">
+                        <img
+                          src={result.imageUrl}
+                          alt={result.cardName}
+                          className="w-24 h-auto rounded-lg border-2 border-slate-700"
+                        />
                       </div>
-                      <div className={`text-sm font-semibold ${
-                        result.trending === 'up' ? 'text-green-400' :
-                        result.trending === 'down' ? 'text-red-400' :
-                        'text-slate-400'
-                      }`}>
-                        {result.trending === 'up' ? '↗ Steigend' : result.trending === 'down' ? '↘ Fallend' : '→ Stabil'}
+                    )}
+                    <div className="flex-1 flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold text-white mb-1">{result.cardName}</h3>
+                        {result.setName && (
+                          <p className="text-sm text-slate-400 mb-2">{result.setName}</p>
+                        )}
+                        <p className="text-xs text-slate-500">
+                          Quelle: {result.source} • {new Date(result.lastUpdated).toLocaleDateString('de-DE')}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-green-400">
+                          {result.prices.market?.toFixed(2)} €
+                        </div>
+                        <div className="text-sm font-semibold text-slate-400 mt-1">
+                          Marktpreis
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -233,13 +264,13 @@ function TCGPricesContent() {
                       href={`/collections/new?prefill=${encodeURIComponent(JSON.stringify({ name: result.cardName, price: result.prices.market }))}`}
                       className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-center"
                     >
-                      ➕ Zu Sammlung hinzufügen
+                      ➕ Zu Sammlung
                     </Link>
                     <button
-                      onClick={() => alert('Price Alert Feature - Coming Soon!')}
-                      className="px-4 py-2 bg-slate-700 text-white rounded-lg font-semibold hover:bg-slate-600 transition-all"
+                      onClick={() => openEbaySoldListings(result.cardName)}
+                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
                     >
-                      🔔 Alert setzen
+                      🛒 eBay Verkäufe
                     </button>
                   </div>
                 </div>

@@ -64,7 +64,7 @@ export default function TCGLandingPage() {
       icon: '📊',
       title: 'Meine Sammlung',
       description: 'Verwalte deine TCG Cards',
-      action: () => router.push('/collections')
+      action: () => router.push('/tcg/collection')
     }
   ]
 

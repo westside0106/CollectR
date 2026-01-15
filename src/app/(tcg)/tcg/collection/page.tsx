@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
-interface YuGiOhCard {
+interface TCGCard {
   id: string
   name: string
   description: string
@@ -13,85 +13,58 @@ interface YuGiOhCard {
   quantity: number
   status: string
   attributes: {
-    tcgGame?: 'yugioh'
+    tcgGame?: 'pokemon' | 'yugioh' | 'magic'
     tcgSet?: string
     tcgRarity?: string
     tcgNumber?: string
     tcgGraded?: boolean
     tcgGrade?: string
     tcgGradingCompany?: string
-    // Yu-Gi-Oh!-specific
-    yugiohCardType?: string // Monster, Spell, Trap
-    yugiohAttribute?: string // DARK, LIGHT, FIRE, etc.
-    yugiohLevel?: number
-    yugiohRank?: number // XYZ
-    yugiohATK?: number
-    yugiohDEF?: number
-    yugiohMonsterType?: string // Dragon, Spellcaster, etc.
   }
   collection_id: string
   collection_name: string
   created_at: string
 }
 
-interface YuGiOhStats {
+interface TCGStats {
   totalCards: number
   totalValue: number
-  attributeDistribution: Record<string, number>
-  cardTypeDistribution: Record<string, number>
+  rarityDistribution: Record<string, number>
+  gameDistribution: Record<string, number>
   gradedCards: number
-  averageATK: number
-  averageDEF: number
+  setCompletion: Record<string, { have: number; total: number }>
 }
 
-const YUGIOH_ATTRIBUTES = {
-  'DARK': { emoji: '🌙', bg: 'bg-purple-900/20', border: 'border-purple-500/50', text: 'text-purple-400' },
-  'LIGHT': { emoji: '✨', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', text: 'text-yellow-300' },
-  'FIRE': { emoji: '🔥', bg: 'bg-red-500/20', border: 'border-red-500/50', text: 'text-red-400' },
-  'WATER': { emoji: '💧', bg: 'bg-blue-500/20', border: 'border-blue-500/50', text: 'text-blue-400' },
-  'EARTH': { emoji: '🌍', bg: 'bg-amber-600/20', border: 'border-amber-600/50', text: 'text-amber-400' },
-  'WIND': { emoji: '💨', bg: 'bg-green-500/20', border: 'border-green-500/50', text: 'text-green-400' },
-  'DIVINE': { emoji: '👁️', bg: 'bg-yellow-300/20', border: 'border-yellow-300/50', text: 'text-yellow-200' },
-}
-
-const YUGIOH_CARD_TYPES = {
-  'Monster': { emoji: '👹', color: 'text-orange-400' },
-  'Spell': { emoji: '📗', color: 'text-green-400' },
-  'Trap': { emoji: '🪤', color: 'text-pink-400' },
-}
-
-export default function YuGiOhCollectionPage() {
-  const [cards, setCards] = useState<YuGiOhCard[]>([])
-  const [filteredCards, setFilteredCards] = useState<YuGiOhCard[]>([])
-  const [stats, setStats] = useState<YuGiOhStats>({
+export default function TCGCollectionPage() {
+  const [cards, setCards] = useState<TCGCard[]>([])
+  const [filteredCards, setFilteredCards] = useState<TCGCard[]>([])
+  const [stats, setStats] = useState<TCGStats>({
     totalCards: 0,
     totalValue: 0,
-    attributeDistribution: {},
-    cardTypeDistribution: {},
+    rarityDistribution: {},
+    gameDistribution: {},
     gradedCards: 0,
-    averageATK: 0,
-    averageDEF: 0
+    setCompletion: {}
   })
   const [isLoading, setIsLoading] = useState(true)
 
   // Filters
-  const [selectedAttribute, setSelectedAttribute] = useState<string>('all')
-  const [selectedCardType, setSelectedCardType] = useState<string>('all')
-  const [selectedLevel, setSelectedLevel] = useState<string>('all')
+  const [selectedGame, setSelectedGame] = useState<string>('all')
   const [selectedRarity, setSelectedRarity] = useState<string>('all')
+  const [selectedSet, setSelectedSet] = useState<string>('all')
   const [showGradedOnly, setShowGradedOnly] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [sortBy, setSortBy] = useState<'name' | 'atk' | 'price' | 'recent'>('recent')
+  const [sortBy, setSortBy] = useState<'name' | 'rarity' | 'price' | 'recent'>('recent')
 
   useEffect(() => {
-    loadYuGiOhCards()
+    loadTCGCards()
   }, [])
 
   useEffect(() => {
     applyFilters()
-  }, [cards, selectedAttribute, selectedCardType, selectedLevel, selectedRarity, showGradedOnly, sortBy])
+  }, [cards, selectedGame, selectedRarity, selectedSet, showGradedOnly, sortBy])
 
-  const loadYuGiOhCards = async () => {
+  const loadTCGCards = async () => {
     setIsLoading(true)
     const supabase = createClient()
 
@@ -125,9 +98,9 @@ export default function YuGiOhCollectionPage() {
 
       if (itemsError) throw itemsError
 
-      // Filter items that are Yu-Gi-Oh! cards
-      const yugiohCards: YuGiOhCard[] = (items || [])
-        .filter(item => item.attributes?.tcgGame === 'yugioh')
+      // Filter items that have tcgGame attribute
+      const tcgCards: TCGCard[] = (items || [])
+        .filter(item => item.attributes?.tcgGame)
         .map(item => {
           const collection = collections.find(c => c.id === item.collection_id)
           return {
@@ -136,8 +109,8 @@ export default function YuGiOhCollectionPage() {
           }
         })
 
-      setCards(yugiohCards)
-      calculateStats(yugiohCards)
+      setCards(tcgCards)
+      calculateStats(tcgCards)
     } catch (error) {
       console.error('Error loading TCG cards:', error)
     } finally {
@@ -145,48 +118,34 @@ export default function YuGiOhCollectionPage() {
     }
   }
 
-  const calculateStats = (yugiohCards: YuGiOhCard[]) => {
-    const stats: YuGiOhStats = {
-      totalCards: yugiohCards.reduce((sum, card) => sum + card.quantity, 0),
-      totalValue: yugiohCards.reduce((sum, card) => sum + (card.price * card.quantity), 0),
-      attributeDistribution: {},
-      cardTypeDistribution: {},
-      gradedCards: yugiohCards.filter(card => card.attributes.tcgGraded).length,
-      averageATK: 0,
-      averageDEF: 0
+  const calculateStats = (tcgCards: TCGCard[]) => {
+    const stats: TCGStats = {
+      totalCards: tcgCards.reduce((sum, card) => sum + card.quantity, 0),
+      totalValue: tcgCards.reduce((sum, card) => sum + (card.price * card.quantity), 0),
+      rarityDistribution: {},
+      gameDistribution: {},
+      gradedCards: tcgCards.filter(card => card.attributes.tcgGraded).length,
+      setCompletion: {}
     }
 
-    let totalATK = 0
-    let atkCount = 0
-    let totalDEF = 0
-    let defCount = 0
+    tcgCards.forEach(card => {
+      // Rarity distribution
+      const rarity = card.attributes.tcgRarity || 'Unknown'
+      stats.rarityDistribution[rarity] = (stats.rarityDistribution[rarity] || 0) + card.quantity
 
-    yugiohCards.forEach(card => {
-      // Attribute distribution
-      const attribute = card.attributes.yugiohAttribute
-      if (attribute) {
-        stats.attributeDistribution[attribute] = (stats.attributeDistribution[attribute] || 0) + card.quantity
-      }
+      // Game distribution
+      const game = card.attributes.tcgGame || 'Unknown'
+      stats.gameDistribution[game] = (stats.gameDistribution[game] || 0) + card.quantity
 
-      // Card Type distribution (Monster/Spell/Trap)
-      const cardType = card.attributes.yugiohCardType
-      if (cardType) {
-        stats.cardTypeDistribution[cardType] = (stats.cardTypeDistribution[cardType] || 0) + card.quantity
-      }
-
-      // Average ATK/DEF
-      if (card.attributes.yugiohATK !== undefined) {
-        totalATK += card.attributes.yugiohATK * card.quantity
-        atkCount += card.quantity
-      }
-      if (card.attributes.yugiohDEF !== undefined) {
-        totalDEF += card.attributes.yugiohDEF * card.quantity
-        defCount += card.quantity
+      // Set completion (simplified - would need total set sizes from API)
+      const set = card.attributes.tcgSet
+      if (set) {
+        if (!stats.setCompletion[set]) {
+          stats.setCompletion[set] = { have: 0, total: 100 } // Placeholder total
+        }
+        stats.setCompletion[set].have += card.quantity
       }
     })
-
-    stats.averageATK = atkCount > 0 ? Math.round(totalATK / atkCount) : 0
-    stats.averageDEF = defCount > 0 ? Math.round(totalDEF / defCount) : 0
 
     setStats(stats)
   }
@@ -194,27 +153,19 @@ export default function YuGiOhCollectionPage() {
   const applyFilters = () => {
     let filtered = [...cards]
 
-    // Attribute filter
-    if (selectedAttribute !== 'all') {
-      filtered = filtered.filter(card => card.attributes.yugiohAttribute === selectedAttribute)
-    }
-
-    // Card Type filter
-    if (selectedCardType !== 'all') {
-      filtered = filtered.filter(card => card.attributes.yugiohCardType === selectedCardType)
-    }
-
-    // Level filter
-    if (selectedLevel !== 'all') {
-      filtered = filtered.filter(card =>
-        card.attributes.yugiohLevel?.toString() === selectedLevel ||
-        card.attributes.yugiohRank?.toString() === selectedLevel
-      )
+    // Game filter
+    if (selectedGame !== 'all') {
+      filtered = filtered.filter(card => card.attributes.tcgGame === selectedGame)
     }
 
     // Rarity filter
     if (selectedRarity !== 'all') {
       filtered = filtered.filter(card => card.attributes.tcgRarity === selectedRarity)
+    }
+
+    // Set filter
+    if (selectedSet !== 'all') {
+      filtered = filtered.filter(card => card.attributes.tcgSet === selectedSet)
     }
 
     // Graded filter
@@ -227,10 +178,10 @@ export default function YuGiOhCollectionPage() {
       switch (sortBy) {
         case 'name':
           return a.name.localeCompare(b.name)
-        case 'atk':
-          return (b.attributes.yugiohATK || 0) - (a.attributes.yugiohATK || 0)
         case 'price':
           return b.price - a.price
+        case 'rarity':
+          return (a.attributes.tcgRarity || '').localeCompare(b.attributes.tcgRarity || '')
         case 'recent':
         default:
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -240,35 +191,53 @@ export default function YuGiOhCollectionPage() {
     setFilteredCards(filtered)
   }
 
-  const getAttributeStyle = (attribute?: string) => {
-    return YUGIOH_ATTRIBUTES[attribute as keyof typeof YUGIOH_ATTRIBUTES] || YUGIOH_ATTRIBUTES['DARK']
+  const getRarityColor = (rarity?: string) => {
+    const rarityColors: Record<string, string> = {
+      'Common': 'text-slate-400',
+      'Uncommon': 'text-green-400',
+      'Rare': 'text-blue-400',
+      'Ultra Rare': 'text-purple-400',
+      'Secret Rare': 'text-yellow-400',
+      'Legendary': 'text-orange-400',
+      'Mythic': 'text-red-400'
+    }
+    return rarityColors[rarity || ''] || 'text-slate-400'
   }
 
+  const getGameEmoji = (game?: string) => {
+    const gameEmojis: Record<string, string> = {
+      'pokemon': '🎴',
+      'yugioh': '🃏',
+      'magic': '🌟'
+    }
+    return gameEmojis[game || ''] || '🎴'
+  }
+
+  const uniqueSets = Array.from(new Set(cards.map(c => c.attributes.tcgSet).filter(Boolean)))
   const uniqueRarities = Array.from(new Set(cards.map(c => c.attributes.tcgRarity).filter(Boolean)))
-  const uniqueLevels = Array.from(new Set(cards.map(c => c.attributes.yugiohLevel || c.attributes.yugiohRank).filter(Boolean))).sort((a, b) => a - b)
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-pink-900/20 flex items-center justify-center">
-        <div className="text-white text-2xl">Loading your Yu-Gi-Oh! collection...</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-2xl">Loading your TCG collection...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-pink-900/20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-5xl font-bold">
-                <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                  🃏 Yu-Gi-Oh! Collection
+                <span className="bg-gradient-to-r from-purple-500 to-green-500 bg-clip-text text-transparent">
+                  🎴 TCG Collection
                 </span>
               </h1>
               <p className="text-xl text-slate-300 mt-2">
-                It's Time to Duel! - Deine Yu-Gi-Oh! TCG Sammlung
+                Deine Trading Card Game Sammlung
               </p>
             </div>
             <Link

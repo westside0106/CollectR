@@ -43,6 +43,13 @@ function DeckBuilderContent() {
     }
   }, [searchParams])
 
+  // Clear search when game changes
+  useEffect(() => {
+    setSearchQuery('')
+    setSearchResults([])
+    setSearchError(null)
+  }, [selectedGame])
+
   // Search cards when query changes
   useEffect(() => {
     if (!searchQuery || searchQuery.length < 2) {
@@ -109,6 +116,50 @@ function DeckBuilderContent() {
 
   const removeCardFromSideDeck = (cardId: string) => {
     setSideDeck(sideDeck.filter(c => c.id !== cardId))
+  }
+
+  const exportDeckAsText = () => {
+    const mainCardCount = mainDeck.reduce((sum, card) => sum + card.count, 0)
+    const extraCardCount = sideDeck.reduce((sum, card) => sum + card.count, 0)
+
+    let text = `=== ${deckName || 'Unbenanntes Deck'} (${selectedGame.toUpperCase()}) ===\n\n`
+
+    text += `Main Deck (${mainCardCount}/${getCurrentConstraints().max || 'unlimited'}):\n`
+    mainDeck.forEach(card => {
+      text += `${card.count}x ${card.name}\n`
+    })
+
+    if (getCurrentConstraints().allowsExtraDeck && sideDeck.length > 0) {
+      text += `\nExtra Deck (${extraCardCount}/${getCurrentConstraints().extraMax || 'unlimited'}):\n`
+      sideDeck.forEach(card => {
+        text += `${card.count}x ${card.name}\n`
+      })
+    }
+
+    return text
+  }
+
+  const copyDeckToClipboard = () => {
+    const text = exportDeckAsText()
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Deck in Zwischenablage kopiert!', 'success')
+    }).catch(() => {
+      showToast('Fehler beim Kopieren', 'error')
+    })
+  }
+
+  const downloadDeckAsFile = () => {
+    const text = exportDeckAsText()
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${deckName || 'deck'}-${selectedGame}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showToast('Deck als Datei heruntergeladen!', 'success')
   }
 
   return (
@@ -298,6 +349,24 @@ function DeckBuilderContent() {
                   </div>
                 )}
               </div>
+
+              {/* Export Buttons */}
+              {mainDeck.length > 0 && (
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={copyDeckToClipboard}
+                    className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                  >
+                    📋 Kopieren
+                  </button>
+                  <button
+                    onClick={downloadDeckAsFile}
+                    className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                  >
+                    💾 Download
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Main Deck */}

@@ -17,39 +17,56 @@ interface CardSearchResult {
 async function searchPokemonCards(query: string): Promise<CardSearchResult[]> {
   try {
     if (!POKEMON_TCG_API_KEY) {
-      console.warn('[Pokemon TCG] API key not configured')
+      console.warn('[Pokemon TCG] API key not configured - using unauthenticated requests')
     }
 
-    const response = await fetch(
-      `https://api.pokemontcg.io/v2/cards?q=name:${encodeURIComponent(query)}*&pageSize=20`,
-      {
-        headers: {
-          'X-Api-Key': POKEMON_TCG_API_KEY
-        }
+    // Try exact match first, then prefix match
+    const searchQueries = [
+      `name:"${query}"`,  // Exact match
+      `name:${query}*`,   // Prefix match (original)
+    ]
+
+    let allResults: CardSearchResult[] = []
+
+    for (const searchQuery of searchQueries) {
+      const headers: Record<string, string> = {}
+      if (POKEMON_TCG_API_KEY) {
+        headers['X-Api-Key'] = POKEMON_TCG_API_KEY
       }
-    )
 
-    if (!response.ok) {
-      console.error(`[Pokemon TCG] API error: ${response.status} ${response.statusText}`)
-      throw new Error(`Pokemon API error: ${response.status}`)
+      const response = await fetch(
+        `https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(searchQuery)}&pageSize=20`,
+        { headers }
+      )
+
+      if (!response.ok) {
+        console.error(`[Pokemon TCG] API error: ${response.status} ${response.statusText}`)
+        continue // Try next search strategy
+      }
+
+      const data = await response.json()
+      console.log(`[Pokemon TCG] Query "${searchQuery}" found ${data.data?.length || 0} cards`)
+
+      if (data.data && data.data.length > 0) {
+        allResults = data.data.map((card: any) => ({
+          id: card.id,
+          name: card.name,
+          type: card.supertype,
+          subtype: card.subtypes?.join(', '),
+          rarity: card.rarity,
+          set: card.set?.name,
+          imageUrl: card.images?.small,
+          game: 'pokemon' as const
+        }))
+        break // Found results, stop searching
+      }
     }
 
-    const data = await response.json()
-    console.log(`[Pokemon TCG] Found ${data.data?.length || 0} cards for "${query}"`)
-
-    return (data.data || []).map((card: any) => ({
-      id: card.id,
-      name: card.name,
-      type: card.supertype,
-      subtype: card.subtypes?.join(', '),
-      rarity: card.rarity,
-      set: card.set?.name,
-      imageUrl: card.images?.small,
-      game: 'pokemon' as const
-    }))
+    console.log(`[Pokemon TCG] Total found ${allResults.length} cards for "${query}"`)
+    return allResults
   } catch (error) {
     console.error('[Pokemon TCG] Search failed:', error)
-    throw error
+    return [] // Return empty array instead of throwing
   }
 }
 
@@ -62,7 +79,7 @@ async function searchYuGiOhCards(query: string): Promise<CardSearchResult[]> {
 
     if (!response.ok) {
       console.error(`[Yu-Gi-Oh!] API error: ${response.status} ${response.statusText}`)
-      throw new Error(`YGOPRODeck API error: ${response.status}`)
+      return [] // Return empty array instead of throwing
     }
 
     const data = await response.json()
@@ -80,7 +97,7 @@ async function searchYuGiOhCards(query: string): Promise<CardSearchResult[]> {
     }))
   } catch (error) {
     console.error('[Yu-Gi-Oh!] Search failed:', error)
-    throw error
+    return [] // Return empty array instead of throwing
   }
 }
 
@@ -93,7 +110,7 @@ async function searchMagicCards(query: string): Promise<CardSearchResult[]> {
 
     if (!response.ok) {
       console.error(`[Magic] API error: ${response.status} ${response.statusText}`)
-      throw new Error(`Scryfall API error: ${response.status}`)
+      return [] // Return empty array instead of throwing
     }
 
     const data = await response.json()
@@ -111,7 +128,7 @@ async function searchMagicCards(query: string): Promise<CardSearchResult[]> {
     }))
   } catch (error) {
     console.error('[Magic] Search failed:', error)
-    throw error
+    return [] // Return empty array instead of throwing
   }
 }
 
