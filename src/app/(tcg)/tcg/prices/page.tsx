@@ -33,49 +33,27 @@ function TCGPricesContent() {
     }
   }, [searchParams])
 
+  // Clear search when game changes
+  useEffect(() => {
+    setSearchQuery('')
+    setSearchResults([])
+  }, [selectedGame])
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) return
 
     setIsSearching(true)
-    try {
-      const response = await fetch('/api/tcg-price-lookup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          cardName: searchQuery,
-          game: selectedGame
-        })
-      })
 
-      if (!response.ok) {
-        throw new Error('Price lookup failed')
-      }
+    // TODO: Implement real price lookup API
+    // This feature requires:
+    // - TCGPlayer API integration for Pokemon/Yu-Gi-Oh/Magic prices
+    // - Price history tracking
+    // - Market trend analysis
 
-      const data = await response.json()
-
-      // Transform API response to PriceResult format
-      const result: PriceResult = {
-        cardName: data.cardName || searchQuery,
-        setName: data.setName,
-        prices: {
-          market: data.rawPrice?.market || data.rawPrice?.avg || data.gradedPrice?.estimated,
-          low: data.rawPrice?.low,
-          mid: data.rawPrice?.mid,
-          high: data.rawPrice?.high
-        },
-        trending: 'stable', // TODO: Implement trending logic from price history
-        lastUpdated: new Date().toISOString()
-      }
-
-      setSearchResults([result])
-    } catch (error) {
-      console.error('Error fetching price:', error)
-      alert('Fehler beim Abrufen der Preise. Bitte versuche es erneut.')
-    } finally {
+    setTimeout(() => {
       setIsSearching(false)
-    }
+      alert('⚠️ Price Checker Feature kommt bald!\n\nDieses Feature benötigt eine Integration mit TCGPlayer oder ähnlichen Preis-APIs.\n\nBis dahin kannst du:\n• Deck Builder nutzen zum Karten suchen\n• Card Scanner nutzen zum Karten scannen\n• Preise manuell bei Items eintragen')
+    }, 500)
   }
 
   const trendingCards = [

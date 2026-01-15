@@ -43,6 +43,13 @@ function DeckBuilderContent() {
     }
   }, [searchParams])
 
+  // Clear search when game changes
+  useEffect(() => {
+    setSearchQuery('')
+    setSearchResults([])
+    setSearchError(null)
+  }, [selectedGame])
+
   // Search cards when query changes
   useEffect(() => {
     if (!searchQuery || searchQuery.length < 2) {
