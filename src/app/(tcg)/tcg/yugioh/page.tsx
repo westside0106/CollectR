@@ -1,226 +1,575 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useTCGStats } from '@/hooks/useTCGStats'
+import { createClient } from '@/lib/supabase/client'
 
-type CardType = 'monster' | 'spell' | 'trap' | 'fusion' | 'synchro' | 'xyz' | 'pendulum' | 'link'
+interface YuGiOhCard {
+  id: string
+  name: string
+  description: string
+  image_url: string | null
+  price: number
+  quantity: number
+  status: string
+  attributes: {
+    tcgGame?: 'yugioh'
+    tcgSet?: string
+    tcgRarity?: string
+    tcgNumber?: string
+    tcgGraded?: boolean
+    tcgGrade?: string
+    tcgGradingCompany?: string
+    // Yu-Gi-Oh!-specific
+    yugiohCardType?: string // Monster, Spell, Trap
+    yugiohAttribute?: string // DARK, LIGHT, FIRE, etc.
+    yugiohLevel?: number
+    yugiohRank?: number // XYZ
+    yugiohATK?: number
+    yugiohDEF?: number
+    yugiohMonsterType?: string // Dragon, Spellcaster, etc.
+  }
+  collection_id: string
+  collection_name: string
+  created_at: string
+}
 
-export default function YuGiOhPage() {
-  const router = useRouter()
-  const [selectedType, setSelectedType] = useState<CardType | null>(null)
-  const { stats, loading } = useTCGStats('yugioh')
+interface YuGiOhStats {
+  totalCards: number
+  totalValue: number
+  attributeDistribution: Record<string, number>
+  cardTypeDistribution: Record<string, number>
+  gradedCards: number
+  averageATK: number
+  averageDEF: number
+}
 
-  const cardTypes: Record<CardType, { emoji: string; color: string; description: string }> = {
-    monster: { emoji: '👾', color: 'from-orange-600 to-amber-600', description: 'Normal, Effect & Ritual' },
-    spell: { emoji: '✨', color: 'from-green-600 to-emerald-600', description: 'Normal, Quick-Play & more' },
-    trap: { emoji: '🪤', color: 'from-pink-600 to-rose-600', description: 'Normal, Counter & Continuous' },
-    fusion: { emoji: '🔮', color: 'from-purple-600 to-violet-600', description: 'Extra Deck Fusion' },
-    synchro: { emoji: '⚪', color: 'from-slate-100 to-gray-300', description: 'White Border Synchro' },
-    xyz: { emoji: '⚫', color: 'from-slate-900 to-black', description: 'Black Border Xyz' },
-    pendulum: { emoji: '🔄', color: 'from-green-500 via-orange-500 to-purple-500', description: 'Half Monster/Half Spell' },
-    link: { emoji: '🔗', color: 'from-blue-600 to-cyan-600', description: 'Blue Border Link' }
+const YUGIOH_ATTRIBUTES = {
+  'DARK': { emoji: '🌙', bg: 'bg-purple-900/20', border: 'border-purple-500/50', text: 'text-purple-400' },
+  'LIGHT': { emoji: '✨', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', text: 'text-yellow-300' },
+  'FIRE': { emoji: '🔥', bg: 'bg-red-500/20', border: 'border-red-500/50', text: 'text-red-400' },
+  'WATER': { emoji: '💧', bg: 'bg-blue-500/20', border: 'border-blue-500/50', text: 'text-blue-400' },
+  'EARTH': { emoji: '🌍', bg: 'bg-amber-600/20', border: 'border-amber-600/50', text: 'text-amber-400' },
+  'WIND': { emoji: '💨', bg: 'bg-green-500/20', border: 'border-green-500/50', text: 'text-green-400' },
+  'DIVINE': { emoji: '👁️', bg: 'bg-yellow-300/20', border: 'border-yellow-300/50', text: 'text-yellow-200' },
+}
+
+const YUGIOH_CARD_TYPES = {
+  'Monster': { emoji: '👹', color: 'text-orange-400' },
+  'Spell': { emoji: '📗', color: 'text-green-400' },
+  'Trap': { emoji: '🪤', color: 'text-pink-400' },
+}
+
+export default function YuGiOhCollectionPage() {
+  const [cards, setCards] = useState<YuGiOhCard[]>([])
+  const [filteredCards, setFilteredCards] = useState<YuGiOhCard[]>([])
+  const [stats, setStats] = useState<YuGiOhStats>({
+    totalCards: 0,
+    totalValue: 0,
+    attributeDistribution: {},
+    cardTypeDistribution: {},
+    gradedCards: 0,
+    averageATK: 0,
+    averageDEF: 0
+  })
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Filters
+  const [selectedAttribute, setSelectedAttribute] = useState<string>('all')
+  const [selectedCardType, setSelectedCardType] = useState<string>('all')
+  const [selectedLevel, setSelectedLevel] = useState<string>('all')
+  const [selectedRarity, setSelectedRarity] = useState<string>('all')
+  const [showGradedOnly, setShowGradedOnly] = useState(false)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [sortBy, setSortBy] = useState<'name' | 'atk' | 'price' | 'recent'>('recent')
+
+  useEffect(() => {
+    loadYuGiOhCards()
+  }, [])
+
+  useEffect(() => {
+    applyFilters()
+  }, [cards, selectedAttribute, selectedCardType, selectedLevel, selectedRarity, showGradedOnly, sortBy])
+
+  const loadYuGiOhCards = async () => {
+    setIsLoading(true)
+    const supabase = createClient()
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setIsLoading(false)
+        return
+      }
+
+      // Get all collections for the user
+      const { data: collections, error: collectionsError } = await supabase
+        .from('collections')
+        .select('id, name')
+        .eq('user_id', user.id)
+
+      if (collectionsError) throw collectionsError
+
+      if (!collections || collections.length === 0) {
+        setIsLoading(false)
+        return
+      }
+
+      const collectionIds = collections.map(c => c.id)
+
+      // Get all items that have TCG attributes
+      const { data: items, error: itemsError } = await supabase
+        .from('items')
+        .select('*')
+        .in('collection_id', collectionIds)
+
+      if (itemsError) throw itemsError
+
+      // Filter items that are Yu-Gi-Oh! cards
+      const yugiohCards: YuGiOhCard[] = (items || [])
+        .filter(item => item.attributes?.tcgGame === 'yugioh')
+        .map(item => {
+          const collection = collections.find(c => c.id === item.collection_id)
+          return {
+            ...item,
+            collection_name: collection?.name || 'Unknown Collection'
+          }
+        })
+
+      setCards(yugiohCards)
+      calculateStats(yugiohCards)
+    } catch (error) {
+      console.error('Error loading TCG cards:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const tools = [
-    {
-      icon: '🎴',
-      title: 'Deck Builder',
-      description: 'Erstelle Decks nach Banlist',
-      link: '/tcg/deck-builder?game=yugioh'
-    },
-    {
-      icon: '📋',
-      title: 'Banlist Checker',
-      description: 'Aktuelle verbotene Karten',
-      link: '/tcg/yugioh/banlist'
-    },
-    {
-      icon: '💰',
-      title: 'Preis-Scanner',
-      description: 'Live Kartenpreise',
-      link: '/tcg/prices?game=yugioh'
-    },
-    {
-      icon: '🔥',
-      title: 'Combo Database',
-      description: 'Beliebte Combos & Engines',
-      link: '/tcg/yugioh/combos'
+  const calculateStats = (yugiohCards: YuGiOhCard[]) => {
+    const stats: YuGiOhStats = {
+      totalCards: yugiohCards.reduce((sum, card) => sum + card.quantity, 0),
+      totalValue: yugiohCards.reduce((sum, card) => sum + (card.price * card.quantity), 0),
+      attributeDistribution: {},
+      cardTypeDistribution: {},
+      gradedCards: yugiohCards.filter(card => card.attributes.tcgGraded).length,
+      averageATK: 0,
+      averageDEF: 0
     }
-  ]
 
-  const popularArchetypes = [
-    { name: 'Blue-Eyes', icon: '🐲', color: 'from-blue-500 to-cyan-500' },
-    { name: 'Dark Magician', icon: '🎩', color: 'from-purple-600 to-pink-600' },
-    { name: 'Cyber Dragon', icon: '🤖', color: 'from-slate-400 to-gray-600' },
-    { name: 'Heroes', icon: '🦸', color: 'from-orange-500 to-red-600' },
-    { name: 'Zombie', icon: '🧟', color: 'from-green-600 to-emerald-700' },
-    { name: 'Dragon', icon: '🐉', color: 'from-red-600 to-orange-600' },
-    { name: 'Spellbook', icon: '📖', color: 'from-blue-600 to-indigo-600' },
-    { name: 'Burning Abyss', icon: '🔥', color: 'from-red-700 to-black' },
-    { name: 'Shaddoll', icon: '🎭', color: 'from-purple-700 to-slate-800' },
-    { name: 'Eldlich', icon: '👑', color: 'from-yellow-600 to-amber-700' },
-    { name: 'Despia', icon: '😈', color: 'from-red-600 to-purple-700' },
-    { name: 'Tearlaments', icon: '💧', color: 'from-blue-500 to-teal-500' }
-  ]
+    let totalATK = 0
+    let atkCount = 0
+    let totalDEF = 0
+    let defCount = 0
 
-  const formats = [
-    { name: 'TCG Advanced', icon: '🌍', description: 'Official TCG Format' },
-    { name: 'OCG', icon: '🇯🇵', description: 'Asian Format' },
-    { name: 'Traditional', icon: '📜', description: 'No Banlist' },
-    { name: 'Speed Duel', icon: '⚡', description: '20-30 Card Decks' }
-  ]
+    yugiohCards.forEach(card => {
+      // Attribute distribution
+      const attribute = card.attributes.yugiohAttribute
+      if (attribute) {
+        stats.attributeDistribution[attribute] = (stats.attributeDistribution[attribute] || 0) + card.quantity
+      }
+
+      // Card Type distribution (Monster/Spell/Trap)
+      const cardType = card.attributes.yugiohCardType
+      if (cardType) {
+        stats.cardTypeDistribution[cardType] = (stats.cardTypeDistribution[cardType] || 0) + card.quantity
+      }
+
+      // Average ATK/DEF
+      if (card.attributes.yugiohATK !== undefined) {
+        totalATK += card.attributes.yugiohATK * card.quantity
+        atkCount += card.quantity
+      }
+      if (card.attributes.yugiohDEF !== undefined) {
+        totalDEF += card.attributes.yugiohDEF * card.quantity
+        defCount += card.quantity
+      }
+    })
+
+    stats.averageATK = atkCount > 0 ? Math.round(totalATK / atkCount) : 0
+    stats.averageDEF = defCount > 0 ? Math.round(totalDEF / defCount) : 0
+
+    setStats(stats)
+  }
+
+  const applyFilters = () => {
+    let filtered = [...cards]
+
+    // Attribute filter
+    if (selectedAttribute !== 'all') {
+      filtered = filtered.filter(card => card.attributes.yugiohAttribute === selectedAttribute)
+    }
+
+    // Card Type filter
+    if (selectedCardType !== 'all') {
+      filtered = filtered.filter(card => card.attributes.yugiohCardType === selectedCardType)
+    }
+
+    // Level filter
+    if (selectedLevel !== 'all') {
+      filtered = filtered.filter(card =>
+        card.attributes.yugiohLevel?.toString() === selectedLevel ||
+        card.attributes.yugiohRank?.toString() === selectedLevel
+      )
+    }
+
+    // Rarity filter
+    if (selectedRarity !== 'all') {
+      filtered = filtered.filter(card => card.attributes.tcgRarity === selectedRarity)
+    }
+
+    // Graded filter
+    if (showGradedOnly) {
+      filtered = filtered.filter(card => card.attributes.tcgGraded)
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name)
+        case 'atk':
+          return (b.attributes.yugiohATK || 0) - (a.attributes.yugiohATK || 0)
+        case 'price':
+          return b.price - a.price
+        case 'recent':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      }
+    })
+
+    setFilteredCards(filtered)
+  }
+
+  const getAttributeStyle = (attribute?: string) => {
+    return YUGIOH_ATTRIBUTES[attribute as keyof typeof YUGIOH_ATTRIBUTES] || YUGIOH_ATTRIBUTES['DARK']
+  }
+
+  const uniqueRarities = Array.from(new Set(cards.map(c => c.attributes.tcgRarity).filter(Boolean)))
+  const uniqueLevels = Array.from(new Set(cards.map(c => c.attributes.yugiohLevel || c.attributes.yugiohRank).filter(Boolean))).sort((a, b) => a - b)
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-pink-900/20 flex items-center justify-center">
+        <div className="text-white text-2xl">Loading your Yu-Gi-Oh! collection...</div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-pink-900/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <span className="text-6xl">🃏</span>
-            <h1 className="text-5xl font-bold">
-              <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                Yu-Gi-Oh!
-              </span>
-            </h1>
-          </div>
-          <p className="text-xl text-slate-300 italic">It's Time to Duel!</p>
-          <Link
-            href="/tcg"
-            className="inline-block mt-4 text-sm text-slate-400 hover:text-slate-200 transition-colors"
-          >
-            ← Zurück zu TCG Übersicht
-          </Link>
-        </div>
-
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-          {tools.map((tool) => (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-5xl font-bold">
+                <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                  🃏 Yu-Gi-Oh! Collection
+                </span>
+              </h1>
+              <p className="text-xl text-slate-300 mt-2">
+                It's Time to Duel! - Deine Yu-Gi-Oh! TCG Sammlung
+              </p>
+            </div>
             <Link
-              key={tool.title}
-              href={tool.link}
-              className="group p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-purple-500/50 transition-all duration-200"
+              href="/tcg"
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
             >
-              <div className="text-4xl mb-3">{tool.icon}</div>
-              <h3 className="font-semibold text-white mb-1 group-hover:text-purple-400 transition-colors">
-                {tool.title}
-              </h3>
-              <p className="text-sm text-slate-400">{tool.description}</p>
+              ← Zurück zu TCG
             </Link>
-          ))}
-        </div>
-
-        {/* Card Types */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 mb-12">
-          <h2 className="text-3xl font-bold text-white mb-6">🎴 Karten-Typen</h2>
-          <p className="text-slate-400 mb-6">Klicke auf einen Typ für mehr Informationen</p>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {(Object.keys(cardTypes) as CardType[]).map((type) => (
-              <button
-                key={type}
-                onClick={() => setSelectedType(selectedType === type ? null : type)}
-                className={`
-                  p-4 rounded-xl transition-all duration-200 transform hover:scale-105
-                  ${selectedType === type
-                    ? 'ring-4 ring-white/50 shadow-2xl'
-                    : 'hover:shadow-xl'
-                  }
-                  bg-gradient-to-br ${cardTypes[type].color}
-                `}
-              >
-                <div className="text-4xl mb-2">{cardTypes[type].emoji}</div>
-                <div className="text-sm font-semibold text-white capitalize">{type}</div>
-              </button>
-            ))}
-          </div>
-
-          {selectedType && (
-            <div className="mt-6 p-6 rounded-xl bg-slate-700/50 border border-slate-600">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-4xl">{cardTypes[selectedType].emoji}</span>
-                <h3 className="text-2xl font-bold text-white capitalize">{selectedType}</h3>
-              </div>
-              <p className="text-slate-300">{cardTypes[selectedType].description}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Formats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-          {formats.map((format) => (
-            <button
-              key={format.name}
-              onClick={() => router.push(`/tcg/yugioh/format/${format.name.toLowerCase().replace(/\s+/g, '-')}`)}
-              className="p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-purple-500/50 transition-all text-center"
-            >
-              <div className="text-4xl mb-3">{format.icon}</div>
-              <h3 className="font-semibold text-white mb-1">{format.name}</h3>
-              <p className="text-sm text-slate-400">{format.description}</p>
-            </button>
-          ))}
-        </div>
-
-        {/* Popular Archetypes */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700">
-          <h2 className="text-3xl font-bold text-white mb-6">⚔️ Beliebte Archetypen</h2>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {popularArchetypes.map((archetype) => (
-              <button
-                key={archetype.name}
-                onClick={() => router.push(`/tcg/yugioh/archetype/${archetype.name.toLowerCase().replace(/\s+/g, '-')}`)}
-                className={`
-                  p-4 rounded-xl border border-slate-600 hover:border-purple-500/50 transition-all text-center
-                  bg-gradient-to-br ${archetype.color}
-                `}
-              >
-                <div className="text-3xl mb-2">{archetype.icon}</div>
-                <div className="text-sm font-semibold text-white">{archetype.name}</div>
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => router.push('/tcg/yugioh/archetypes')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
-            >
-              <span>Alle Archetypen</span>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-purple-400 mb-1">
-              {loading ? '...' : stats.totalCards}
-            </div>
-            <div className="text-sm text-slate-400">Yu-Gi-Oh! Cards</div>
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30">
+            <div className="text-4xl mb-2">🎴</div>
+            <div className="text-3xl font-bold text-white">{stats.totalCards}</div>
+            <div className="text-sm text-slate-400">Total Cards</div>
           </div>
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-green-400 mb-1">
-              {loading ? '...' : `${stats.totalValue.toFixed(2)} €`}
-            </div>
+
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-green-500/30">
+            <div className="text-4xl mb-2">💰</div>
+            <div className="text-3xl font-bold text-green-400">{stats.totalValue.toFixed(2)} €</div>
             <div className="text-sm text-slate-400">Collection Value</div>
           </div>
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-blue-400 mb-1">
-              {loading ? '...' : stats.totalDecks}
-            </div>
-            <div className="text-sm text-slate-400">Decks Built</div>
+
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30">
+            <div className="text-4xl mb-2">⭐</div>
+            <div className="text-3xl font-bold text-blue-400">{stats.gradedCards}</div>
+            <div className="text-sm text-slate-400">Graded Cards</div>
           </div>
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-pink-400 mb-1">
-              {loading ? '...' : stats.hotCards}
-            </div>
-            <div className="text-sm text-slate-400">Rare Cards</div>
+
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-yellow-500/30">
+            <div className="text-4xl mb-2">📦</div>
+            <div className="text-3xl font-bold text-yellow-400">{Object.keys(stats.setCompletion).length}</div>
+            <div className="text-sm text-slate-400">Unique Sets</div>
           </div>
+        </div>
+
+        {/* Game Distribution */}
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Game Distribution</h2>
+          <div className="grid grid-cols-3 gap-4">
+            {Object.entries(stats.gameDistribution).map(([game, count]) => (
+              <div key={game} className="text-center p-4 rounded-lg bg-slate-900/50">
+                <div className="text-3xl mb-2">{getGameEmoji(game)}</div>
+                <div className="text-2xl font-bold text-white">{count}</div>
+                <div className="text-sm text-slate-400 capitalize">{game}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Game Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Game</label>
+              <select
+                value={selectedGame}
+                onChange={(e) => setSelectedGame(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Games</option>
+                <option value="pokemon">🎴 Pokémon</option>
+                <option value="yugioh">🃏 Yu-Gi-Oh!</option>
+                <option value="magic">🌟 Magic</option>
+              </select>
+            </div>
+
+            {/* Rarity Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Rarity</label>
+              <select
+                value={selectedRarity}
+                onChange={(e) => setSelectedRarity(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Rarities</option>
+                {uniqueRarities.map(rarity => (
+                  <option key={rarity} value={rarity}>{rarity}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Set Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Set</label>
+              <select
+                value={selectedSet}
+                onChange={(e) => setSelectedSet(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Sets</option>
+                {uniqueSets.map(set => (
+                  <option key={set} value={set}>{set}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Graded Toggle */}
+            <div className="flex items-center gap-2 mt-6">
+              <input
+                type="checkbox"
+                id="graded"
+                checked={showGradedOnly}
+                onChange={(e) => setShowGradedOnly(e.target.checked)}
+                className="w-5 h-5 rounded border-slate-600 bg-slate-900/50"
+              />
+              <label htmlFor="graded" className="text-white">Nur Graded</label>
+            </div>
+
+            {/* View Mode */}
+            <div className="ml-auto flex gap-2">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                📱 Grid
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                📋 List
+              </button>
+            </div>
+
+            {/* Sort */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Sort</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="recent">Neueste zuerst</option>
+                <option value="name">Name A-Z</option>
+                <option value="price">Preis (hoch-niedrig)</option>
+                <option value="rarity">Rarity</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Cards Display */}
+        {filteredCards.length === 0 ? (
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-12 border border-slate-700 text-center">
+            <div className="text-6xl mb-4">🎴</div>
+            <h3 className="text-2xl font-bold text-white mb-2">Noch keine TCG-Karten</h3>
+            <p className="text-slate-400 mb-6">
+              Füge deine ersten Trading Cards hinzu
+            </p>
+            <Link
+              href="/tcg/prices"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+            >
+              🔍 Karten suchen
+            </Link>
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {filteredCards.map((card) => (
+              <Link
+                key={card.id}
+                href={`/collections/${card.collection_id}/items/${card.id}`}
+                className="group relative bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20"
+              >
+                {/* Card Image */}
+                <div className="aspect-[3/4] bg-slate-900/50 relative overflow-hidden">
+                  {card.image_url ? (
+                    <img
+                      src={card.image_url}
+                      alt={card.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-6xl">
+                      {getGameEmoji(card.attributes.tcgGame)}
+                    </div>
+                  )}
+
+                  {/* Graded Badge */}
+                  {card.attributes.tcgGraded && (
+                    <div className="absolute top-2 right-2 bg-yellow-500 text-slate-900 px-2 py-1 rounded text-xs font-bold">
+                      {card.attributes.tcgGradingCompany} {card.attributes.tcgGrade}
+                    </div>
+                  )}
+
+                  {/* Quantity Badge */}
+                  {card.quantity > 1 && (
+                    <div className="absolute top-2 left-2 bg-purple-600 text-white px-2 py-1 rounded text-xs font-bold">
+                      x{card.quantity}
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Info */}
+                <div className="p-4">
+                  <h3 className="font-bold text-white mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors">
+                    {card.name}
+                  </h3>
+
+                  {card.attributes.tcgSet && (
+                    <p className="text-xs text-slate-400 mb-2">{card.attributes.tcgSet}</p>
+                  )}
+
+                  {card.attributes.tcgRarity && (
+                    <p className={`text-xs font-semibold mb-2 ${getRarityColor(card.attributes.tcgRarity)}`}>
+                      ⭐ {card.attributes.tcgRarity}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-green-400">
+                      {card.price.toFixed(2)} €
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      {getGameEmoji(card.attributes.tcgGame)}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl border border-slate-700 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-slate-900/50">
+                <tr className="text-left text-sm text-slate-400">
+                  <th className="p-4">Card</th>
+                  <th className="p-4">Game</th>
+                  <th className="p-4">Set</th>
+                  <th className="p-4">Rarity</th>
+                  <th className="p-4">Qty</th>
+                  <th className="p-4">Price</th>
+                  <th className="p-4">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCards.map((card) => (
+                  <tr
+                    key={card.id}
+                    className="border-t border-slate-700 hover:bg-slate-900/50 transition-colors"
+                  >
+                    <td className="p-4">
+                      <Link
+                        href={`/collections/${card.collection_id}/items/${card.id}`}
+                        className="flex items-center gap-3 hover:text-purple-400 transition-colors"
+                      >
+                        {card.image_url && (
+                          <img
+                            src={card.image_url}
+                            alt={card.name}
+                            className="w-12 h-16 object-cover rounded border border-slate-600"
+                          />
+                        )}
+                        <div>
+                          <div className="font-semibold text-white">{card.name}</div>
+                          {card.attributes.tcgGraded && (
+                            <div className="text-xs text-yellow-400">
+                              {card.attributes.tcgGradingCompany} {card.attributes.tcgGrade}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="p-4">
+                      <span className="capitalize text-white">
+                        {getGameEmoji(card.attributes.tcgGame)} {card.attributes.tcgGame}
+                      </span>
+                    </td>
+                    <td className="p-4 text-slate-300">{card.attributes.tcgSet || '-'}</td>
+                    <td className="p-4">
+                      <span className={getRarityColor(card.attributes.tcgRarity)}>
+                        {card.attributes.tcgRarity || '-'}
+                      </span>
+                    </td>
+                    <td className="p-4 text-white">{card.quantity}</td>
+                    <td className="p-4 text-green-400">{card.price.toFixed(2)} €</td>
+                    <td className="p-4 text-green-400 font-bold">
+                      {(card.price * card.quantity).toFixed(2)} €
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Results Count */}
+        <div className="mt-6 text-center text-slate-400">
+          {filteredCards.length} von {cards.length} Karten angezeigt
         </div>
       </div>
     </div>
