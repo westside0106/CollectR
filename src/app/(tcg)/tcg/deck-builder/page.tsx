@@ -119,15 +119,18 @@ function DeckBuilderContent() {
   }
 
   const exportDeckAsText = () => {
+    const mainCardCount = mainDeck.reduce((sum, card) => sum + card.count, 0)
+    const extraCardCount = sideDeck.reduce((sum, card) => sum + card.count, 0)
+
     let text = `=== ${deckName || 'Unbenanntes Deck'} (${selectedGame.toUpperCase()}) ===\n\n`
 
-    text += `Main Deck (${mainCards}/${getCurrentConstraints().max || 'unlimited'}):\n`
+    text += `Main Deck (${mainCardCount}/${getCurrentConstraints().max || 'unlimited'}):\n`
     mainDeck.forEach(card => {
       text += `${card.count}x ${card.name}\n`
     })
 
     if (getCurrentConstraints().allowsExtraDeck && sideDeck.length > 0) {
-      text += `\nExtra Deck (${extraCards}/${getCurrentConstraints().extraMax || 'unlimited'}):\n`
+      text += `\nExtra Deck (${extraCardCount}/${getCurrentConstraints().extraMax || 'unlimited'}):\n`
       sideDeck.forEach(card => {
         text += `${card.count}x ${card.name}\n`
       })
