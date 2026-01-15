@@ -47,10 +47,42 @@ export default function TCGScannerPage() {
     setShowAddModal(true)
   }
 
-  const handleBarcodeScanned = (barcode: string) => {
+  const handleBarcodeScanned = async (barcode: string) => {
     setShowBarcodeScanner(false)
-    // TODO: Look up card by barcode
-    showToast(`Barcode gescannt: ${barcode}. Barcode-Datenbank-Lookup wird in zukünftiger Version implementiert.`, 'info')
+
+    try {
+      showToast('Suche Karte nach Barcode...', 'info')
+
+      const response = await fetch(`/api/tcg-barcode-lookup?barcode=${encodeURIComponent(barcode)}&game=${selectedGame}`)
+      const data = await response.json()
+
+      if (data.success && data.cards && data.cards.length > 0) {
+        // Use first card from results
+        const card = data.cards[0]
+        const cardData = {
+          name: card.name,
+          set: card.set,
+          rarity: card.rarity,
+          game: selectedGame,
+          imageUrl: card.imageUrl,
+          price: card.price,
+          aiDescription: `${card.name} from ${card.set}`,
+          aiTags: [card.rarity, card.set]
+        }
+
+        setDetectedCard(cardData)
+        setShowAddModal(true)
+        showToast(`Karte gefunden: ${card.name}!`, 'success')
+      } else {
+        showToast(
+          data.message || `Keine Karte für Barcode ${barcode} gefunden. Versuche es mit Kamera-Scan oder manueller Suche.`,
+          'warning'
+        )
+      }
+    } catch (error) {
+      console.error('Barcode lookup error:', error)
+      showToast('Fehler beim Barcode-Lookup. Bitte versuche es erneut.', 'error')
+    }
   }
 
   const handleAddToCollection = () => {

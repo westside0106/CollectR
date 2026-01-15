@@ -47,6 +47,7 @@ export default function TCGCollectionPage() {
     setCompletion: {}
   })
   const [isLoading, setIsLoading] = useState(true)
+  const [setInfoCache, setSetInfoCache] = useState<Record<string, { total: number, game: string }>>({})
 
   // Filters
   const [selectedGame, setSelectedGame] = useState<string>('all')
@@ -110,7 +111,7 @@ export default function TCGCollectionPage() {
         })
 
       setCards(tcgCards)
-      calculateStats(tcgCards)
+      await calculateStats(tcgCards)
     } catch (error) {
       console.error('Error loading TCG cards:', error)
     } finally {
@@ -118,7 +119,39 @@ export default function TCGCollectionPage() {
     }
   }
 
-  const calculateStats = (tcgCards: TCGCard[]) => {
+  const fetchSetInfo = async (setName: string, game: string): Promise<number> => {
+    // Check cache first
+    const cacheKey = `${game}:${setName}`
+    if (setInfoCache[cacheKey]) {
+      return setInfoCache[cacheKey].total
+    }
+
+    try {
+      const response = await fetch(
+        `/api/tcg-set-info?game=${game}&setName=${encodeURIComponent(setName)}`
+      )
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.set) {
+          const total = data.set.totalCards || 0
+          // Cache the result
+          setSetInfoCache(prev => ({
+            ...prev,
+            [cacheKey]: { total, game }
+          }))
+          return total
+        }
+      }
+    } catch (error) {
+      console.error(`Failed to fetch set info for ${setName}:`, error)
+    }
+
+    // Return 0 if fetch failed
+    return 0
+  }
+
+  const calculateStats = async (tcgCards: TCGCard[]) => {
     const stats: TCGStats = {
       totalCards: tcgCards.reduce((sum, card) => sum + card.quantity, 0),
       totalValue: tcgCards.reduce((sum, card) => sum + (card.price * card.quantity), 0),
@@ -137,15 +170,28 @@ export default function TCGCollectionPage() {
       const game = card.attributes.tcgGame || 'Unknown'
       stats.gameDistribution[game] = (stats.gameDistribution[game] || 0) + card.quantity
 
-      // Set completion (simplified - would need total set sizes from API)
+      // Set completion tracking (prepare data structure)
       const set = card.attributes.tcgSet
-      if (set) {
+      if (set && game !== 'Unknown') {
         if (!stats.setCompletion[set]) {
-          stats.setCompletion[set] = { have: 0, total: 100 } // Placeholder total
+          stats.setCompletion[set] = { have: 0, total: 0 }
         }
         stats.setCompletion[set].have += card.quantity
       }
     })
+
+    // Fetch real set sizes for all sets
+    const setPromises = Object.keys(stats.setCompletion).map(async (setName) => {
+      // Find the game for this set from cards
+      const cardWithSet = tcgCards.find(c => c.attributes.tcgSet === setName)
+      const game = cardWithSet?.attributes.tcgGame || 'pokemon'
+
+      const totalCards = await fetchSetInfo(setName, game)
+      stats.setCompletion[setName].total = totalCards
+    })
+
+    // Wait for all set info to be fetched
+    await Promise.all(setPromises)
 
     setStats(stats)
   }

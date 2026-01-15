@@ -78,6 +78,7 @@ export default function YuGiOhCollectionPage() {
   const [selectedAttribute, setSelectedAttribute] = useState<string>('all')
   const [selectedCardType, setSelectedCardType] = useState<string>('all')
   const [selectedLevel, setSelectedLevel] = useState<string>('all')
+  const [selectedSet, setSelectedSet] = useState<string>('all')
   const [selectedRarity, setSelectedRarity] = useState<string>('all')
   const [showGradedOnly, setShowGradedOnly] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -89,7 +90,7 @@ export default function YuGiOhCollectionPage() {
 
   useEffect(() => {
     applyFilters()
-  }, [cards, selectedAttribute, selectedCardType, selectedLevel, selectedRarity, showGradedOnly, sortBy])
+  }, [cards, selectedAttribute, selectedCardType, selectedLevel, selectedSet, selectedRarity, showGradedOnly, sortBy])
 
   const loadYuGiOhCards = async () => {
     setIsLoading(true)
@@ -212,6 +213,11 @@ export default function YuGiOhCollectionPage() {
       )
     }
 
+    // Set filter
+    if (selectedSet !== 'all') {
+      filtered = filtered.filter(card => card.attributes.tcgSet === selectedSet)
+    }
+
     // Rarity filter
     if (selectedRarity !== 'all') {
       filtered = filtered.filter(card => card.attributes.tcgRarity === selectedRarity)
@@ -244,8 +250,20 @@ export default function YuGiOhCollectionPage() {
     return YUGIOH_ATTRIBUTES[attribute as keyof typeof YUGIOH_ATTRIBUTES] || YUGIOH_ATTRIBUTES['DARK']
   }
 
+  const getRarityColor = (rarity?: string) => {
+    switch (rarity?.toLowerCase()) {
+      case 'secret rare': return 'text-red-400'
+      case 'ultra rare': return 'text-yellow-400'
+      case 'rare': return 'text-blue-400'
+      case 'super rare': return 'text-purple-400'
+      case 'common': return 'text-slate-400'
+      default: return 'text-slate-300'
+    }
+  }
+
   const uniqueRarities = Array.from(new Set(cards.map(c => c.attributes.tcgRarity).filter(Boolean)))
   const uniqueLevels = Array.from(new Set(cards.map(c => c.attributes.yugiohLevel || c.attributes.yugiohRank).filter(Boolean))).sort((a, b) => a - b)
+  const uniqueSets = Array.from(new Set(cards.map(c => c.attributes.tcgSet).filter(Boolean)))
 
   if (isLoading) {
     return (
@@ -387,6 +405,21 @@ export default function YuGiOhCollectionPage() {
                 <option value="all">All Levels</option>
                 {uniqueLevels.map(level => (
                   <option key={level} value={level.toString()}>★{level}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Set Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Set</label>
+              <select
+                value={selectedSet}
+                onChange={(e) => setSelectedSet(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Sets</option>
+                {uniqueSets.map(set => (
+                  <option key={set} value={set}>{set}</option>
                 ))}
               </select>
             </div>
