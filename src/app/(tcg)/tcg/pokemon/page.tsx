@@ -71,6 +71,7 @@ export default function PokemonCollectionPage() {
   // Filters
   const [selectedType, setSelectedType] = useState<string>('all')
   const [selectedGeneration, setSelectedGeneration] = useState<string>('all')
+  const [selectedSet, setSelectedSet] = useState<string>('all')
   const [selectedRarity, setSelectedRarity] = useState<string>('all')
   const [showGradedOnly, setShowGradedOnly] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -82,7 +83,7 @@ export default function PokemonCollectionPage() {
 
   useEffect(() => {
     applyFilters()
-  }, [cards, selectedType, selectedGeneration, selectedRarity, showGradedOnly, sortBy])
+  }, [cards, selectedType, selectedGeneration, selectedSet, selectedRarity, showGradedOnly, sortBy])
 
   const loadPokemonCards = async () => {
     setIsLoading(true)
@@ -194,6 +195,11 @@ export default function PokemonCollectionPage() {
       filtered = filtered.filter(card =>
         card.attributes.pokemonGeneration?.toString() === selectedGeneration
       )
+    }
+
+    // Set filter
+    if (selectedSet !== 'all') {
+      filtered = filtered.filter(card => card.attributes.tcgSet === selectedSet)
     }
 
     // Rarity filter
