@@ -1,237 +1,559 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useTCGStats } from '@/hooks/useTCGStats'
+import { createClient } from '@/lib/supabase/client'
 
-type PokemonType = 'fire' | 'water' | 'grass' | 'electric' | 'psychic' | 'fighting' | 'dark' | 'steel' | 'dragon' | 'fairy'
+interface PokemonCard {
+  id: string
+  name: string
+  description: string
+  image_url: string | null
+  price: number
+  quantity: number
+  status: string
+  attributes: {
+    tcgGame?: 'pokemon'
+    tcgSet?: string
+    tcgRarity?: string
+    tcgNumber?: string
+    tcgGraded?: boolean
+    tcgGrade?: string
+    tcgGradingCompany?: string
+    // Pokemon-specific
+    pokemonType?: string
+    pokemonTypes?: string[]
+    pokemonHP?: number
+    pokemonGeneration?: number
+  }
+  collection_id: string
+  collection_name: string
+  created_at: string
+}
 
-export default function PokemonTCGPage() {
-  const router = useRouter()
-  const [selectedType, setSelectedType] = useState<PokemonType | null>(null)
-  const { stats, loading } = useTCGStats('pokemon')
+interface PokemonStats {
+  totalCards: number
+  totalValue: number
+  typeDistribution: Record<string, number>
+  generationDistribution: Record<number, number>
+  gradedCards: number
+  averageHP: number
+}
 
-  const typeChart: Record<PokemonType, { emoji: string; color: string; weakTo: string[]; strongVs: string[] }> = {
-    fire: { emoji: '🔥', color: 'from-red-500 to-orange-500', weakTo: ['Water', 'Ground', 'Rock'], strongVs: ['Grass', 'Ice', 'Bug', 'Steel'] },
-    water: { emoji: '💧', color: 'from-blue-500 to-cyan-500', weakTo: ['Electric', 'Grass'], strongVs: ['Fire', 'Ground', 'Rock'] },
-    grass: { emoji: '🌿', color: 'from-green-500 to-emerald-500', weakTo: ['Fire', 'Ice', 'Poison', 'Flying', 'Bug'], strongVs: ['Water', 'Ground', 'Rock'] },
-    electric: { emoji: '⚡', color: 'from-yellow-400 to-amber-400', weakTo: ['Ground'], strongVs: ['Water', 'Flying'] },
-    psychic: { emoji: '🔮', color: 'from-pink-500 to-purple-500', weakTo: ['Bug', 'Ghost', 'Dark'], strongVs: ['Fighting', 'Poison'] },
-    fighting: { emoji: '🥊', color: 'from-orange-600 to-red-600', weakTo: ['Flying', 'Psychic', 'Fairy'], strongVs: ['Normal', 'Ice', 'Rock', 'Dark', 'Steel'] },
-    dark: { emoji: '🌑', color: 'from-gray-800 to-slate-900', weakTo: ['Fighting', 'Bug', 'Fairy'], strongVs: ['Psychic', 'Ghost'] },
-    steel: { emoji: '⚙️', color: 'from-slate-400 to-gray-500', weakTo: ['Fire', 'Fighting', 'Ground'], strongVs: ['Ice', 'Rock', 'Fairy'] },
-    dragon: { emoji: '🐲', color: 'from-indigo-600 to-purple-700', weakTo: ['Ice', 'Dragon', 'Fairy'], strongVs: ['Dragon'] },
-    fairy: { emoji: '✨', color: 'from-pink-400 to-rose-400', weakTo: ['Poison', 'Steel'], strongVs: ['Fighting', 'Dragon', 'Dark'] }
+const POKEMON_TYPES = {
+  'Fire': { emoji: '🔥', bg: 'bg-red-500/20', border: 'border-red-500/50', text: 'text-red-400' },
+  'Water': { emoji: '💧', bg: 'bg-blue-500/20', border: 'border-blue-500/50', text: 'text-blue-400' },
+  'Grass': { emoji: '🌿', bg: 'bg-green-500/20', border: 'border-green-500/50', text: 'text-green-400' },
+  'Electric': { emoji: '⚡', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', text: 'text-yellow-400' },
+  'Psychic': { emoji: '🔮', bg: 'bg-purple-500/20', border: 'border-purple-500/50', text: 'text-purple-400' },
+  'Fighting': { emoji: '👊', bg: 'bg-orange-500/20', border: 'border-orange-500/50', text: 'text-orange-400' },
+  'Darkness': { emoji: '🌙', bg: 'bg-slate-500/20', border: 'border-slate-500/50', text: 'text-slate-400' },
+  'Metal': { emoji: '⚙️', bg: 'bg-slate-400/20', border: 'border-slate-400/50', text: 'text-slate-300' },
+  'Dragon': { emoji: '🐉', bg: 'bg-indigo-500/20', border: 'border-indigo-500/50', text: 'text-indigo-400' },
+  'Fairy': { emoji: '✨', bg: 'bg-pink-500/20', border: 'border-pink-500/50', text: 'text-pink-400' },
+  'Colorless': { emoji: '⭐', bg: 'bg-slate-500/20', border: 'border-slate-500/50', text: 'text-slate-300' },
+  'Lightning': { emoji: '⚡', bg: 'bg-yellow-500/20', border: 'border-yellow-500/50', text: 'text-yellow-400' },
+}
+
+export default function PokemonCollectionPage() {
+  const [cards, setCards] = useState<PokemonCard[]>([])
+  const [filteredCards, setFilteredCards] = useState<PokemonCard[]>([])
+  const [stats, setStats] = useState<PokemonStats>({
+    totalCards: 0,
+    totalValue: 0,
+    typeDistribution: {},
+    generationDistribution: {},
+    gradedCards: 0,
+    averageHP: 0
+  })
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Filters
+  const [selectedType, setSelectedType] = useState<string>('all')
+  const [selectedGeneration, setSelectedGeneration] = useState<string>('all')
+  const [selectedRarity, setSelectedRarity] = useState<string>('all')
+  const [showGradedOnly, setShowGradedOnly] = useState(false)
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [sortBy, setSortBy] = useState<'name' | 'hp' | 'price' | 'recent'>('recent')
+
+  useEffect(() => {
+    loadPokemonCards()
+  }, [])
+
+  useEffect(() => {
+    applyFilters()
+  }, [cards, selectedType, selectedGeneration, selectedRarity, showGradedOnly, sortBy])
+
+  const loadPokemonCards = async () => {
+    setIsLoading(true)
+    const supabase = createClient()
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setIsLoading(false)
+        return
+      }
+
+      // Get all collections for the user
+      const { data: collections, error: collectionsError } = await supabase
+        .from('collections')
+        .select('id, name')
+        .eq('user_id', user.id)
+
+      if (collectionsError) throw collectionsError
+
+      if (!collections || collections.length === 0) {
+        setIsLoading(false)
+        return
+      }
+
+      const collectionIds = collections.map(c => c.id)
+
+      // Get all items that have TCG attributes
+      const { data: items, error: itemsError } = await supabase
+        .from('items')
+        .select('*')
+        .in('collection_id', collectionIds)
+
+      if (itemsError) throw itemsError
+
+      // Filter items that are Pokemon cards
+      const pokemonCards: PokemonCard[] = (items || [])
+        .filter(item => item.attributes?.tcgGame === 'pokemon')
+        .map(item => {
+          const collection = collections.find(c => c.id === item.collection_id)
+          return {
+            ...item,
+            collection_name: collection?.name || 'Unknown Collection'
+          }
+        })
+
+      setCards(pokemonCards)
+      calculateStats(pokemonCards)
+    } catch (error) {
+      console.error('Error loading TCG cards:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const tools = [
-    {
-      icon: '🎴',
-      title: 'Deck Builder',
-      description: 'Erstelle wettbewerbsfähige Decks',
-      link: '/tcg/deck-builder?game=pokemon'
-    },
-    {
-      icon: '📊',
-      title: 'Meta Decks',
-      description: 'Top Tournament Decks',
-      link: '/tcg/pokemon/meta-decks'
-    },
-    {
-      icon: '💰',
-      title: 'Preis-Scanner',
-      description: 'Aktuelle Kartenpreise',
-      link: '/tcg/prices?game=pokemon'
-    },
-    {
-      icon: '📈',
-      title: 'Price Trends',
-      description: 'Marktentwicklung',
-      link: '/tcg/pokemon/price-trends'
+  const calculateStats = (pokemonCards: PokemonCard[]) => {
+    const stats: PokemonStats = {
+      totalCards: pokemonCards.reduce((sum, card) => sum + card.quantity, 0),
+      totalValue: pokemonCards.reduce((sum, card) => sum + (card.price * card.quantity), 0),
+      typeDistribution: {},
+      generationDistribution: {},
+      gradedCards: pokemonCards.filter(card => card.attributes.tcgGraded).length,
+      averageHP: 0
     }
-  ]
 
-  const popularSets = [
-    { name: 'Base Set', year: '1999', icon: '🌟' },
-    { name: 'Jungle', year: '1999', icon: '🌴' },
-    { name: 'Fossil', year: '1999', icon: '🦴' },
-    { name: 'Team Rocket', year: '2000', icon: '🚀' },
-    { name: 'Neo Genesis', year: '2000', icon: '💫' },
-    { name: 'EX Series', year: '2003-2007', icon: '⭐' },
-    { name: 'Diamond & Pearl', year: '2007-2009', icon: '💎' },
-    { name: 'Black & White', year: '2011-2013', icon: '⚫⚪' },
-    { name: 'XY', year: '2014-2016', icon: '✖️' },
-    { name: 'Sun & Moon', year: '2017-2019', icon: '☀️🌙' },
-    { name: 'Sword & Shield', year: '2020-2022', icon: '⚔️🛡️' },
-    { name: 'Scarlet & Violet', year: '2023+', icon: '🔴🟣' }
-  ]
+    let totalHP = 0
+    let hpCount = 0
+
+    pokemonCards.forEach(card => {
+      // Type distribution
+      const types = card.attributes.pokemonTypes || [card.attributes.pokemonType]
+      types.forEach(type => {
+        if (type) {
+          stats.typeDistribution[type] = (stats.typeDistribution[type] || 0) + card.quantity
+        }
+      })
+
+      // Generation distribution
+      const gen = card.attributes.pokemonGeneration
+      if (gen) {
+        stats.generationDistribution[gen] = (stats.generationDistribution[gen] || 0) + card.quantity
+      }
+
+      // Average HP
+      if (card.attributes.pokemonHP) {
+        totalHP += card.attributes.pokemonHP * card.quantity
+        hpCount += card.quantity
+      }
+    })
+
+    stats.averageHP = hpCount > 0 ? Math.round(totalHP / hpCount) : 0
+
+    setStats(stats)
+  }
+
+  const applyFilters = () => {
+    let filtered = [...cards]
+
+    // Type filter
+    if (selectedType !== 'all') {
+      filtered = filtered.filter(card => {
+        const types = card.attributes.pokemonTypes || [card.attributes.pokemonType]
+        return types.includes(selectedType)
+      })
+    }
+
+    // Generation filter
+    if (selectedGeneration !== 'all') {
+      filtered = filtered.filter(card =>
+        card.attributes.pokemonGeneration?.toString() === selectedGeneration
+      )
+    }
+
+    // Rarity filter
+    if (selectedRarity !== 'all') {
+      filtered = filtered.filter(card => card.attributes.tcgRarity === selectedRarity)
+    }
+
+    // Graded filter
+    if (showGradedOnly) {
+      filtered = filtered.filter(card => card.attributes.tcgGraded)
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name)
+        case 'hp':
+          return (b.attributes.pokemonHP || 0) - (a.attributes.pokemonHP || 0)
+        case 'price':
+          return b.price - a.price
+        case 'recent':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      }
+    })
+
+    setFilteredCards(filtered)
+  }
+
+  const getTypeStyle = (type?: string) => {
+    return POKEMON_TYPES[type as keyof typeof POKEMON_TYPES] || POKEMON_TYPES['Colorless']
+  }
+
+  const uniqueRarities = Array.from(new Set(cards.map(c => c.attributes.tcgRarity).filter(Boolean)))
+  const uniqueGenerations = Array.from(new Set(cards.map(c => c.attributes.pokemonGeneration).filter(Boolean))).sort((a, b) => a - b)
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900/20 to-yellow-900/20 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-2xl">Loading your Pokémon collection...</div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900/20 to-yellow-900/20 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <span className="text-6xl">🎴</span>
-            <h1 className="text-5xl font-bold">
-              <span className="bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
-                Pokémon TCG
-              </span>
-            </h1>
-          </div>
-          <p className="text-xl text-slate-300 italic">Gotta Catch 'Em All!</p>
-          <Link
-            href="/tcg"
-            className="inline-block mt-4 text-sm text-slate-400 hover:text-slate-200 transition-colors"
-          >
-            ← Zurück zu TCG Übersicht
-          </Link>
-        </div>
-
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-          {tools.map((tool) => (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-5xl font-bold">
+                <span className="bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent">
+                  🎴 Pokémon Collection
+                </span>
+              </h1>
+              <p className="text-xl text-slate-300 mt-2">
+                Gotta Catch 'Em All! - Deine Pokémon TCG Sammlung
+              </p>
+            </div>
             <Link
-              key={tool.title}
-              href={tool.link}
-              className="group p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-red-500/50 transition-all duration-200"
+              href="/tcg"
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
             >
-              <div className="text-4xl mb-3">{tool.icon}</div>
-              <h3 className="font-semibold text-white mb-1 group-hover:text-red-400 transition-colors">
-                {tool.title}
-              </h3>
-              <p className="text-sm text-slate-400">{tool.description}</p>
+              ← Zurück zu TCG
             </Link>
-          ))}
-        </div>
-
-        {/* Type Matchup Chart */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 mb-12">
-          <h2 className="text-3xl font-bold text-white mb-6">⚔️ Typ-Matchup Chart</h2>
-          <p className="text-slate-400 mb-6">Klicke auf einen Typ für Details zu Stärken & Schwächen</p>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-            {(Object.keys(typeChart) as PokemonType[]).map((type) => (
-              <button
-                key={type}
-                onClick={() => setSelectedType(selectedType === type ? null : type)}
-                className={`
-                  p-4 rounded-xl transition-all duration-200 transform hover:scale-105
-                  ${selectedType === type
-                    ? 'ring-4 ring-white/50 shadow-2xl'
-                    : 'hover:shadow-xl'
-                  }
-                  bg-gradient-to-br ${typeChart[type].color}
-                `}
-              >
-                <div className="text-4xl mb-2">{typeChart[type].emoji}</div>
-                <div className="text-sm font-semibold text-white capitalize">{type}</div>
-              </button>
-            ))}
-          </div>
-
-          {selectedType && (
-            <div className="mt-6 p-6 rounded-xl bg-slate-700/50 border border-slate-600">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-4xl">{typeChart[selectedType].emoji}</span>
-                <h3 className="text-2xl font-bold text-white capitalize">{selectedType}</h3>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-green-400 font-semibold mb-2 flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Stark gegen
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {typeChart[selectedType].strongVs.map((t) => (
-                      <span key={t} className="px-3 py-1 rounded-lg bg-green-500/20 text-green-300 text-sm">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="text-red-400 font-semibold mb-2 flex items-center gap-2">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    Schwach gegen
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {typeChart[selectedType].weakTo.map((t) => (
-                      <span key={t} className="px-3 py-1 rounded-lg bg-red-500/20 text-red-300 text-sm">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Popular Sets */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700">
-          <h2 className="text-3xl font-bold text-white mb-6">📦 Beliebte Sets</h2>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {popularSets.map((set) => (
-              <button
-                key={set.name}
-                onClick={() => router.push(`/tcg/pokemon/sets/${set.name.toLowerCase().replace(/\s+/g, '-')}`)}
-                className="p-4 rounded-xl bg-slate-700/50 hover:bg-slate-700 border border-slate-600 hover:border-red-500/50 transition-all text-center"
-              >
-                <div className="text-3xl mb-2">{set.icon}</div>
-                <div className="text-sm font-semibold text-white mb-1">{set.name}</div>
-                <div className="text-xs text-slate-400">{set.year}</div>
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => router.push('/tcg/pokemon/sets')}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-yellow-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
-            >
-              <span>Alle Sets Anzeigen</span>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-red-400 mb-1">
-              {loading ? '...' : stats.totalCards}
-            </div>
-            <div className="text-sm text-slate-400">Pokémon Cards</div>
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30">
+            <div className="text-4xl mb-2">🎴</div>
+            <div className="text-3xl font-bold text-white">{stats.totalCards}</div>
+            <div className="text-sm text-slate-400">Total Cards</div>
           </div>
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-green-400 mb-1">
-              {loading ? '...' : `${stats.totalValue.toFixed(2)} €`}
-            </div>
+
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-green-500/30">
+            <div className="text-4xl mb-2">💰</div>
+            <div className="text-3xl font-bold text-green-400">{stats.totalValue.toFixed(2)} €</div>
             <div className="text-sm text-slate-400">Collection Value</div>
           </div>
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-blue-400 mb-1">
-              {loading ? '...' : stats.totalDecks}
-            </div>
-            <div className="text-sm text-slate-400">Decks Built</div>
-          </div>
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
-            <div className="text-3xl font-bold text-purple-400 mb-1">
-              {loading ? '...' : stats.hotCards}
-            </div>
+
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30">
+            <div className="text-4xl mb-2">⭐</div>
+            <div className="text-3xl font-bold text-blue-400">{stats.gradedCards}</div>
             <div className="text-sm text-slate-400">Graded Cards</div>
           </div>
+
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-yellow-500/30">
+            <div className="text-4xl mb-2">📦</div>
+            <div className="text-3xl font-bold text-yellow-400">{Object.keys(stats.setCompletion).length}</div>
+            <div className="text-sm text-slate-400">Unique Sets</div>
+          </div>
+        </div>
+
+        {/* Game Distribution */}
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Game Distribution</h2>
+          <div className="grid grid-cols-3 gap-4">
+            {Object.entries(stats.gameDistribution).map(([game, count]) => (
+              <div key={game} className="text-center p-4 rounded-lg bg-slate-900/50">
+                <div className="text-3xl mb-2">{getGameEmoji(game)}</div>
+                <div className="text-2xl font-bold text-white">{count}</div>
+                <div className="text-sm text-slate-400 capitalize">{game}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Game Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Game</label>
+              <select
+                value={selectedGame}
+                onChange={(e) => setSelectedGame(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Games</option>
+                <option value="pokemon">🎴 Pokémon</option>
+                <option value="yugioh">🃏 Yu-Gi-Oh!</option>
+                <option value="magic">🌟 Magic</option>
+              </select>
+            </div>
+
+            {/* Rarity Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Rarity</label>
+              <select
+                value={selectedRarity}
+                onChange={(e) => setSelectedRarity(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Rarities</option>
+                {uniqueRarities.map(rarity => (
+                  <option key={rarity} value={rarity}>{rarity}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Set Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Set</label>
+              <select
+                value={selectedSet}
+                onChange={(e) => setSelectedSet(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Sets</option>
+                {uniqueSets.map(set => (
+                  <option key={set} value={set}>{set}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Graded Toggle */}
+            <div className="flex items-center gap-2 mt-6">
+              <input
+                type="checkbox"
+                id="graded"
+                checked={showGradedOnly}
+                onChange={(e) => setShowGradedOnly(e.target.checked)}
+                className="w-5 h-5 rounded border-slate-600 bg-slate-900/50"
+              />
+              <label htmlFor="graded" className="text-white">Nur Graded</label>
+            </div>
+
+            {/* View Mode */}
+            <div className="ml-auto flex gap-2">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                📱 Grid
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  viewMode === 'list'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                📋 List
+              </button>
+            </div>
+
+            {/* Sort */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Sort</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="recent">Neueste zuerst</option>
+                <option value="name">Name A-Z</option>
+                <option value="price">Preis (hoch-niedrig)</option>
+                <option value="rarity">Rarity</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Cards Display */}
+        {filteredCards.length === 0 ? (
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-12 border border-slate-700 text-center">
+            <div className="text-6xl mb-4">🎴</div>
+            <h3 className="text-2xl font-bold text-white mb-2">Noch keine TCG-Karten</h3>
+            <p className="text-slate-400 mb-6">
+              Füge deine ersten Trading Cards hinzu
+            </p>
+            <Link
+              href="/tcg/prices"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+            >
+              🔍 Karten suchen
+            </Link>
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {filteredCards.map((card) => (
+              <Link
+                key={card.id}
+                href={`/collections/${card.collection_id}/items/${card.id}`}
+                className="group relative bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20"
+              >
+                {/* Card Image */}
+                <div className="aspect-[3/4] bg-slate-900/50 relative overflow-hidden">
+                  {card.image_url ? (
+                    <img
+                      src={card.image_url}
+                      alt={card.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-6xl">
+                      {getGameEmoji(card.attributes.tcgGame)}
+                    </div>
+                  )}
+
+                  {/* Graded Badge */}
+                  {card.attributes.tcgGraded && (
+                    <div className="absolute top-2 right-2 bg-yellow-500 text-slate-900 px-2 py-1 rounded text-xs font-bold">
+                      {card.attributes.tcgGradingCompany} {card.attributes.tcgGrade}
+                    </div>
+                  )}
+
+                  {/* Quantity Badge */}
+                  {card.quantity > 1 && (
+                    <div className="absolute top-2 left-2 bg-purple-600 text-white px-2 py-1 rounded text-xs font-bold">
+                      x{card.quantity}
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Info */}
+                <div className="p-4">
+                  <h3 className="font-bold text-white mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors">
+                    {card.name}
+                  </h3>
+
+                  {card.attributes.tcgSet && (
+                    <p className="text-xs text-slate-400 mb-2">{card.attributes.tcgSet}</p>
+                  )}
+
+                  {card.attributes.tcgRarity && (
+                    <p className={`text-xs font-semibold mb-2 ${getRarityColor(card.attributes.tcgRarity)}`}>
+                      ⭐ {card.attributes.tcgRarity}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-green-400">
+                      {card.price.toFixed(2)} €
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      {getGameEmoji(card.attributes.tcgGame)}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl border border-slate-700 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-slate-900/50">
+                <tr className="text-left text-sm text-slate-400">
+                  <th className="p-4">Card</th>
+                  <th className="p-4">Game</th>
+                  <th className="p-4">Set</th>
+                  <th className="p-4">Rarity</th>
+                  <th className="p-4">Qty</th>
+                  <th className="p-4">Price</th>
+                  <th className="p-4">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCards.map((card) => (
+                  <tr
+                    key={card.id}
+                    className="border-t border-slate-700 hover:bg-slate-900/50 transition-colors"
+                  >
+                    <td className="p-4">
+                      <Link
+                        href={`/collections/${card.collection_id}/items/${card.id}`}
+                        className="flex items-center gap-3 hover:text-purple-400 transition-colors"
+                      >
+                        {card.image_url && (
+                          <img
+                            src={card.image_url}
+                            alt={card.name}
+                            className="w-12 h-16 object-cover rounded border border-slate-600"
+                          />
+                        )}
+                        <div>
+                          <div className="font-semibold text-white">{card.name}</div>
+                          {card.attributes.tcgGraded && (
+                            <div className="text-xs text-yellow-400">
+                              {card.attributes.tcgGradingCompany} {card.attributes.tcgGrade}
+                            </div>
+                          )}
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="p-4">
+                      <span className="capitalize text-white">
+                        {getGameEmoji(card.attributes.tcgGame)} {card.attributes.tcgGame}
+                      </span>
+                    </td>
+                    <td className="p-4 text-slate-300">{card.attributes.tcgSet || '-'}</td>
+                    <td className="p-4">
+                      <span className={getRarityColor(card.attributes.tcgRarity)}>
+                        {card.attributes.tcgRarity || '-'}
+                      </span>
+                    </td>
+                    <td className="p-4 text-white">{card.quantity}</td>
+                    <td className="p-4 text-green-400">{card.price.toFixed(2)} €</td>
+                    <td className="p-4 text-green-400 font-bold">
+                      {(card.price * card.quantity).toFixed(2)} €
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Results Count */}
+        <div className="mt-6 text-center text-slate-400">
+          {filteredCards.length} von {cards.length} Karten angezeigt
         </div>
       </div>
     </div>
