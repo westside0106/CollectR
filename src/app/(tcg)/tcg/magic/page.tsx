@@ -77,6 +77,7 @@ export default function MagicCollectionPage() {
   const [selectedColor, setSelectedColor] = useState<string>('all')
   const [selectedCardType, setSelectedCardType] = useState<string>('all')
   const [selectedManaCost, setSelectedManaCost] = useState<string>('all')
+  const [selectedSet, setSelectedSet] = useState<string>('all')
   const [selectedRarity, setSelectedRarity] = useState<string>('all')
   const [showGradedOnly, setShowGradedOnly] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -88,7 +89,7 @@ export default function MagicCollectionPage() {
 
   useEffect(() => {
     applyFilters()
-  }, [cards, selectedColor, selectedCardType, selectedManaCost, selectedRarity, showGradedOnly, sortBy])
+  }, [cards, selectedColor, selectedCardType, selectedManaCost, selectedSet, selectedRarity, showGradedOnly, sortBy])
 
   const loadMagicCards = async () => {
     setIsLoading(true)
@@ -204,6 +205,11 @@ export default function MagicCollectionPage() {
       filtered = filtered.filter(card =>
         card.attributes.magicManaCost?.toString() === selectedManaCost
       )
+    }
+
+    // Set filter
+    if (selectedSet !== 'all') {
+      filtered = filtered.filter(card => card.attributes.tcgSet === selectedSet)
     }
 
     // Rarity filter
@@ -392,6 +398,21 @@ export default function MagicCollectionPage() {
                 <option value="all">All CMC</option>
                 {uniqueManaCosts.map(cmc => (
                   <option key={cmc} value={cmc.toString()}>{cmc}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Set Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Set</label>
+              <select
+                value={selectedSet}
+                onChange={(e) => setSelectedSet(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Sets</option>
+                {uniqueSets.map(set => (
+                  <option key={set} value={set}>{set}</option>
                 ))}
               </select>
             </div>

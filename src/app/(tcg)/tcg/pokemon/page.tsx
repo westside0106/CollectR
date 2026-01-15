@@ -234,8 +234,20 @@ export default function PokemonCollectionPage() {
     return POKEMON_TYPES[type as keyof typeof POKEMON_TYPES] || POKEMON_TYPES['Colorless']
   }
 
+  const getRarityColor = (rarity?: string) => {
+    switch (rarity?.toLowerCase()) {
+      case 'secret rare': return 'text-red-400'
+      case 'ultra rare': return 'text-yellow-400'
+      case 'rare': return 'text-blue-400'
+      case 'uncommon': return 'text-green-400'
+      case 'common': return 'text-slate-400'
+      default: return 'text-slate-300'
+    }
+  }
+
   const uniqueRarities = Array.from(new Set(cards.map(c => c.attributes.tcgRarity).filter(Boolean)))
   const uniqueGenerations = Array.from(new Set(cards.map(c => c.attributes.pokemonGeneration).filter(Boolean))).sort((a, b) => a - b)
+  const uniqueSets = Array.from(new Set(cards.map(c => c.attributes.tcgSet).filter(Boolean)))
 
   if (isLoading) {
     return (
@@ -357,6 +369,21 @@ export default function PokemonCollectionPage() {
                 <option value="all">All Generations</option>
                 {uniqueGenerations.map(gen => (
                   <option key={gen} value={gen.toString()}>Gen {gen}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Set Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Set</label>
+              <select
+                value={selectedSet}
+                onChange={(e) => setSelectedSet(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Sets</option>
+                {uniqueSets.map(set => (
+                  <option key={set} value={set}>{set}</option>
                 ))}
               </select>
             </div>
