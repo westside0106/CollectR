@@ -148,44 +148,38 @@ export default function MagicCollectionPage() {
     const stats: MagicStats = {
       totalCards: magicCards.reduce((sum, card) => sum + card.quantity, 0),
       totalValue: magicCards.reduce((sum, card) => sum + (card.price * card.quantity), 0),
-      attributeDistribution: {},
+      colorDistribution: {},
       cardTypeDistribution: {},
       gradedCards: magicCards.filter(card => card.attributes.tcgGraded).length,
-      averageATK: 0,
-      averageDEF: 0
+      averageManaCost: 0
     }
 
-    let totalATK = 0
-    let atkCount = 0
-    let totalDEF = 0
-    let defCount = 0
+    let totalManaCost = 0
+    let manaCostCount = 0
 
     magicCards.forEach(card => {
-      // Attribute distribution
-      const attribute = card.attributes.magicAttribute
-      if (attribute) {
-        stats.attributeDistribution[attribute] = (stats.attributeDistribution[attribute] || 0) + card.quantity
-      }
+      // Color distribution
+      const colors = card.attributes.magicColors || []
+      colors.forEach(color => {
+        if (color) {
+          stats.colorDistribution[color] = (stats.colorDistribution[color] || 0) + card.quantity
+        }
+      })
 
-      // Card Type distribution (Monster/Spell/Trap)
+      // Card Type distribution
       const cardType = card.attributes.magicCardType
       if (cardType) {
         stats.cardTypeDistribution[cardType] = (stats.cardTypeDistribution[cardType] || 0) + card.quantity
       }
 
-      // Average ATK/DEF
-      if (card.attributes.magicATK !== undefined) {
-        totalATK += card.attributes.magicATK * card.quantity
-        atkCount += card.quantity
-      }
-      if (card.attributes.magicDEF !== undefined) {
-        totalDEF += card.attributes.magicDEF * card.quantity
-        defCount += card.quantity
+      // Average Mana Cost
+      if (card.attributes.magicManaCost !== undefined) {
+        totalManaCost += card.attributes.magicManaCost * card.quantity
+        manaCostCount += card.quantity
       }
     })
 
-    stats.averageATK = atkCount > 0 ? Math.round(totalATK / atkCount) : 0
-    stats.averageDEF = defCount > 0 ? Math.round(totalDEF / defCount) : 0
+    stats.averageManaCost = manaCostCount > 0 ? Math.round(totalManaCost / manaCostCount) : 0
 
     setStats(stats)
   }
@@ -193,9 +187,11 @@ export default function MagicCollectionPage() {
   const applyFilters = () => {
     let filtered = [...cards]
 
-    // Attribute filter
-    if (selectedAttribute !== 'all') {
-      filtered = filtered.filter(card => card.attributes.magicAttribute === selectedAttribute)
+    // Color filter
+    if (selectedColor !== 'all') {
+      filtered = filtered.filter(card =>
+        card.attributes.magicColors?.includes(selectedColor)
+      )
     }
 
     // Card Type filter
@@ -203,11 +199,10 @@ export default function MagicCollectionPage() {
       filtered = filtered.filter(card => card.attributes.magicCardType === selectedCardType)
     }
 
-    // Level filter
-    if (selectedLevel !== 'all') {
+    // Mana Cost filter
+    if (selectedManaCost !== 'all') {
       filtered = filtered.filter(card =>
-        card.attributes.magicLevel?.toString() === selectedLevel ||
-        card.attributes.magicRank?.toString() === selectedLevel
+        card.attributes.magicManaCost?.toString() === selectedManaCost
       )
     }
 
@@ -226,8 +221,8 @@ export default function MagicCollectionPage() {
       switch (sortBy) {
         case 'name':
           return a.name.localeCompare(b.name)
-        case 'atk':
-          return (b.attributes.magicATK || 0) - (a.attributes.magicATK || 0)
+        case 'cmc':
+          return (b.attributes.magicManaCost || 0) - (a.attributes.magicManaCost || 0)
         case 'price':
           return b.price - a.price
         case 'recent':
@@ -239,17 +234,28 @@ export default function MagicCollectionPage() {
     setFilteredCards(filtered)
   }
 
-  const getAttributeStyle = (attribute?: string) => {
-    return YUGIOH_ATTRIBUTES[attribute as keyof typeof YUGIOH_ATTRIBUTES] || YUGIOH_ATTRIBUTES['DARK']
+  const getColorStyle = (color?: string) => {
+    return MAGIC_COLORS[color as keyof typeof MAGIC_COLORS] || MAGIC_COLORS['C']
+  }
+
+  const getRarityColor = (rarity?: string) => {
+    switch (rarity?.toLowerCase()) {
+      case 'mythic': return 'text-red-400'
+      case 'rare': return 'text-yellow-400'
+      case 'uncommon': return 'text-blue-400'
+      case 'common': return 'text-slate-400'
+      default: return 'text-slate-300'
+    }
   }
 
   const uniqueRarities = Array.from(new Set(cards.map(c => c.attributes.tcgRarity).filter(Boolean)))
-  const uniqueLevels = Array.from(new Set(cards.map(c => c.attributes.magicLevel || c.attributes.magicRank).filter(Boolean))).sort((a, b) => a - b)
+  const uniqueManaCosts = Array.from(new Set(cards.map(c => c.attributes.magicManaCost).filter((c): c is number => c !== undefined))).sort((a, b) => a - b)
+  const uniqueSets = Array.from(new Set(cards.map(c => c.attributes.tcgSet).filter(Boolean)))
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/20 to-purple-900/20 flex items-center justify-center">
-        <div className="text-white text-2xl">Loading your Yu-Gi-Oh! collection...</div>
+        <div className="text-white text-2xl">Loading your Magic collection...</div>
       </div>
     )
   }
@@ -300,41 +306,93 @@ export default function MagicCollectionPage() {
           </div>
 
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-yellow-500/30">
-            <div className="text-4xl mb-2">📦</div>
-            <div className="text-3xl font-bold text-yellow-400">{Object.keys(stats.setCompletion).length}</div>
-            <div className="text-sm text-slate-400">Unique Sets</div>
+            <div className="text-4xl mb-2">💎</div>
+            <div className="text-3xl font-bold text-yellow-400">{stats.averageManaCost}</div>
+            <div className="text-sm text-slate-400">Avg. Mana Cost</div>
           </div>
         </div>
 
-        {/* Game Distribution */}
+        {/* Color Distribution */}
         <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Game Distribution</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {Object.entries(stats.gameDistribution).map(([game, count]) => (
-              <div key={game} className="text-center p-4 rounded-lg bg-slate-900/50">
-                <div className="text-3xl mb-2">{getGameEmoji(game)}</div>
-                <div className="text-2xl font-bold text-white">{count}</div>
-                <div className="text-sm text-slate-400 capitalize">{game}</div>
-              </div>
-            ))}
+          <h2 className="text-2xl font-bold text-white mb-4">Color Distribution</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {Object.entries(MAGIC_COLORS).map(([colorCode, color]) => {
+              const count = stats.colorDistribution[colorCode] || 0
+              if (count === 0) return null
+              return (
+                <div key={colorCode} className={`text-center p-4 rounded-lg ${color.bg} border ${color.border}`}>
+                  <div className="text-3xl mb-2">{color.emoji}</div>
+                  <div className="text-2xl font-bold text-white">{count}</div>
+                  <div className={`text-sm ${color.text}`}>{color.name}</div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Card Type Distribution */}
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Card Type Distribution</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {Object.entries(stats.cardTypeDistribution).map(([type, count]) => {
+              const typeInfo = MAGIC_CARD_TYPES[type as keyof typeof MAGIC_CARD_TYPES]
+              if (!typeInfo) return null
+              return (
+                <div key={type} className="text-center p-4 rounded-lg bg-slate-900/50 border border-slate-700">
+                  <div className="text-3xl mb-2">{typeInfo.emoji}</div>
+                  <div className="text-2xl font-bold text-white">{count}</div>
+                  <div className={`text-sm ${typeInfo.color}`}>{type}</div>
+                </div>
+              )
+            })}
           </div>
         </div>
 
         {/* Filters */}
         <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
           <div className="flex flex-wrap items-center gap-4">
-            {/* Game Filter */}
+            {/* Color Filter */}
             <div>
-              <label className="text-sm text-slate-400 mb-1 block">Game</label>
+              <label className="text-sm text-slate-400 mb-1 block">Color</label>
               <select
-                value={selectedGame}
-                onChange={(e) => setSelectedGame(e.target.value)}
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
                 className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
               >
-                <option value="all">All Games</option>
-                <option value="pokemon">🎴 Pokémon</option>
-                <option value="magic">🃏 Yu-Gi-Oh!</option>
-                <option value="magic">🌟 Magic</option>
+                <option value="all">All Colors</option>
+                {Object.entries(MAGIC_COLORS).map(([code, color]) => (
+                  <option key={code} value={code}>{color.emoji} {color.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Card Type Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Card Type</label>
+              <select
+                value={selectedCardType}
+                onChange={(e) => setSelectedCardType(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Types</option>
+                {Object.entries(MAGIC_CARD_TYPES).map(([type, info]) => (
+                  <option key={type} value={type}>{info.emoji} {type}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Mana Cost Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Mana Cost</label>
+              <select
+                value={selectedManaCost}
+                onChange={(e) => setSelectedManaCost(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All CMC</option>
+                {uniqueManaCosts.map(cmc => (
+                  <option key={cmc} value={cmc.toString()}>{cmc}</option>
+                ))}
               </select>
             </div>
 
@@ -349,21 +407,6 @@ export default function MagicCollectionPage() {
                 <option value="all">All Rarities</option>
                 {uniqueRarities.map(rarity => (
                   <option key={rarity} value={rarity}>{rarity}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Set Filter */}
-            <div>
-              <label className="text-sm text-slate-400 mb-1 block">Set</label>
-              <select
-                value={selectedSet}
-                onChange={(e) => setSelectedSet(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
-              >
-                <option value="all">All Sets</option>
-                {uniqueSets.map(set => (
-                  <option key={set} value={set}>{set}</option>
                 ))}
               </select>
             </div>
@@ -414,8 +457,8 @@ export default function MagicCollectionPage() {
               >
                 <option value="recent">Neueste zuerst</option>
                 <option value="name">Name A-Z</option>
+                <option value="cmc">Mana Cost (hoch-niedrig)</option>
                 <option value="price">Preis (hoch-niedrig)</option>
-                <option value="rarity">Rarity</option>
               </select>
             </div>
           </div>
@@ -424,10 +467,10 @@ export default function MagicCollectionPage() {
         {/* Cards Display */}
         {filteredCards.length === 0 ? (
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-12 border border-slate-700 text-center">
-            <div className="text-6xl mb-4">🎴</div>
-            <h3 className="text-2xl font-bold text-white mb-2">Noch keine TCG-Karten</h3>
+            <div className="text-6xl mb-4">🌟</div>
+            <h3 className="text-2xl font-bold text-white mb-2">Noch keine Magic-Karten</h3>
             <p className="text-slate-400 mb-6">
-              Füge deine ersten Trading Cards hinzu
+              Füge deine ersten Magic: The Gathering Karten hinzu
             </p>
             <Link
               href="/tcg/prices"
@@ -454,7 +497,7 @@ export default function MagicCollectionPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-6xl">
-                      {getGameEmoji(card.attributes.tcgGame)}
+                      🌟
                     </div>
                   )}
 
@@ -494,7 +537,7 @@ export default function MagicCollectionPage() {
                       {card.price.toFixed(2)} €
                     </span>
                     <span className="text-xs text-slate-500">
-                      {getGameEmoji(card.attributes.tcgGame)}
+                      🌟
                     </span>
                   </div>
                 </div>
@@ -545,7 +588,7 @@ export default function MagicCollectionPage() {
                     </td>
                     <td className="p-4">
                       <span className="capitalize text-white">
-                        {getGameEmoji(card.attributes.tcgGame)} {card.attributes.tcgGame}
+                        🌟 {card.attributes.tcgGame}
                       </span>
                     </td>
                     <td className="p-4 text-slate-300">{card.attributes.tcgSet || '-'}</td>
