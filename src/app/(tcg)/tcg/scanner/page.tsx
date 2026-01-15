@@ -76,7 +76,7 @@ export default function TCGScannerPage() {
       } else {
         showToast(
           data.message || `Keine Karte für Barcode ${barcode} gefunden. Versuche es mit Kamera-Scan oder manueller Suche.`,
-          'warning'
+          'info'
         )
       }
     } catch (error) {
