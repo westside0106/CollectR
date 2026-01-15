@@ -285,21 +285,38 @@ export default function PokemonCollectionPage() {
           </div>
 
           <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-yellow-500/30">
-            <div className="text-4xl mb-2">📦</div>
-            <div className="text-3xl font-bold text-yellow-400">{Object.keys(stats.setCompletion).length}</div>
-            <div className="text-sm text-slate-400">Unique Sets</div>
+            <div className="text-4xl mb-2">❤️</div>
+            <div className="text-3xl font-bold text-yellow-400">{stats.averageHP}</div>
+            <div className="text-sm text-slate-400">Avg. HP</div>
           </div>
         </div>
 
-        {/* Game Distribution */}
+        {/* Type Distribution */}
         <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Game Distribution</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {Object.entries(stats.gameDistribution).map(([game, count]) => (
-              <div key={game} className="text-center p-4 rounded-lg bg-slate-900/50">
-                <div className="text-3xl mb-2">{getGameEmoji(game)}</div>
+          <h2 className="text-2xl font-bold text-white mb-4">Type Distribution</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {Object.entries(stats.typeDistribution).map(([type, count]) => {
+              const typeInfo = POKEMON_TYPES[type as keyof typeof POKEMON_TYPES]
+              if (!typeInfo) return null
+              return (
+                <div key={type} className={`text-center p-4 rounded-lg ${typeInfo.bg} border ${typeInfo.border}`}>
+                  <div className="text-3xl mb-2">{typeInfo.emoji}</div>
+                  <div className="text-2xl font-bold text-white">{count}</div>
+                  <div className={`text-sm ${typeInfo.text}`}>{type}</div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Generation Distribution */}
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-4">Generation Distribution</h2>
+          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-4">
+            {Object.entries(stats.generationDistribution).map(([gen, count]) => (
+              <div key={gen} className="text-center p-4 rounded-lg bg-slate-900/50 border border-slate-700">
                 <div className="text-2xl font-bold text-white">{count}</div>
-                <div className="text-sm text-slate-400 capitalize">{game}</div>
+                <div className="text-sm text-slate-400">Gen {gen}</div>
               </div>
             ))}
           </div>
@@ -308,18 +325,33 @@ export default function PokemonCollectionPage() {
         {/* Filters */}
         <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
           <div className="flex flex-wrap items-center gap-4">
-            {/* Game Filter */}
+            {/* Type Filter */}
             <div>
-              <label className="text-sm text-slate-400 mb-1 block">Game</label>
+              <label className="text-sm text-slate-400 mb-1 block">Type</label>
               <select
-                value={selectedGame}
-                onChange={(e) => setSelectedGame(e.target.value)}
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
                 className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
               >
-                <option value="all">All Games</option>
-                <option value="pokemon">🎴 Pokémon</option>
-                <option value="yugioh">🃏 Yu-Gi-Oh!</option>
-                <option value="magic">🌟 Magic</option>
+                <option value="all">All Types</option>
+                {Object.entries(POKEMON_TYPES).map(([type, info]) => (
+                  <option key={type} value={type}>{info.emoji} {type}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Generation Filter */}
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Generation</label>
+              <select
+                value={selectedGeneration}
+                onChange={(e) => setSelectedGeneration(e.target.value)}
+                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+              >
+                <option value="all">All Generations</option>
+                {uniqueGenerations.map(gen => (
+                  <option key={gen} value={gen.toString()}>Gen {gen}</option>
+                ))}
               </select>
             </div>
 
@@ -334,21 +366,6 @@ export default function PokemonCollectionPage() {
                 <option value="all">All Rarities</option>
                 {uniqueRarities.map(rarity => (
                   <option key={rarity} value={rarity}>{rarity}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Set Filter */}
-            <div>
-              <label className="text-sm text-slate-400 mb-1 block">Set</label>
-              <select
-                value={selectedSet}
-                onChange={(e) => setSelectedSet(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
-              >
-                <option value="all">All Sets</option>
-                {uniqueSets.map(set => (
-                  <option key={set} value={set}>{set}</option>
                 ))}
               </select>
             </div>
@@ -439,7 +456,7 @@ export default function PokemonCollectionPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-6xl">
-                      {getGameEmoji(card.attributes.tcgGame)}
+                      🎴
                     </div>
                   )}
 
@@ -479,7 +496,7 @@ export default function PokemonCollectionPage() {
                       {card.price.toFixed(2)} €
                     </span>
                     <span className="text-xs text-slate-500">
-                      {getGameEmoji(card.attributes.tcgGame)}
+                      🎴
                     </span>
                   </div>
                 </div>
@@ -530,7 +547,7 @@ export default function PokemonCollectionPage() {
                     </td>
                     <td className="p-4">
                       <span className="capitalize text-white">
-                        {getGameEmoji(card.attributes.tcgGame)} {card.attributes.tcgGame}
+                        🎴 {card.attributes.tcgGame}
                       </span>
                     </td>
                     <td className="p-4 text-slate-300">{card.attributes.tcgSet || '-'}</td>
