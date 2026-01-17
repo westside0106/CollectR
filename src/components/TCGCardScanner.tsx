@@ -102,45 +102,60 @@ export function TCGCardScanner({ mode, game, onCardDetected, onClose }: TCGCardS
     setError(null)
 
     try {
-      // Upload image to Supabase Storage
-      const filename = `tcg-scan-${Date.now()}.jpg`
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('item_images')
-        .upload(filename, imageBlob, {
-          contentType: 'image/jpeg',
-          cacheControl: '3600'
-        })
+      // Convert blob to base64 for AI analysis
+      const base64Image = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onloadend = () => resolve(reader.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(imageBlob)
+      })
 
-      if (uploadError) throw uploadError
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('item_images')
-        .getPublicUrl(filename)
-
-      // Call AI analysis Edge Function
+      // Call AI analysis Edge Function with base64 image
       const { data, error: functionError } = await supabase.functions.invoke('analyze-image', {
         body: {
-          imageUrl: publicUrl,
-          context: `This is a ${game} trading card. Please identify the card name, set, rarity, and any visible attributes.`
+          imageBase64: base64Image,
+          collectionType: game
         }
       })
 
       if (functionError) throw functionError
 
-      // Parse AI response
-      const aiDescription = data?.description || ''
-      const aiTags = data?.tags || []
+      // Parse AI response - data is already the parsed JSON from Edge Function
+      const aiResponse = data || {}
+      const cardName = aiResponse.name || 'Unknown Card'
+      const aiDescription = aiResponse.description || ''
+
+      // Upload scanned image to storage as fallback
+      const filename = `tcg-scan-${Date.now()}.jpg`
+      let scannedImageUrl = ''
+
+      try {
+        const { error: uploadError } = await supabase.storage
+          .from('item_images')
+          .upload(filename, imageBlob, {
+            contentType: 'image/jpeg',
+            cacheControl: '3600'
+          })
+
+        if (!uploadError) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('item_images')
+            .getPublicUrl(filename)
+          scannedImageUrl = publicUrl
+        }
+      } catch (uploadError) {
+        console.warn('Failed to upload scanned image:', uploadError)
+      }
 
       // Try to extract card info from AI response
       const cardData: any = {
-        name: extractCardName(aiDescription, aiTags),
-        set: extractSet(aiDescription),
-        rarity: extractRarity(aiDescription, aiTags),
+        name: cardName,
+        set: aiResponse.attributes?.set || aiResponse.attributes?.['Set/Edition'] || null,
+        rarity: aiResponse.attributes?.rarity || aiResponse.attributes?.Seltenheit || null,
         game: game,
-        imageUrl: publicUrl, // Default to scanned image
+        imageUrl: scannedImageUrl, // Default to scanned image
         aiDescription,
-        aiTags,
+        aiTags: [],
         price: null
       }
 

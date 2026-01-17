@@ -43,8 +43,8 @@ function EditModal({ collection, onClose, onSave }: EditModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={e => e.stopPropagation()}>
-        <h2 className="text-xl font-bold mb-4 dark:text-white">Sammlung bearbeiten</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md modal-responsive p-4 sm:p-6" onClick={e => e.stopPropagation()}>
+        <h2 className="text-lg sm:text-xl font-bold mb-4 dark:text-white">Sammlung bearbeiten</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4 flex gap-4 items-start">
             <div>
@@ -74,18 +74,18 @@ function EditModal({ collection, onClose, onSave }: EditModalProps) {
               placeholder="Optional: Beschreibe deine Sammlung..."
             />
           </div>
-          <div className="flex gap-3 justify-end">
+          <div className="flex flex-col sm:flex-row gap-3 justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+              className="button-responsive rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
             >
               Abbrechen
             </button>
             <button
               type="submit"
               disabled={saving || !name.trim()}
-              className="px-4 py-2 rounded-lg bg-accent-500 text-white hover:bg-accent-600 transition disabled:opacity-50"
+              className="button-responsive rounded-lg bg-accent-500 text-white hover:bg-accent-600 transition disabled:opacity-50"
             >
               {saving ? 'Speichern...' : 'Speichern'}
             </button>
@@ -117,8 +117,8 @@ function DeleteModal({ collection, onClose, onDelete }: DeleteModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md mx-4 p-6" onClick={e => e.stopPropagation()}>
-        <h2 className="text-xl font-bold mb-2 text-red-600 dark:text-red-400">Sammlung löschen</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md modal-responsive p-4 sm:p-6" onClick={e => e.stopPropagation()}>
+        <h2 className="text-lg sm:text-xl font-bold mb-2 text-red-600 dark:text-red-400">Sammlung löschen</h2>
         <p className="text-gray-600 dark:text-slate-300 mb-4">
           Möchtest du <strong>"{collection.name}"</strong> wirklich löschen?
         </p>
@@ -146,18 +146,18 @@ function DeleteModal({ collection, onClose, onDelete }: DeleteModalProps) {
           </p>
         )}
 
-        <div className="flex gap-3 justify-end">
+        <div className="flex flex-col sm:flex-row gap-3 justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
+            className="button-responsive rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition"
           >
             Abbrechen
           </button>
           <button
             onClick={handleDelete}
             disabled={deleting || (needsConfirm && confirmText !== collection.name)}
-            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition disabled:opacity-50"
+            className="button-responsive rounded-lg bg-red-600 text-white hover:bg-red-700 transition disabled:opacity-50"
           >
             {deleting ? 'Löschen...' : 'Endgültig löschen'}
           </button>
@@ -310,25 +310,25 @@ export default function CollectionsPage() {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
         <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
-              <span className="text-gray-400 dark:text-slate-500">/</span>
-              <span className="text-gray-600 dark:text-slate-400">Sammlungen</span>
+          <div className="max-w-7xl mx-auto container-responsive py-3 sm:py-4 flex justify-between items-center">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Link href="/" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
+              <span className="text-gray-400 dark:text-slate-500 hidden sm:inline">/</span>
+              <span className="text-gray-600 dark:text-slate-400 text-sm sm:text-base hidden sm:inline">Sammlungen</span>
             </div>
           </div>
         </header>
-        <main className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold dark:text-white">Meine Sammlungen</h1>
+        <main className="max-w-7xl mx-auto container-responsive py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <h1 className="heading-responsive font-bold dark:text-white">Meine Sammlungen</h1>
             <Link
               href="/collections/new"
-              className="bg-accent-500 text-white px-4 py-2 rounded-lg hover:bg-accent-600 transition"
+              className="button-responsive bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition w-full sm:w-auto text-center"
             >
               + Neue Sammlung
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-responsive-3 gap-4 sm:gap-6">
             {[1, 2, 3, 4, 5, 6].map(i => (
               <CollectionCardSkeleton key={i} />
             ))}
@@ -374,21 +374,21 @@ export default function CollectionsPage() {
       )}
 
       <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
-            <span className="text-gray-400 dark:text-slate-500">/</span>
-            <span className="text-gray-600 dark:text-slate-400">Sammlungen</span>
+        <div className="max-w-7xl mx-auto container-responsive py-3 sm:py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link href="/" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
+            <span className="text-gray-400 dark:text-slate-500 hidden sm:inline">/</span>
+            <span className="text-gray-600 dark:text-slate-400 text-sm sm:text-base hidden sm:inline">Sammlungen</span>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto container-responsive py-6 sm:py-8">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h1 className="text-2xl font-bold dark:text-white">Meine Sammlungen</h1>
+          <h1 className="heading-responsive font-bold dark:text-white">Meine Sammlungen</h1>
           <Link
             href="/collections/new"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            className="button-responsive bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition w-full sm:w-auto text-center"
           >
             + Neue Sammlung
           </Link>
@@ -406,13 +406,13 @@ export default function CollectionsPage() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Sammlungen suchen..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-slate-800 dark:text-white text-sm sm:text-base"
               />
             </div>
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value as 'name' | 'items' | 'newest')}
-              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 dark:text-white"
+              className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 dark:text-white text-sm sm:text-base"
             >
               <option value="newest">Neueste zuerst</option>
               <option value="name">Name (A-Z)</option>
@@ -422,35 +422,35 @@ export default function CollectionsPage() {
         )}
 
         {filteredCollections.length === 0 && collections.length === 0 ? (
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-12 text-center">
-            <div className="text-5xl mb-4">📭</div>
-            <h2 className="text-xl font-semibold mb-2 dark:text-white">Noch keine Sammlungen</h2>
-            <p className="text-gray-600 dark:text-slate-400 mb-4">Erstelle deine erste Sammlung, um loszulegen!</p>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm card-padding text-center">
+            <div className="text-4xl sm:text-5xl mb-4">📭</div>
+            <h2 className="subheading-responsive font-semibold mb-2 dark:text-white">Noch keine Sammlungen</h2>
+            <p className="text-responsive text-gray-600 dark:text-slate-400 mb-4">Erstelle deine erste Sammlung, um loszulegen!</p>
             <Link
               href="/collections/new"
-              className="inline-block bg-accent-500 text-white px-6 py-3 rounded-lg hover:bg-accent-600 transition"
+              className="inline-block bg-accent-500 text-white button-responsive rounded-lg hover:bg-accent-600 transition"
             >
               Sammlung erstellen
             </Link>
           </div>
         ) : filteredCollections.length === 0 ? (
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-12 text-center">
-            <div className="text-5xl mb-4">🔍</div>
-            <h2 className="text-xl font-semibold mb-2 dark:text-white">Keine Ergebnisse</h2>
-            <p className="text-gray-600 dark:text-slate-400 mb-4">Keine Sammlungen gefunden für "{searchQuery}"</p>
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm card-padding text-center">
+            <div className="text-4xl sm:text-5xl mb-4">🔍</div>
+            <h2 className="subheading-responsive font-semibold mb-2 dark:text-white">Keine Ergebnisse</h2>
+            <p className="text-responsive text-gray-600 dark:text-slate-400 mb-4">Keine Sammlungen gefunden für "{searchQuery}"</p>
             <button
               onClick={() => setSearchQuery('')}
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline text-sm sm:text-base"
             >
               Suche zurücksetzen
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-responsive-3 gap-4 sm:gap-6">
             {filteredCollections.map((collection) => (
               <div
                 key={collection.id}
-                className={`bg-white dark:bg-slate-800 rounded-xl shadow-sm border p-6 hover:shadow-md transition relative group ${
+                className={`bg-white dark:bg-slate-800 rounded-xl shadow-sm border card-padding hover:shadow-md transition relative group ${
                   collection.is_shared
                     ? 'border-purple-200 dark:border-purple-800 hover:border-purple-400 dark:hover:border-purple-600'
                     : 'border-gray-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600'
@@ -508,12 +508,12 @@ export default function CollectionsPage() {
                 )}
 
                 <Link href={`/collections/${collection.id}`}>
-                  <div className="text-3xl mb-2">
+                  <div className="text-2xl sm:text-3xl mb-2">
                     {collection.is_shared ? '👥' : (collection.settings?.icon || '📁')}
                   </div>
-                  <h3 className="text-lg font-semibold dark:text-white">{collection.name}</h3>
+                  <h3 className="text-base sm:text-lg font-semibold dark:text-white">{collection.name}</h3>
                   {collection.description && (
-                    <p className="text-gray-600 dark:text-slate-400 text-sm mt-1 line-clamp-2">{collection.description}</p>
+                    <p className="text-gray-600 dark:text-slate-400 text-xs sm:text-sm mt-1 line-clamp-2">{collection.description}</p>
                   )}
                   <p className="text-gray-400 dark:text-slate-500 text-xs mt-2">
                     {collection.item_count} {collection.item_count === 1 ? 'Item' : 'Items'}

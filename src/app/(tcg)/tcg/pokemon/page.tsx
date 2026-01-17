@@ -246,7 +246,7 @@ export default function PokemonCollectionPage() {
   }
 
   const uniqueRarities = Array.from(new Set(cards.map(c => c.attributes.tcgRarity).filter(Boolean)))
-  const uniqueGenerations = Array.from(new Set(cards.map(c => c.attributes.pokemonGeneration).filter(Boolean))).sort((a, b) => a - b)
+  const uniqueGenerations = Array.from(new Set(cards.map(c => c.attributes.pokemonGeneration).filter((g): g is number => g !== undefined))).sort((a, b) => a - b)
   const uniqueSets = Array.from(new Set(cards.map(c => c.attributes.tcgSet).filter(Boolean)))
 
   if (isLoading) {
