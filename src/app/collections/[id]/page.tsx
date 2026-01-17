@@ -408,7 +408,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="p-8 dark:bg-slate-900 min-h-screen" data-pull-refresh>
+    <div className="p-4 sm:p-6 md:p-8 dark:bg-slate-900 min-h-screen" data-pull-refresh>
       {/* Pull-to-Refresh Indicator */}
       {(isPulling || isPullRefreshing) && (
         <div
@@ -443,37 +443,37 @@ export default function CollectionDetailPage({ params }: PageProps) {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-start mb-6">
-        <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4 sm:mb-6">
+        <div className="w-full sm:w-auto">
           <Link
             href="/collections"
             className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm flex items-center gap-1 mb-2"
           >
             ← Alle Sammlungen
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{collection.name}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white break-words">{collection.name}</h1>
           {collection.description && (
-            <p className="text-slate-500 dark:text-slate-400 mt-1">{collection.description}</p>
+            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mt-1">{collection.description}</p>
           )}
         </div>
-        <div className="flex gap-3">
+        <div className="flex overflow-x-auto gap-2 sm:gap-3 w-full sm:w-auto pb-2 sm:pb-0 scrollbar-hide">
           {/* Share Button */}
           <button
             onClick={() => setShowShareModal(true)}
-            className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-slate-700 dark:text-slate-200"
+            className="flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2 text-slate-700 dark:text-slate-200 text-sm"
             title="Sammlung teilen"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
-            Teilen
+            <span className="hidden sm:inline">Teilen</span>
           </button>
 
           {/* More Menu */}
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200"
+              className="px-3 sm:px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-200 text-sm"
             >
               ⋯
             </button>
@@ -510,16 +510,16 @@ export default function CollectionDetailPage({ params }: PageProps) {
               </>
             )}
           </div>
-          
+
           <Link
             href={`/collections/${id}/scan`}
-            className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-slate-700 dark:text-slate-200"
+            className="flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-slate-700 dark:text-slate-200 text-sm whitespace-nowrap"
           >
             📷 Scannen
           </Link>
           <button
             onClick={() => setShowAIBatchUpload(true)}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+            className="flex-shrink-0 px-3 sm:px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2 text-sm whitespace-nowrap"
           >
             ✨ KI Batch-Upload
           </button>
@@ -531,7 +531,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
           )}
           <Link
             href={`/collections/${id}/items/new`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            className="flex-shrink-0 bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm whitespace-nowrap"
           >
             + Neues Item
           </Link>
@@ -539,23 +539,23 @@ export default function CollectionDetailPage({ params }: PageProps) {
       </div>
 
       {/* Stats Bar */}
-      <div className="flex gap-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 sm:mb-6">
         <div>
-          <span className="text-2xl font-bold dark:text-white">{stats.totalItems}</span>
-          <span className="text-slate-500 dark:text-slate-400 ml-2">Items</span>
+          <span className="text-xl sm:text-2xl font-bold dark:text-white">{stats.totalItems}</span>
+          <span className="text-sm sm:text-base text-slate-500 dark:text-slate-400 ml-2">Items</span>
         </div>
-        <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
-          <span className="text-2xl font-bold dark:text-white">{stats.totalValue.toFixed(2)}</span>
-          <span className="text-slate-500 dark:text-slate-400 ml-2">EUR</span>
+        <div className="sm:border-l border-slate-200 dark:border-slate-700 sm:pl-6">
+          <span className="text-xl sm:text-2xl font-bold dark:text-white">{stats.totalValue.toFixed(2)}</span>
+          <span className="text-sm sm:text-base text-slate-500 dark:text-slate-400 ml-2">EUR</span>
         </div>
-        <div className="border-l border-slate-200 dark:border-slate-700 pl-6">
-          <span className="text-2xl font-bold dark:text-white">{categories.length}</span>
-          <span className="text-slate-500 dark:text-slate-400 ml-2">Kategorien</span>
+        <div className="sm:border-l border-slate-200 dark:border-slate-700 sm:pl-6">
+          <span className="text-xl sm:text-2xl font-bold dark:text-white">{categories.length}</span>
+          <span className="text-sm sm:text-base text-slate-500 dark:text-slate-400 ml-2">Kategorien</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mb-6 w-fit">
+      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mb-4 sm:mb-6 w-full sm:w-fit">
         <button
           onClick={() => setActiveTab('items')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition ${
