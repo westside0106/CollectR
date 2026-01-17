@@ -208,13 +208,13 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-8">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 space-y-4">
-            <div className="h-6 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-            <div className="h-10 w-full bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-            <div className="h-10 w-full bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 sm:p-8">
+        <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
+          <div className="h-6 sm:h-8 w-32 sm:w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 space-y-3 sm:space-y-4">
+            <div className="h-5 sm:h-6 w-24 sm:w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            <div className="h-8 sm:h-10 w-full bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+            <div className="h-8 sm:h-10 w-full bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
           </div>
         </div>
       </div>
@@ -225,57 +225,57 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-4 sm:p-8">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link
             href="/"
-            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm flex items-center gap-1 mb-2"
+            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-xs sm:text-sm flex items-center gap-1 mb-2"
           >
             ← Zurück zum Dashboard
           </Link>
-          <h1 className="text-2xl font-bold dark:text-white">Einstellungen</h1>
-          <p className="text-slate-700 dark:text-slate-300 mt-1">{user?.email}</p>
+          <h1 className="text-xl sm:text-2xl font-bold dark:text-white">Einstellungen</h1>
+          <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 mt-1">{user?.email}</p>
         </div>
 
         <div className="space-y-6">
           {/* Stats Overview */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
             <Link
               href="/settings/costs"
-              className="bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl p-4 text-white hover:shadow-lg transition-shadow group"
+              className="bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl p-3 sm:p-4 text-white hover:shadow-lg transition-shadow group col-span-2 sm:col-span-1"
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-2xl">💰</span>
-                <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center justify-between mb-1 sm:mb-2">
+                <span className="text-xl sm:text-2xl">💰</span>
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
-              <div className="text-lg font-semibold">Service Kosten</div>
+              <div className="text-sm sm:text-base md:text-lg font-semibold">Service Kosten</div>
               <div className="text-xs opacity-90 mt-1">Monitoring & Budget</div>
             </Link>
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-              <div className="text-2xl font-bold dark:text-white">{stats.collections}</div>
-              <div className="text-sm text-slate-700 dark:text-slate-300">Sammlungen</div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+              <div className="text-xl sm:text-2xl font-bold dark:text-white">{stats.collections}</div>
+              <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">Sammlungen</div>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-              <div className="text-2xl font-bold dark:text-white">{stats.items}</div>
-              <div className="text-sm text-slate-700 dark:text-slate-300">Items</div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+              <div className="text-xl sm:text-2xl font-bold dark:text-white">{stats.items}</div>
+              <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">Items</div>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.sharedWithMe}</div>
-              <div className="text-sm text-slate-700 dark:text-slate-300">Geteilt mit mir</div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+              <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.sharedWithMe}</div>
+              <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">Geteilt mit mir</div>
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
-              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.sharedByMe}</div>
-              <div className="text-sm text-slate-700 dark:text-slate-300">Offene Einladungen</div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-700">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.sharedByMe}</div>
+              <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">Offene Einladungen</div>
             </div>
           </div>
 
           {/* Profile Settings */}
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold dark:text-white">Profil</h2>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-base sm:text-lg font-semibold dark:text-white">Profil</h2>
             </div>
-            <form onSubmit={handleSaveProfile} className="p-6 space-y-4">
+            <form onSubmit={handleSaveProfile} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Anzeigename
@@ -316,63 +316,63 @@ export default function SettingsPage() {
 
           {/* Theme Settings */}
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold dark:text-white">Erscheinungsbild</h2>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-base sm:text-lg font-semibold dark:text-white">Erscheinungsbild</h2>
             </div>
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
               {/* Light/Dark/System */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 sm:mb-3">
                   Modus
                 </label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   <button
                     onClick={() => handleThemeChange('light')}
-                    className={`p-4 rounded-lg border-2 transition ${
+                    className={`p-3 sm:p-4 rounded-lg border-2 transition ${
                       theme === 'light'
                         ? 'border-accent-500 bg-accent-50'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="text-2xl mb-2">☀️</div>
-                    <div className="text-sm font-medium dark:text-white">Hell</div>
+                    <div className="text-xl sm:text-2xl mb-1 sm:mb-2">☀️</div>
+                    <div className="text-xs sm:text-sm font-medium dark:text-white">Hell</div>
                   </button>
                   <button
                     onClick={() => handleThemeChange('dark')}
-                    className={`p-4 rounded-lg border-2 transition ${
+                    className={`p-3 sm:p-4 rounded-lg border-2 transition ${
                       theme === 'dark'
                         ? 'border-accent-500 bg-accent-100 dark:bg-accent-900/30'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="text-2xl mb-2">🌙</div>
-                    <div className="text-sm font-medium dark:text-white">Dunkel</div>
+                    <div className="text-xl sm:text-2xl mb-1 sm:mb-2">🌙</div>
+                    <div className="text-xs sm:text-sm font-medium dark:text-white">Dunkel</div>
                   </button>
                   <button
                     onClick={() => handleThemeChange('system')}
-                    className={`p-4 rounded-lg border-2 transition ${
+                    className={`p-3 sm:p-4 rounded-lg border-2 transition ${
                       theme === 'system'
                         ? 'border-accent-500 bg-accent-50 dark:bg-accent-900/30'
                         : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
-                    <div className="text-2xl mb-2">💻</div>
-                    <div className="text-sm font-medium dark:text-white">System</div>
+                    <div className="text-xl sm:text-2xl mb-1 sm:mb-2">💻</div>
+                    <div className="text-xs sm:text-sm font-medium dark:text-white">System</div>
                   </button>
                 </div>
               </div>
 
               {/* Accent Color */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 sm:mb-3">
                   Akzentfarbe
                 </label>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                   {ACCENT_COLORS.map((color) => (
                     <button
                       key={color.value}
                       onClick={() => handleAccentChange(color.value)}
-                      className={`w-12 h-12 rounded-full transition-all duration-200 flex items-center justify-center ${
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full transition-all duration-200 flex items-center justify-center ${
                         accentColor === color.value
                           ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-500 dark:ring-offset-slate-800 scale-110'
                           : 'hover:scale-105'
@@ -381,7 +381,7 @@ export default function SettingsPage() {
                       title={color.label}
                     >
                       {accentColor === color.value && (
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
@@ -398,32 +398,32 @@ export default function SettingsPage() {
           {/* Shared Collections */}
           {sharedCollections.length > 0 && (
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-                <h2 className="text-lg font-semibold dark:text-white">Geteilte Sammlungen</h2>
-                <p className="text-sm text-slate-700 dark:text-slate-300">Sammlungen, die mit dir geteilt wurden</p>
+              <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-700">
+                <h2 className="text-base sm:text-lg font-semibold dark:text-white">Geteilte Sammlungen</h2>
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">Sammlungen, die mit dir geteilt wurden</p>
               </div>
               <div className="divide-y divide-slate-200 dark:divide-slate-700">
                 {sharedCollections.map(sc => (
-                  <div key={sc.id} className="px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center text-purple-600 dark:text-purple-400">
+                  <div key={sc.id} className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center text-purple-600 dark:text-purple-400 text-sm sm:text-base">
                         👥
                       </div>
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <Link
                           href={`/collections/${sc.collection.id}`}
-                          className="font-medium dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+                          className="text-sm sm:text-base font-medium dark:text-white hover:text-blue-600 dark:hover:text-blue-400 block truncate"
                         >
                           {sc.collection.name}
                         </Link>
-                        <div className="text-sm text-slate-700 dark:text-slate-300">
+                        <div className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
                           {ROLE_LABELS[sc.role]}
                         </div>
                       </div>
                     </div>
                     <button
                       onClick={() => handleLeaveCollection(sc.id, sc.collection.name)}
-                      className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                      className="text-xs sm:text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 whitespace-nowrap"
                     >
                       Verlassen
                     </button>
@@ -435,10 +435,10 @@ export default function SettingsPage() {
 
           {/* Password Change */}
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold dark:text-white">Passwort ändern</h2>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-base sm:text-lg font-semibold dark:text-white">Passwort ändern</h2>
             </div>
-            <form onSubmit={handleChangePassword} className="p-6 space-y-4">
+            <form onSubmit={handleChangePassword} className="p-4 sm:p-6 space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Neues Passwort
@@ -477,10 +477,10 @@ export default function SettingsPage() {
 
           {/* Account Info */}
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold dark:text-white">Account</h2>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-base sm:text-lg font-semibold dark:text-white">Account</h2>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
               <div className="flex justify-between items-center">
                 <div>
                   <div className="font-medium dark:text-white">Account erstellt</div>
@@ -512,16 +512,16 @@ export default function SettingsPage() {
 
           {/* Danger Zone */}
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-red-200 dark:border-red-900 overflow-hidden">
-            <div className="px-6 py-4 border-b border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20">
-              <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">Gefahrenzone</h2>
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20">
+              <h2 className="text-base sm:text-lg font-semibold text-red-600 dark:text-red-400">Gefahrenzone</h2>
             </div>
-            <div className="p-6">
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            <div className="p-4 sm:p-6">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mb-3 sm:mb-4">
                 Wenn du deinen Account löschst, werden alle deine Sammlungen und Items unwiderruflich gelöscht.
               </p>
               <button
                 onClick={() => showToast('Account-Löschung ist noch nicht implementiert', 'error')}
-                className="px-4 py-2 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+                className="px-3 sm:px-4 py-2 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition text-sm sm:text-base"
               >
                 Account löschen
               </button>
