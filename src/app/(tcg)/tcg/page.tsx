@@ -202,7 +202,7 @@ export default function TCGLandingPage() {
 
             <div className="mt-6 text-center">
               <Link
-                href="/collections"
+                href="/tcg/collection"
                 className="inline-flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
               >
                 <span>Zur Sammlung</span>
@@ -210,8 +210,7 @@ export default function TCGLandingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
-            </div>
-          </div>
+            </div>          </div>
 
           {/* Features Highlight */}
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
