@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 
 type GameType = 'pokemon' | 'yugioh' | 'magic'
 
@@ -73,6 +72,45 @@ function TCGPricesContent() {
   const openEbaySoldListings = (cardName: string) => {
     const ebayUrl = `https://www.ebay.de/sch/i.html?_nkw=${encodeURIComponent(cardName)}&_sacat=0&LH_Complete=1&LH_Sold=1`
     window.open(ebayUrl, '_blank')
+  }
+
+  const addToTCGCollection = async (card: PriceResult) => {
+    try {
+      const supabase = (await import('@/lib/supabase/client')).createClient()
+
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        alert('Bitte melde dich an um Karten zur Sammlung hinzuzufügen')
+        return
+      }
+
+      // Add card to tcg_cards table
+      const { error } = await supabase.from('tcg_cards').insert({
+        owner_id: user.id,
+        name: card.cardName,
+        quantity: 1,
+        attributes: {
+          tcgGame: selectedGame,
+          tcgSet: card.setName,
+          tcgRarity: null,
+          purchasePrice: card.prices.market || card.prices.mid,
+          currentPrice: card.prices.market || card.prices.mid,
+          imageUrl: card.imageUrl
+        },
+        created_at: new Date().toISOString()
+      })
+
+      if (error) {
+        console.error('Error adding card:', error)
+        alert('❌ Fehler beim Hinzufügen der Karte')
+      } else {
+        alert(`✅ ${card.cardName} wurde zur TCG Sammlung hinzugefügt!`)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('❌ Fehler beim Hinzufügen der Karte')
+    }
   }
 
   const trendingCards = [
@@ -260,12 +298,12 @@ function TCGPricesContent() {
 
                   {/* Actions */}
                   <div className="flex gap-3">
-                    <Link
-                      href={`/collections/new?prefill=${encodeURIComponent(JSON.stringify({ name: result.cardName, price: result.prices.market }))}`}
-                      className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all text-center"
+                    <button
+                      onClick={() => addToTCGCollection(result)}
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
                     >
                       ➕ Zu Sammlung
-                    </Link>
+                    </button>
                     <button
                       onClick={() => openEbaySoldListings(result.cardName)}
                       className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
