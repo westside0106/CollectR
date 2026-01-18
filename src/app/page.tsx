@@ -465,16 +465,16 @@ function DashboardContent() {
 
       {/* Header */}
       <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="max-w-7xl mx-auto container-responsive py-3 sm:py-4 flex justify-between items-center">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
               <span className="text-blue-600 dark:text-blue-400">Collectors</span>phere
             </h1>
             <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full">
               HUB
             </span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={() => setShowSettings(true)}
               className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200
@@ -492,17 +492,18 @@ function DashboardContent() {
                 await supabase.auth.signOut()
                 router.push('/login')
               }}
-              className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+              className="text-xs sm:text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
             >
-              Abmelden
+              <span className="hidden sm:inline">Abmelden</span>
+              <span className="sm:hidden">Aus</span>
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Content - Tile Grid */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <main className="max-w-7xl mx-auto container-responsive py-4 sm:py-6 md:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {visibleTiles.map(tile => (
             <DashboardTile
               key={tile.id}
@@ -514,17 +515,17 @@ function DashboardContent() {
         </div>
 
         {visibleTiles.length === 0 && (
-          <div className="text-center py-16">
-            <div className="text-5xl mb-4">🎨</div>
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="text-center py-12 sm:py-16">
+            <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">🎨</div>
+            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
               Dashboard ist leer
             </h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">
+            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-4 px-4">
               Alle Kacheln sind ausgeblendet
             </p>
             <button
               onClick={() => setShowSettings(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               Dashboard anpassen
             </button>

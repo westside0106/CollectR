@@ -332,19 +332,19 @@ export default function NewCollectionPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center gap-4">
-          <Link href="/" className="text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
-          <span className="text-gray-400 dark:text-slate-500">/</span>
-          <Link href="/collections" className="text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white">Sammlungen</Link>
-          <span className="text-gray-400 dark:text-slate-500">/</span>
-          <span className="text-gray-600 dark:text-slate-400">Neu</span>
+        <div className="max-w-7xl mx-auto container-responsive py-3 sm:py-4 flex items-center gap-2 sm:gap-4">
+          <Link href="/" className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
+          <span className="text-gray-400 dark:text-slate-500 hidden sm:inline">/</span>
+          <Link href="/collections" className="text-sm sm:text-base text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hidden sm:inline">Sammlungen</Link>
+          <span className="text-gray-400 dark:text-slate-500 hidden sm:inline">/</span>
+          <span className="text-sm sm:text-base text-gray-600 dark:text-slate-400 hidden sm:inline">Neu</span>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-6 dark:text-white">Neue Sammlung erstellen</h1>
+      <main className="max-w-2xl mx-auto container-responsive py-6 sm:py-8">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 dark:text-white">Neue Sammlung erstellen</h1>
 
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 space-y-6 border border-slate-200 dark:border-slate-700">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 rounded-xl shadow-sm card-padding space-y-4 sm:space-y-6 border border-slate-200 dark:border-slate-700">
           {error && (
             <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm border border-red-200 dark:border-red-800">
               {error}
@@ -410,7 +410,7 @@ export default function NewCollectionPage() {
 
           {/* Preset-Auswahl */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-3">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 sm:mb-3">
               Vorlage (Optional)
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -422,36 +422,36 @@ export default function NewCollectionPage() {
                     setSelectedPreset(preset.id)
                     setIcon(preset.icon)
                   }}
-                  className={`p-3 rounded-lg border-2 text-left transition-all ${
+                  className={`p-2 sm:p-3 rounded-lg border-2 text-left transition-all ${
                     selectedPreset === preset.id
                       ? 'border-accent-500 bg-accent-50 dark:bg-accent-900/30'
                       : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 hover:bg-gray-50 dark:hover:bg-slate-700'
                   }`}
                 >
-                  <div className="text-xl mb-1">{preset.icon}</div>
-                  <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{preset.name}</div>
+                  <div className="text-lg sm:text-xl mb-1">{preset.icon}</div>
+                  <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">{preset.name}</div>
                 </button>
               ))}
             </div>
             {selectedPreset !== 'custom' && (
-              <p className="mt-3 text-sm text-gray-500 dark:text-slate-400">
+              <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-gray-500 dark:text-slate-400">
                 {COLLECTION_PRESETS.find(p => p.id === selectedPreset)?.description}
                 {' '}Kategorien und Attribute werden automatisch erstellt.
               </p>
             )}
           </div>
 
-          <div className="flex gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
             <button
               type="submit"
               disabled={loading || !name}
-              className="flex-1 bg-accent-500 text-white py-3 rounded-lg hover:bg-accent-600 transition font-medium disabled:opacity-50"
+              className="sm:flex-1 button-responsive bg-accent-500 text-white rounded-lg hover:bg-accent-600 transition font-medium disabled:opacity-50"
             >
               {loading ? 'Wird erstellt...' : 'Sammlung erstellen'}
             </button>
             <Link
               href="/collections"
-              className="px-6 py-3 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition text-center dark:text-slate-300"
+              className="button-responsive border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition text-center dark:text-slate-300"
             >
               Abbrechen
             </Link>

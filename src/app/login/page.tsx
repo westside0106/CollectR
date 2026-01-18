@@ -41,19 +41,19 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <Image
             src="/icons/icon-192.png"
             alt="CollectR Logo"
             width={96}
             height={96}
-            className="mx-auto mb-4"
+            className="mx-auto mb-3 sm:mb-4"
           />
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">CollectR</h1>
-          <p className="text-slate-700 dark:text-slate-300 mt-2">Melde dich an</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">CollectR</h1>
+          <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 mt-2">Melde dich an</p>
         </div>
 
-        <form onSubmit={handleLogin} className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+        <form onSubmit={handleLogin} className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
               {error}
