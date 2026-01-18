@@ -92,8 +92,7 @@ export default function OfficialLandingPage() {
 
         <div className="relative max-w-7xl mx-auto container-responsive py-8 sm:py-12 md:py-20">
           {/* Header */}
-          <div className="text-center mb-8 sm:mb-8 sm:mb-10 md:mb-12 md:mb-16
-            <p className="text-base sm:text-lg md:text-xl text-slate-300 max-w-2xl mx-auto px-4">">
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
             <div className="flex flex-col sm:inline-flex sm:flex-row items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <span className="text-4xl sm:text-5xl md:text-6xl">{theme.emoji}</span>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
