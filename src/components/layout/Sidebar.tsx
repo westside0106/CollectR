@@ -34,9 +34,18 @@ export function Sidebar() {
   }
 
   const mainLinks = [
-    { href: '/', label: 'Dashboard', icon: '📊' },
-    { href: '/collections', label: 'Sammlungen', icon: '📦' },
-    { href: '/reminders', label: 'Erinnerungen', icon: '🔔' },
+    { href: '/', label: 'Dashboard', icon: '📊', description: 'Übersicht' },
+    { href: '/hub', label: 'CollectR HUB', icon: '🏠', description: 'Zentrale' },
+    { href: '/collections', label: 'Sammlungen', icon: '📦', description: 'Alle Collections' },
+    { href: '/reminders', label: 'Erinnerungen', icon: '🔔', description: 'Termine' },
+  ]
+
+  const sphereLinks = [
+    { href: '/tcg', label: 'TCG', icon: '🎴', description: 'Trading Cards', color: 'text-red-400' },
+    { href: '/gaming', label: 'Gaming', icon: '🎮', description: 'Video Games', color: 'text-purple-400' },
+    { href: '/official', label: 'Official', icon: '📜', description: 'Dokumente', color: 'text-cyan-400' },
+    { href: '/geo', label: 'Geo', icon: '⛏️', description: 'Geologie', color: 'text-emerald-400' },
+    { href: '/shop', label: 'Shop', icon: '🛒', description: 'Marketplace', color: 'text-green-400' },
   ]
 
   const toolLinks = [
@@ -61,7 +70,7 @@ export function Sidebar() {
           />
           <span className="font-bold">CollectR</span>
         </Link>
-        
+
         {/* Hamburger Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -110,7 +119,7 @@ export function Sidebar() {
             />
             <div>
               <h1 className="text-xl font-bold">CollectR</h1>
-              <p className="text-xs text-slate-400">Deine Sammlungen</p>
+              <p className="text-xs text-slate-400">Multi-Sphere Platform</p>
             </div>
           </Link>
         </div>
@@ -121,7 +130,10 @@ export function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
           {/* Haupt-Navigation */}
-          <ul className="space-y-1">
+          <p className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Navigation
+          </p>
+          <ul className="space-y-1 mb-6">
             {mainLinks.map(link => {
               const isActive = pathname === link.href
               return (
@@ -129,19 +141,59 @@ export function Sidebar() {
                   <Link
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive 
-                        ? 'bg-blue-600 text-white' 
+                    className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive
+                        ? 'bg-blue-600 text-white'
                         : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
-                    <span className="text-lg">{link.icon}</span>
-                    <span className="font-medium">{link.label}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg">{link.icon}</span>
+                      <span className="font-medium">{link.label}</span>
+                    </div>
+                    {link.description && !isActive && (
+                      <span className="text-xs text-slate-500 hidden xl:inline">{link.description}</span>
+                    )}
                   </Link>
                 </li>
               )
             })}
           </ul>
+
+          {/* Spheres Section */}
+          <div className="mb-6">
+            <p className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Spheres
+            </p>
+            <ul className="space-y-1">
+              {sphereLinks.map(link => {
+                const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors ${
+                        isActive
+                          ? 'bg-slate-800 text-white border-l-2 border-blue-500'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">{link.icon}</span>
+                        <span className="font-medium">{link.label}</span>
+                      </div>
+                      {link.description && !isActive && (
+                        <span className={`text-xs hidden xl:inline ${link.color || 'text-slate-500'}`}>
+                          {link.description}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
 
           {/* Trennlinie */}
           <div className="my-4 border-t border-slate-700" />
@@ -158,14 +210,14 @@ export function Sidebar() {
                   <Link
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive 
-                        ? 'bg-blue-600 text-white' 
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
+                      isActive
+                        ? 'bg-blue-600 text-white'
                         : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
-                    <span className="text-lg">{link.icon}</span>
-                    <span className="font-medium">{link.label}</span>
+                    <span className="text-base">{link.icon}</span>
+                    <span className="text-sm">{link.label}</span>
                   </Link>
                 </li>
               )
