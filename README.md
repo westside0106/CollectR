@@ -1,19 +1,18 @@
 <p align="center">
-  <img src="public/icons/icon-192.png" alt="CollectR Logo" width="120" height="120">
+  <img src="public/brand/collectr-r.png" alt="CollectR Logo" width="200">
 </p>
 
 <h1 align="center">CollectR</h1>
 
 <p align="center">
-  <strong>Die intelligente Sammlungsverwaltung fuer leidenschaftliche Sammler</strong>
+  <strong>Die intelligente Multi-Sphere Sammlungsplattform für leidenschaftliche Sammler</strong>
 </p>
 
 <p align="center">
+  <a href="#-spheres">Spheres</a> •
   <a href="#-features">Features</a> •
-  <a href="#-demo">Demo</a> •
   <a href="#-installation">Installation</a> •
   <a href="#-tech-stack">Tech Stack</a> •
-  <a href="#-api-integrationen">APIs</a> •
   <a href="#-roadmap">Roadmap</a>
 </p>
 
@@ -27,177 +26,222 @@
 
 ---
 
-## Was ist CollectR?
+## 🌟 Was ist CollectR?
 
-CollectR ist eine moderne, datenschutzfreundliche Web-App zur Verwaltung deiner Sammlungen. Egal ob Schallplatten, Muenzen, Hot Wheels, Buecher oder Antiquitaeten – CollectR hilft dir, den Ueberblick zu behalten, Werte zu tracken und deine Sammlung zu organisieren.
+CollectR ist eine moderne, datenschutzfreundliche Multi-Sphere Plattform zur Verwaltung deiner wertvollsten Sammlungen. Mit spezialisierten "Spheres" für verschiedene Sammelgebiete bietet CollectR maßgeschneiderte Tools für TCG, Gaming, Dokumente, Geologie und mehr.
 
----
+### Sphere-Konzept
 
-## Highlights
+CollectR organisiert sich in spezialisierte **Spheres** (Sphären), von denen jede optimiert ist für spezifische Sammelkategorien:
 
 ```
-+------------------------------------------------------------------+
-|                                                                  |
-|    Unbegrenzte          11 Fertige           Barcode-            |
-|    Sammlungen           Vorlagen             Scanner             |
-|        oo                  oo                  oo                |
-|                                                                  |
-|    Dashboard            Sammlungs-           Import/             |
-|    & Charts             Ziele                Export              |
-|        oo                  oo                  oo                |
-|                                                                  |
-|    Discogs              Open Library         Dark Mode           |
-|    Integration          fuer Buecher         Support             |
-|        oo                  oo                  oo                |
-|                                                                  |
-+------------------------------------------------------------------+
+┌─────────────────────────────────────────────────────────────┐
+│                    CollectR HUB (🏠)                        │
+│              Universal Collection Manager                    │
+└───────────┬─────────────────────────────────────────────────┘
+            │
+    ┌───────┴────────┬─────────┬──────────┬──────────┐
+    │                │         │          │          │
+┌───▼───┐  ┌────▼────┐  ┌────▼────┐  ┌──▼──┐  ┌───▼────┐
+│  TCG  │  │ Gaming  │  │Official │  │ Geo │  │  Shop  │
+│  🎴   │  │   🎮    │  │   📜    │  │ ⛏️  │  │  🛒    │
+└───────┘  └─────────┘  └─────────┘  └─────┘  └────────┘
 ```
 
 ---
 
-## Features
+## 🎯 Spheres
 
-### Sammlungsverwaltung
+### 🎴 CollectorsphereTCG
+**Trading Card Game Platform**
+
+Die ultimative Plattform für TCG-Sammler mit Unterstützung für:
+- **Pokémon TCG** - Typ-Matchup Chart, Deck Builder, Meta Decks, Preis-Scanner
+- **Yu-Gi-Oh!** - Combo Database, Banlist Checker, Deck Profiles
+- **Magic: The Gathering** - Commander Deck Builder, Mana Curve, Format Checker
+
+**Features:**
+- ✅ Card Scanner mit AI-Erkennung (Kamera, Upload, Barcode)
+- ✅ Live-Preisabfragen von pokemontcg.io, YGOPRODeck, Scryfall
+- ✅ Deck Builder für alle Games
+- ✅ Grading-System Integration (PSA, BGS)
+- ✅ Collection Value Tracking
+- ✅ Hot Cards Detection (High Value/Grade Cards)
+
+### 🎮 CollectorssphereGAMING
+**Video Game Collection Manager**
+
+Multi-Platform Gaming Hub für:
+- **PlayStation** (PS1-PS5, PSP/Vita) - Trophy Tracking, Digital Library Sync
+- **Xbox** (OG-Series X/S) - Achievement Tracking, Game Pass Integration
+- **Nintendo** (NES-Switch) - Complete Collection Tracker, eShop Prices
+- **PC Gaming** (Steam, Epic, GOG) - Multi-Platform Sync, Playtime Stats
+- **Retro Gaming** - Cartridge Grading, Sealed Game Tracker
+
+**Features:**
+- ✅ Game Scanner (Barcode & Cover Recognition)
+- ✅ Price Tracking über alle Plattformen
+- ✅ Wishlist Manager mit Price Alerts
+- ✅ Platform-spezifische Stats
+- ⏳ Trophy/Achievement Sync (geplant)
+
+### 📜 CollectorssphereOFFICIAL
+**Documents & Certificates Manager**
+
+Professionelle Verwaltung für:
+- **Urkunden & Zertifikate** - Bildungsabschlüsse, Zertifizierungen
+- **Verträge** - Arbeitsverträge, Mietverträge, Versicherungen
+- **Ausweise & Pässe** - Sicheres Dokumenten-Management
+- **Steuer & Finanzen** - Steuerbescheide, Kontoauszüge
+- **Medizinische Dokumente** - Impfausweise, Arztbriefe
+
+**Features:**
+- ✅ OCR Text-Erkennung für Dokumenten-Suche
+- ✅ Secure Vault mit Verschlüsselung
+- ✅ Ablaufdatum-Erinnerungen
+- ✅ PDF-Generierung & Export
+- ✅ Notarielle Beglaubigung Tracking
+
+### ⛏️ CollectorssphereGEO
+**Geology & Archaeology Platform**
+
+Spezialisiert auf:
+- **Mineralien** - Mohshärte-DB, Fundort-Tracking, Chemische Formel
+- **Fossilien** - Zeitalter-Bestimmung, Arten-Identifikation, Echtheitsprüfung
+- **Kristalle** - Kristallsystem, Reinheitsgrad, Heilstein-Eigenschaften
+- **Meteoriten** - Klassifikation, Fundgeschichte, Nickel-Gehalt
+- **Artefakte** - Datierung, Kulturzuordnung, Provenienz
+
+**Features:**
+- ✅ Specimen Scanner mit Foto-Erkennung
+- ✅ GPS-basiertes Fundort-Tracking mit Karten
+- ✅ Labor-Daten & Zertifikate-Management
+- ✅ Wissenschaftliche Klassifikation
+- ⏳ AI-gestützte Mineralien-Identifikation (geplant)
+
+### 🛒 CollectorssphereSHOP
+**Marketplace & Sales Platform**
+
+Komplette E-Commerce Lösung:
+- **Inventory Management** - Lagerbestand, SKU, Varianten
+- **Pricing & Costing** - Einkaufs-/Verkaufspreise, Marge-Kalkulation
+- **Seller Tools** - eBay/Etsy Integration, Bulk-Upload
+- **Sales Analytics** - Umsatz, Bestseller, ROI-Tracking
+- **Shipping Management** - Versandkosten, Tracking-Nummern
+
+**Features:**
+- ✅ Multi-Channel Listing (eBay, Etsy, Vinted)
+- ✅ Automated Pricing (Market-basiert)
+- ✅ Profit Calculator
+- ✅ Customer Management
+- ⏳ Inventory Sync (geplant)
+
+---
+
+## ✨ Core Features
+
+### Universal Platform Features
 
 | Feature | Beschreibung |
 |---------|-------------|
-| **Unbegrenzte Sammlungen** | Erstelle beliebig viele Sammlungen fuer verschiedene Kategorien |
-| **11 Vorlagen** | Hot Wheels, Muenzen, Briefmarken, Vinyl, LEGO, Moebel, Schmuck, Comics, Uhren, Spielzeug, Antiquitaeten |
-| **Kategorien & Tags** | Hierarchische Kategorien mit Icons und Farben |
-| **Flexible Attribute** | 8 Attributtypen: Text, Nummer, Auswahl, Tags, Checkbox, Datum, Link, Waehrung |
-
-### Item-Management
-
-- **Vollstaendige CRUD-Operationen** – Erstellen, Bearbeiten, Loeschen
-- **Rich Metadata** – Kaufpreis, Datum, Ort, Waehrung
-- **Status-Tracking** – In Sammlung, Verkauft, Wunschliste, Bestellt, Verloren
-- **Barcode-Support** – Scanner-Integration fuer schnelles Hinzufuegen
-- **Mehrere Bilder** – Galerie-Ansicht mit Primaerbild
+| **Multi-Sphere Architecture** | Spezialisierte Tools für jede Sammelkategorie |
+| **Cross-Platform** | Web, Desktop, Mobile - automatische Synchronisation |
+| **Universal Search** | Sphere-übergreifende Suche |
+| **Flexible Attributes** | 8+ Attributtypen: Text, Nummer, Tags, Checkbox, Datum, Link, Währung |
+| **Barcode Scanner** | Unterstützt EAN-13, EAN-8, UPC-A, UPC-E, Code-128, QR |
 
 ### Dashboard & Analytics
 
 ```
-+-------------------------------------------------------------+
-|  Dashboard                                                  |
-+-------------+-------------+-------------+-------------------+
-| 3           | 127         | EUR 4,250   | 12                |
-| Sammlungen  | Items       | Gesamtwert  | Kategorien        |
-+-------------+-------------+-------------+-------------------+
-|                                                             |
-|  [Kategorien-Chart]          [Status-Chart]                 |
-|                                                             |
-|  [Wertvollste Items]         [Letzte Aktivitaet]            |
-|   1. Rolex Submariner         - Item hinzugefuegt           |
-|   2. Vintage LP               - Sammlung erstellt           |
-|   3. Goldmuenze               - Preis aktualisiert          |
-+-------------------------------------------------------------+
-```
-
-### Sammlungsziele
-
-Setze dir Ziele und verfolge deinen Fortschritt:
-
-- **Anzahl-Ziele** – "100 Schallplatten sammeln"
-- **Wert-Ziele** – "Sammlung auf EUR 10.000 bringen"
-- **Kategorie-Ziele** – "50 Jazz-Platten sammeln"
-- **Deadlines** – Mit Fortschrittsanzeige und Warnungen
-
-### Barcode-Scanner
-
-```
-+-----------------------------+
-|                             |
-|   +-------------------+     |
-|   |                   |     |
-|   |   [ Kamera ]      |     |
-|   |                   |     |
-|   +-------------------+     |
-|                             |
-|   Erkannte Formate:         |
-|   EAN-13 - EAN-8 - UPC-A    |
-|   UPC-E - Code-128 - QR     |
-+-----------------------------+
++─────────────────────────────────────────────────────────+
+│  CollectR Dashboard                                     │
+├─────────────┬─────────────┬─────────────┬───────────────┤
+│ 5 Spheres   │ 847 Items   │ €25,430     │ 18 Categories │
+│ Active      │ Total       │ Total Value │ Across All    │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  [Sphere Distribution]    [Value by Category]          │
+│                                                         │
+│  [Top Items]              [Recent Activity]            │
+│   1. Charizard VMAX        - Card added to TCG         │
+│   2. PS5 Sealed            - Game added to Gaming      │
+│   3. Amethyst Geode        - Mineral added to Geo      │
++─────────────────────────────────────────────────────────+
 ```
 
 ### Import & Export
 
-| Format | Import | Export |
-|--------|:------:|:------:|
-| CSV    |   Ja   |   Ja   |
-| JSON   |   Ja   |   Ja   |
-
-- Intelligente Spaltenerkennung
-- Automatisches Kategorie-Mapping
-- Selektiver Export nach Status
-
-### Tools
-
-| Tool | Beschreibung |
-|------|-------------|
-| **Waehrungsrechner** | Live-Kurse fuer 8 Waehrungen (EUR, USD, GBP, CHF, JPY, CNY, AUD, CAD) |
-| **Markt-Ticker** | Echtzeit-Preise fuer Gold, Silber, Bitcoin, Ethereum |
-| **Sammler-News** | News-Feed fuer deine Sammelgebiete |
-| **Buch-Suche** | Open Library Integration (ISBN, Titel, Autor) |
-| **Vinyl-Suche** | Discogs Integration (Barcode, Kuenstler, Album) |
+| Format | Import | Export | Bemerkung |
+|--------|:------:|:------:|-----------|
+| CSV    |   ✅   |   ✅   | Alle Spheres |
+| JSON   |   ✅   |   ✅   | Mit Metadaten |
+| PDF    |   ❌   |   ✅   | Export-Listen |
+| Excel  |   ⏳   |   ⏳   | Geplant |
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-| Kategorie | Technologie |
-|-----------|-------------|
-| **Framework** | Next.js 15 (App Router) |
-| **Sprache** | TypeScript (strict mode) |
-| **Styling** | Tailwind CSS v4 |
-| **Backend** | Supabase (PostgreSQL) |
-| **Auth** | Supabase Auth + SSR |
-| **PWA** | next-pwa v5.6 |
-| **React** | v19 |
-| **Hosting** | Vercel |
+| Kategorie | Technologie | Version |
+|-----------|-------------|---------|
+| **Framework** | Next.js | 15 (App Router) |
+| **Sprache** | TypeScript | 5.0+ (strict) |
+| **Styling** | Tailwind CSS | 4.0 |
+| **Backend** | Supabase | PostgreSQL 15 |
+| **Auth** | Supabase Auth | SSR + JWT |
+| **PWA** | next-pwa | 5.6 |
+| **React** | React | 19 |
+| **Hosting** | Vercel | Edge Runtime |
 
 ### Architektur
 
 ```
-+-------------------------------------------------------------+
-|                      Frontend                               |
-|  +-----------+  +-----------+  +-----------+                |
-|  |  Next.js  |  |   React   |  | Tailwind  |                |
-|  | App Router|  |Components |  |    CSS    |                |
-|  +-----+-----+  +-----+-----+  +-----------+                |
-|        |              |                                     |
-|        +------+-------+                                     |
-|               |                                             |
-|  +------------v------------------------------------------+  |
-|  |              Supabase Client                          |  |
-|  |         (Auth, Database, Storage)                     |  |
-|  +---------------------------+---------------------------+  |
-+------------------------------|------------------------------+
-                               |
-+------------------------------v------------------------------+
-|                      Backend                                |
-|  +-------------------------------------------------------+  |
-|  |                 Supabase                              |  |
-|  |  +----------+  +----------+  +----------+             |  |
-|  |  |PostgreSQL|  |   Auth   |  | Storage  |             |  |
-|  |  |    DB    |  |  (JWT)   |  | (Images) |             |  |
-|  |  +----------+  +----------+  +----------+             |  |
-|  +-------------------------------------------------------+  |
-|                                                             |
-|  +-------------------------------------------------------+  |
-|  |              External APIs                            |  |
-|  |  Discogs - Open Library - CoinGecko - GNews           |  |
-|  +-------------------------------------------------------+  |
-+-------------------------------------------------------------+
+┌────────────────────────────────────────────────────────┐
+│                    Frontend Layer                      │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐            │
+│  │ Next.js  │  │  React   │  │Tailwind  │            │
+│  │   15     │  │    19    │  │  CSS 4   │            │
+│  └────┬─────┘  └────┬─────┘  └──────────┘            │
+│       │             │                                  │
+│       └─────────────┼──────────────┐                  │
+│                     │              │                  │
+│  ┌──────────────────▼──────────────▼────────────┐    │
+│  │         Sphere-Specific Components            │    │
+│  │  TCG • Gaming • Official • Geo • Shop        │    │
+│  └───────────────────┬───────────────────────────┘    │
+└──────────────────────┼────────────────────────────────┘
+                       │
+┌──────────────────────▼────────────────────────────────┐
+│                  API Layer                            │
+│  ┌─────────────────────────────────────────────┐     │
+│  │         Supabase Client (SSR)               │     │
+│  │    Auth • Database • Storage • Realtime     │     │
+│  └──────────────────┬──────────────────────────┘     │
+└────────────────────┼──────────────────────────────────┘
+                     │
+┌────────────────────▼──────────────────────────────────┐
+│                 Backend Services                      │
+│  ┌────────────────────────────────────────────┐      │
+│  │              Supabase                      │      │
+│  │  PostgreSQL • Auth • Storage • Functions   │      │
+│  └────────────────────────────────────────────┘      │
+│                                                       │
+│  ┌────────────────────────────────────────────┐      │
+│  │           External APIs                    │      │
+│  │  PokémonTCG • YGOPRODeck • Scryfall        │      │
+│  │  OpenLibrary • Discogs • CoinGecko         │      │
+│  └────────────────────────────────────────────┘      │
+└───────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Installation
+## 🚀 Installation
 
 ### Voraussetzungen
 
 - Node.js 18+
-- npm oder yarn
+- npm, yarn oder pnpm
 - Supabase Account
 
 ### 1. Repository klonen
@@ -207,7 +251,7 @@ git clone https://github.com/westside0106/CollectR.git
 cd CollectR
 ```
 
-### 2. Abhaengigkeiten installieren
+### 2. Abhängigkeiten installieren
 
 ```bash
 npm install
@@ -222,7 +266,7 @@ Erstelle eine `.env.local` Datei:
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-# APIs (optional)
+# APIs (optional - für erweiterte Features)
 NEXT_PUBLIC_CURRENCYLAYER_API_KEY=your-key
 NEXT_PUBLIC_GNEWS_API_KEY=your-key
 DISCOGS_TOKEN=your-token
@@ -230,7 +274,10 @@ DISCOGS_TOKEN=your-token
 
 ### 4. Datenbank einrichten
 
-Fuehre die SQL-Migrationen in deinem Supabase Dashboard aus.
+Führe die SQL-Migrationen in deinem Supabase Dashboard aus:
+
+1. Gehe zu SQL Editor in Supabase
+2. Führe die Migrations aus `supabase/migrations/` aus
 
 ### 5. Entwicklungsserver starten
 
@@ -238,299 +285,202 @@ Fuehre die SQL-Migrationen in deinem Supabase Dashboard aus.
 npm run dev
 ```
 
-Oeffne [http://localhost:3000](http://localhost:3000)
+Öffne [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## Projektstruktur
+## 📁 Projektstruktur
 
 ```
 CollectR/
-|-- src/
-|   |-- app/                    # Next.js App Router
-|   |   |-- page.tsx            # Dashboard
-|   |   |-- collections/        # Sammlungen
-|   |   |   |-- [id]/
-|   |   |   |   |-- items/      # Items CRUD
-|   |   |   |   |-- categories/ # Kategorien
-|   |   |   |   |-- import/     # Import
-|   |   |   |   |-- export/     # Export
-|   |   |   |   |-- scan/       # Scanner
-|   |   |   |-- new/            # Neue Sammlung
-|   |   |-- tools/              # Werkzeuge
-|   |   |   |-- currency/       # Waehrungsrechner
-|   |   |   |-- market/         # Markt-Ticker
-|   |   |   |-- news/           # News
-|   |   |   |-- books/          # Buch-Suche
-|   |   |   |-- vinyl/          # Vinyl-Suche
-|   |   |-- api/                # API Routes
-|   |       |-- discogs/        # Discogs Proxy
-|   |
-|   |-- components/             # React Komponenten
-|   |   |-- layout/             # Layout (Sidebar)
-|   |   |-- BarcodeScanner.tsx
-|   |   |-- DashboardCharts.tsx
-|   |   |-- CollectionGoals.tsx
-|   |   |-- ImageUpload.tsx
-|   |   |-- SearchBar.tsx
-|   |   |-- FilterBar.tsx
-|   |
-|   |-- services/               # API Services
-|   |   |-- currencyService.ts
-|   |   |-- marketService.ts
-|   |   |-- newsService.ts
-|   |   |-- openLibraryApi.ts
-|   |   |-- discogsApi.ts
-|   |
-|   |-- lib/supabase/           # Supabase Client
-|   |-- contexts/               # React Context
-|   |-- hooks/                  # Custom Hooks
-|   |-- types/                  # TypeScript Types
-|
-|-- public/
-|   |-- manifest.json           # PWA Manifest
-|   |-- icons/                  # App Icons
-|   |-- brand/                  # Branding Assets
-|
-|-- middleware.ts               # Auth Middleware
-|-- next.config.ts              # Next.js Config
-|-- package.json
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── (hub)/              # Main Hub
+│   │   │   └── hub/page.tsx
+│   │   ├── (tcg)/              # TCG Sphere
+│   │   │   └── tcg/
+│   │   │       ├── page.tsx
+│   │   │       ├── scanner/
+│   │   │       ├── prices/
+│   │   │       ├── deck-builder/
+│   │   │       ├── pokemon/
+│   │   │       ├── yugioh/
+│   │   │       └── magic/
+│   │   ├── (gaming)/           # Gaming Sphere
+│   │   │   └── gaming/
+│   │   │       ├── page.tsx
+│   │   │       ├── scanner/
+│   │   │       ├── prices/
+│   │   │       └── playstation/
+│   │   ├── (official)/         # Official Sphere
+│   │   │   └── official/page.tsx
+│   │   ├── (geo)/              # Geo Sphere
+│   │   │   └── geo/page.tsx
+│   │   ├── (shop)/             # Shop Sphere
+│   │   │   └── shop/page.tsx
+│   │   ├── collections/        # Universal Collections
+│   │   ├── api/                # API Routes
+│   │   └── page.tsx            # Dashboard
+│   │
+│   ├── components/             # React Components
+│   │   ├── layout/
+│   │   ├── TCGCardScanner.tsx
+│   │   ├── BarcodeScanner.tsx
+│   │   ├── AddToCollectionModal.tsx
+│   │   └── ...
+│   │
+│   ├── hooks/                  # Custom Hooks
+│   │   ├── useTCGStats.ts
+│   │   ├── useGamingStats.ts
+│   │   └── useGeoStats.ts
+│   │
+│   ├── lib/
+│   │   ├── supabase/           # Supabase Client
+│   │   └── themes/
+│   │       └── sphere-themes.ts # Sphere Theme System
+│   │
+│   └── types/                  # TypeScript Types
+│
+├── public/
+│   ├── brand/                  # Brand Assets
+│   │   ├── collectr-hero.png
+│   │   └── collectr-r.png
+│   └── icons/                  # PWA Icons
+│
+├── middleware.ts               # Auth Middleware
+└── next.config.ts              # Next.js Config
 ```
 
 ---
 
-## API-Integrationen
+## 🎨 Sphere Theme System
 
-### Discogs API
-
-Vinyl- und Musikdatenbank mit ueber 15 Millionen Releases.
+Jede Sphere hat ein eigenes, konsistentes Design-System:
 
 ```typescript
-// Barcode-Suche
-const results = await searchDiscogs({ barcode: '0602537479658' })
-
-// Text-Suche
-const results = await searchDiscogs({ query: 'Pink Floyd Dark Side' })
-```
-
-**Features:**
-- Barcode-Suche (EAN/UPC)
-- Kuenstler/Album-Suche
-- Release-Details (Tracklist, Jahr, Genre)
-- Marketplace-Preise
-
-### Open Library API
-
-Freie Buchdatenbank mit Millionen von Titeln.
-
-```typescript
-// ISBN-Suche
-const book = await searchOpenLibrary({ isbn: '9783423214124' })
-
-// Titel-Suche
-const books = await searchOpenLibrary({ query: 'Der Herr der Ringe' })
-```
-
-**Features:**
-- ISBN-10 und ISBN-13
-- Titel/Autor-Suche
-- Cover-Bilder
-- Keine API-Key erforderlich
-
-### CoinGecko API
-
-Echtzeit-Krypto- und Rohstoffpreise.
-
-```typescript
-const prices = await getMarketData()
-// Returns: Gold, Silver, Bitcoin, Ethereum, etc.
-```
-
-### CurrencyLayer API
-
-Waehrungsumrechnung mit aktuellen Kursen.
-
-```typescript
-const converted = await convertCurrency(100, 'USD', 'EUR')
+// sphere-themes.ts
+export const SPHERE_THEMES = {
+  tcg: {
+    emoji: '🎴',
+    name: 'CollectorsphereTCG',
+    colors: {
+      primary: '#dc2626',      // Red
+      gradient: 'from-red-600 to-amber-500'
+    }
+  },
+  gaming: {
+    emoji: '🎮',
+    name: 'CollectorssphereGAMING',
+    colors: {
+      primary: '#7c3aed',      // Violet
+      gradient: 'from-violet-600 to-pink-600'
+    }
+  },
+  // ... weitere Spheres
+}
 ```
 
 ---
 
-## Datenbank-Schema
+## 🗺️ Roadmap
 
-```
-+------------------+       +------------------+
-|   collections    |       |    categories    |
-+------------------+       +------------------+
-| id               |<------| collection_id    |
-| owner_id         |       | parent_id        |
-| name             |       | name             |
-| description      |       | icon             |
-| cover_image      |       | color            |
-| is_public        |       | sort_order       |
-| settings (JSON)  |       +--------+---------+
-+--------+---------+                |
-         |                          |
-         |     +--------------------+
-         |     |
-         v     v
-+------------------------------------------+
-|                  items                   |
-+------------------------------------------+
-| id                                       |
-| collection_id                            |
-| category_id                              |
-| name                                     |
-| description                              |
-| purchase_price / purchase_currency       |
-| purchase_date / purchase_location        |
-| status (in_collection/sold/wishlist)     |
-| sold_price / sold_date                   |
-| barcode                                  |
-| attributes (JSONB)                       |
-| notes                                    |
-+--------------------+---------------------+
-                     |
-                     v
-+------------------------------------------+
-|              item_images                 |
-+------------------------------------------+
-| id                                       |
-| item_id                                  |
-| original_url / thumbnail_url             |
-| is_primary                               |
-| ai_tags / ai_description                 |
-+------------------------------------------+
+### ✅ Phase 1: Core Platform (Erledigt)
+- [x] Multi-Sphere Architecture
+- [x] Hub Landing Page
+- [x] TCG Sphere (Pokémon, Yu-Gi-Oh!, Magic)
+- [x] Gaming Sphere (PlayStation, Xbox, Nintendo, PC, Retro)
+- [x] Official Sphere
+- [x] Geo Sphere
+- [x] Shop Sphere
 
-+------------------------------------------+
-|           collection_goals               |
-+------------------------------------------+
-| id                                       |
-| collection_id                            |
-| name                                     |
-| goal_type (count/value/category)         |
-| target_count / target_value              |
-| target_category_id                       |
-| deadline                                 |
-+------------------------------------------+
-```
+### ✅ Phase 2: TCG Features (Erledigt)
+- [x] Card Scanner (Camera, Upload, Barcode)
+- [x] Price Checker mit Live APIs
+- [x] Deck Builder
+- [x] Grading System
+- [x] Collection Stats
+
+### 🔄 Phase 3: Gaming Features (In Arbeit)
+- [x] Game Scanner
+- [x] Price Tracking
+- [x] Wishlist Manager
+- [ ] Trophy/Achievement Sync
+- [ ] Digital Library Integration
+
+### 📋 Phase 4: Geo Features (Geplant)
+- [x] Basic Specimen Management
+- [x] Category System (Minerals, Fossils, Crystals, etc.)
+- [ ] GPS Location Tracking mit Maps
+- [ ] Lab Data & Certificates
+- [ ] AI Mineral Identification
+- [ ] 3D Specimen Viewer
+
+### 🛒 Phase 5: Shop Features (Geplant)
+- [ ] eBay Integration
+- [ ] Etsy Integration
+- [ ] Inventory Sync
+- [ ] Automated Listing
+- [ ] Sales Analytics Dashboard
+
+### 🚀 Phase 6: Advanced Features (Geplant)
+- [ ] AI Image Recognition (alle Spheres)
+- [ ] Blockchain Verification (High-Value Items)
+- [ ] AR Viewer (3D Models)
+- [ ] Community Features
+- [ ] Public Collections & Sharing
 
 ---
 
-## PWA & Offline
-
-CollectR ist als Progressive Web App installierbar:
-
-### Installation
-
-**Android / Desktop:**
-- Klicke auf "Installieren" im Browser-Menue
-- Oder warte auf den automatischen Installationsprompt
-
-**iOS:**
-1. Oeffne CollectR in Safari
-2. Tippe auf "Teilen"
-3. Waehle "Zum Home-Bildschirm"
-
-### Features
-
-- [x] Installierbar als App
-- [x] Standalone-Modus (ohne Browser-UI)
-- [x] App-Icon auf Home-Screen
-- [ ] Offline-Caching (in Entwicklung)
-- [ ] Push-Benachrichtigungen (geplant)
-
----
-
-## Roadmap
-
-### Phase 1: Core (Erledigt)
-- [x] Sammlungen CRUD
-- [x] Items CRUD
-- [x] Kategorien & Attribute
-- [x] Import/Export
-- [x] Barcode-Scanner
-- [x] Waehrungsrechner
-
-### Phase 2: Analytics (Erledigt)
-- [x] Dashboard Charts
-- [x] Sammlungsziele
-- [x] Wert-Tracking
-- [x] Status-Statistiken
-
-### Phase 3: Integrationen (Erledigt)
-- [x] Discogs API
-- [x] Open Library API
-- [x] CoinGecko API
-- [x] GNews API
-
-### Phase 4: Erweitert (In Arbeit)
-- [ ] Bild-Upload zu Supabase Storage
-- [ ] AI-Bilderkennung
-- [ ] Globale Suche
-- [ ] Duplikat-Erkennung
-- [ ] eBay-Integration
-
-### Phase 5: Community (Geplant)
-- [ ] Oeffentliche Sammlungen
-- [ ] Wunschlisten teilen
-- [ ] Tauschboerse
-- [ ] Sammler-Netzwerk
-
-### Phase 6: Mobile (Geplant)
-- [ ] Native iOS App
-- [ ] Native Android App
-- [ ] Offline-Sync
-- [ ] Push-Notifications
-
----
-
-## Scripts
+## 🔧 Scripts
 
 ```bash
 npm run dev      # Entwicklungsserver (localhost:3000)
 npm run build    # Produktions-Build
 npm run start    # Produktions-Server
-npm run lint     # ESLint ausfuehren
+npm run lint     # ESLint ausführen
+npm run type-check # TypeScript Type-Checking
 ```
 
 ---
 
-## Mitwirken
+## 🤝 Mitwirken
 
-Beitraege sind willkommen!
+Beiträge sind willkommen!
 
 1. Fork das Repository
 2. Erstelle einen Feature-Branch (`git checkout -b feature/amazing-feature`)
-3. Committe deine Aenderungen (`git commit -m 'Add amazing feature'`)
+3. Committe deine Änderungen (`git commit -m 'Add amazing feature'`)
 4. Push zum Branch (`git push origin feature/amazing-feature`)
-5. Oeffne einen Pull Request
+5. Öffne einen Pull Request
 
 ---
 
-## Lizenz
+## 📄 Lizenz
 
-MIT License - siehe [LICENSE](LICENSE) fuer Details.
+MIT License - siehe [LICENSE](LICENSE) für Details.
 
 ---
 
-## Danksagung
+## 🙏 Danksagung
 
 Besonderer Dank an:
 
 - [Supabase](https://supabase.com) - Backend as a Service
-- [Discogs](https://discogs.com) - Musik-Datenbank
-- [Open Library](https://openlibrary.org) - Buch-Datenbank
-- [CoinGecko](https://coingecko.com) - Krypto-Preise
-- [Vercel](https://vercel.com) - Hosting
+- [PokémonTCG API](https://pokemontcg.io) - Pokémon Card Data
+- [YGOPRODeck](https://ygoprodeck.com) - Yu-Gi-Oh! API
+- [Scryfall](https://scryfall.com) - Magic: The Gathering API
+- [Open Library](https://openlibrary.org) - Book Database
+- [Discogs](https://discogs.com) - Music Database
+- [Vercel](https://vercel.com) - Hosting Platform
 
 ---
 
 <p align="center">
-  <strong>Made with Leidenschaft for collectors</strong>
+  <strong>Made with ❤️ for collectors worldwide</strong>
 </p>
 
 <p align="center">
   <a href="https://github.com/westside0106/CollectR">GitHub</a> •
-  <a href="https://github.com/westside0106/CollectR/issues">Issues</a>
+  <a href="https://github.com/westside0106/CollectR/issues">Issues</a> •
+  <a href="https://github.com/westside0106/CollectR/discussions">Discussions</a>
 </p>
