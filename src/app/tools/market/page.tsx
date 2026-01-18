@@ -54,11 +54,11 @@ export default function MarketPage() {
 
   if (!mounted) {
     return (
-      <div className="p-4 sm:p-8 max-w-4xl mx-auto">
+      <div className="p-4 sm:card-padding max-w-4xl mx-auto">
         <div className="animate-pulse">
           <div className="h-10 bg-slate-200 rounded w-48 mb-4"></div>
-          <div className="h-6 bg-slate-200 rounded w-64 mb-8"></div>
-          <div className="space-y-4">
+          <div className="h-6 bg-slate-200 rounded w-64 mb-6 sm:mb-8"></div>
+          <div className="space-y-3 sm:space-y-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="h-20 bg-slate-200 rounded-xl"></div>
             ))}
@@ -69,10 +69,10 @@ export default function MarketPage() {
   }
 
   return (
-    <div className="p-4 sm:p-8 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 sm:card-padding max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">📈 Marktübersicht</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">📈 Marktübersicht</h1>
           <p className="text-slate-500 mt-1">Kurse relevanter Assets für Sammler</p>
         </div>
         <div className="flex items-center gap-2">
@@ -132,8 +132,8 @@ export default function MarketPage() {
       )}
 
       {loading && quotes.length === 0 ? (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <div className="space-y-4">
+        <div className="bg-white rounded-xl card-padding shadow-sm border border-slate-200">
+          <div className="space-y-3 sm:space-y-4">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="animate-pulse flex justify-between items-center p-4 bg-slate-50 rounded-lg">
                 <div className="flex items-center gap-3">

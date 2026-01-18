@@ -60,28 +60,28 @@ export default function BooksLookupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 lg:p-8">
+    <div className="min-h-screen bg-gray-50 container-responsive">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/" className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm mb-3 sm:mb-4 inline-block">
             &larr; Zurück zum Dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Bücher-Suche</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Bücher-Suche</h1>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">
             Suche nach Büchern via Open Library - kostenlos und ohne API-Key
           </p>
         </div>
 
         {/* Search Form */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <form onSubmit={handleSearch} className="space-y-4">
+        <div className="bg-white rounded-xl shadow-sm card-padding mb-4 sm:mb-6">
+          <form onSubmit={handleSearch} className="space-y-3 sm:space-y-4">
             {/* Search Type Toggle */}
-            <div className="flex gap-4 mb-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4 mb-4">
               <button
                 type="button"
                 onClick={() => setSearchType('isbn')}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg font-medium transition ${
                   searchType === 'isbn'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -92,7 +92,7 @@ export default function BooksLookupPage() {
               <button
                 type="button"
                 onClick={() => setSearchType('text')}
-                className={`px-4 py-2 rounded-lg font-medium transition ${
+                className={`px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg font-medium transition ${
                   searchType === 'text'
                     ? 'bg-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -102,18 +102,18 @@ export default function BooksLookupPage() {
               </button>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={searchType === 'isbn' ? 'ISBN eingeben (z.B. 978-3-...)' : 'Titel oder Autor eingeben...'}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
               <button
                 type="submit"
                 disabled={loading || !query.trim()}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {loading ? 'Suche...' : 'Suchen'}
               </button>
@@ -130,8 +130,8 @@ export default function BooksLookupPage() {
 
         {/* Search Results List */}
         {searchResults.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4">Suchergebnisse ({searchResults.length})</h2>
+          <div className="bg-white rounded-xl shadow-sm card-padding mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Suchergebnisse ({searchResults.length})</h2>
             <div className="space-y-3">
               {searchResults.map((result) => (
                 <button
@@ -173,8 +173,8 @@ export default function BooksLookupPage() {
 
         {/* Book Detail */}
         {book && (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">Buch-Details</h2>
+          <div className="bg-white rounded-xl shadow-sm card-padding">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Buch-Details</h2>
             <div className="flex flex-col md:flex-row gap-6">
               {/* Cover */}
               <div className="flex-shrink-0">
@@ -201,7 +201,7 @@ export default function BooksLookupPage() {
               </div>
 
               {/* Details */}
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 space-y-3 sm:space-y-4">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900">{book.title}</h3>
                   <p className="text-lg text-gray-600">{book.authors.join(', ')}</p>
@@ -295,7 +295,7 @@ export default function BooksLookupPage() {
         )}
 
         {/* Info Box */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6">
+        <div className="mt-8 bg-blue-50 rounded-xl card-padding">
           <h3 className="font-semibold text-blue-900 mb-2">Über Open Library</h3>
           <p className="text-blue-800 text-sm">
             Open Library ist eine offene, editierbare Bibliotheksdatenbank mit über 20 Millionen Büchern.
