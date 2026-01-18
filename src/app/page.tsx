@@ -19,6 +19,7 @@ import {
   TopItemsTile,
   CollectionListTile,
   TCGHighlightsTile,
+  SpheresTile,
 } from '@/components/dashboard'
 
 interface ChartData {
@@ -365,6 +366,8 @@ function DashboardContent() {
             totalValue={stats.totalValue}
           />
         )
+      case 'spheres':
+        return <SpheresTile />
       case 'quick_actions':
         return <QuickActionsTile />
       case 'reminders':
