@@ -260,31 +260,31 @@ export default function MagicCollectionPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/20 to-purple-900/20 flex items-center justify-center">
-        <div className="text-white text-2xl">Loading your Magic collection...</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/20 to-purple-900/20 flex items-center justify-center p-4">
+        <div className="text-white text-lg sm:text-2xl">Loading your Magic collection...</div>
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/20 to-purple-900/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto container-responsive py-6 sm:py-12">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div>
-              <h1 className="text-5xl font-bold">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">
                 <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                   🌟 Magic Collection
                 </span>
               </h1>
-              <p className="text-xl text-slate-300 mt-2">
+              <p className="text-base sm:text-xl text-slate-300 mt-2">
                 Gather Your Spells - Deine Magic: The Gathering Sammlung
               </p>
             </div>
             <Link
               href="/tcg"
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+              className="button-responsive bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors w-full sm:w-auto text-center whitespace-nowrap"
             >
               ← Zurück zu TCG
             </Link>
@@ -292,44 +292,44 @@ export default function MagicCollectionPage() {
         </div>
 
         {/* Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-purple-500/30">
-            <div className="text-4xl mb-2">🎴</div>
-            <div className="text-3xl font-bold text-white">{stats.totalCards}</div>
-            <div className="text-sm text-slate-400">Total Cards</div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-purple-500/30">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">🎴</div>
+            <div className="text-xl sm:text-3xl font-bold text-white">{stats.totalCards}</div>
+            <div className="text-xs sm:text-sm text-slate-400">Total Cards</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-green-500/30">
-            <div className="text-4xl mb-2">💰</div>
-            <div className="text-3xl font-bold text-green-400">{stats.totalValue.toFixed(2)} €</div>
-            <div className="text-sm text-slate-400">Collection Value</div>
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-green-500/30">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">💰</div>
+            <div className="text-xl sm:text-3xl font-bold text-green-400">{stats.totalValue.toFixed(2)} €</div>
+            <div className="text-xs sm:text-sm text-slate-400">Collection Value</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-blue-500/30">
-            <div className="text-4xl mb-2">⭐</div>
-            <div className="text-3xl font-bold text-blue-400">{stats.gradedCards}</div>
-            <div className="text-sm text-slate-400">Graded Cards</div>
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-blue-500/30">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">⭐</div>
+            <div className="text-xl sm:text-3xl font-bold text-blue-400">{stats.gradedCards}</div>
+            <div className="text-xs sm:text-sm text-slate-400">Graded Cards</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-yellow-500/30">
-            <div className="text-4xl mb-2">💎</div>
-            <div className="text-3xl font-bold text-yellow-400">{stats.averageManaCost}</div>
-            <div className="text-sm text-slate-400">Avg. Mana Cost</div>
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-yellow-500/30">
+            <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">💎</div>
+            <div className="text-xl sm:text-3xl font-bold text-yellow-400">{stats.averageManaCost}</div>
+            <div className="text-xs sm:text-sm text-slate-400">Avg. Mana Cost</div>
           </div>
         </div>
 
         {/* Color Distribution */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Color Distribution</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Color Distribution</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
             {Object.entries(MAGIC_COLORS).map(([colorCode, color]) => {
               const count = stats.colorDistribution[colorCode] || 0
               if (count === 0) return null
               return (
-                <div key={colorCode} className={`text-center p-4 rounded-lg ${color.bg} border ${color.border}`}>
-                  <div className="text-3xl mb-2">{color.emoji}</div>
-                  <div className="text-2xl font-bold text-white">{count}</div>
-                  <div className={`text-sm ${color.text}`}>{color.name}</div>
+                <div key={colorCode} className={`text-center p-2 sm:p-4 rounded-lg ${color.bg} border ${color.border}`}>
+                  <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{color.emoji}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-white">{count}</div>
+                  <div className={`text-xs sm:text-sm ${color.text}`}>{color.name}</div>
                 </div>
               )
             })}
@@ -337,17 +337,17 @@ export default function MagicCollectionPage() {
         </div>
 
         {/* Card Type Distribution */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">Card Type Distribution</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Card Type Distribution</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
             {Object.entries(stats.cardTypeDistribution).map(([type, count]) => {
               const typeInfo = MAGIC_CARD_TYPES[type as keyof typeof MAGIC_CARD_TYPES]
               if (!typeInfo) return null
               return (
-                <div key={type} className="text-center p-4 rounded-lg bg-slate-900/50 border border-slate-700">
-                  <div className="text-3xl mb-2">{typeInfo.emoji}</div>
-                  <div className="text-2xl font-bold text-white">{count}</div>
-                  <div className={`text-sm ${typeInfo.color}`}>{type}</div>
+                <div key={type} className="text-center p-2 sm:p-4 rounded-lg bg-slate-900/50 border border-slate-700">
+                  <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{typeInfo.emoji}</div>
+                  <div className="text-lg sm:text-2xl font-bold text-white">{count}</div>
+                  <div className={`text-xs sm:text-sm ${typeInfo.color}`}>{type}</div>
                 </div>
               )
             })}
@@ -355,15 +355,15 @@ export default function MagicCollectionPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
-          <div className="flex flex-wrap items-center gap-4">
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4">
             {/* Color Filter */}
             <div>
-              <label className="text-sm text-slate-400 mb-1 block">Color</label>
+              <label className="text-xs sm:text-sm text-slate-400 mb-1 block">Color</label>
               <select
                 value={selectedColor}
                 onChange={(e) => setSelectedColor(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All Colors</option>
                 {Object.entries(MAGIC_COLORS).map(([code, color]) => (
@@ -374,11 +374,11 @@ export default function MagicCollectionPage() {
 
             {/* Card Type Filter */}
             <div>
-              <label className="text-sm text-slate-400 mb-1 block">Card Type</label>
+              <label className="text-xs sm:text-sm text-slate-400 mb-1 block">Card Type</label>
               <select
                 value={selectedCardType}
                 onChange={(e) => setSelectedCardType(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All Types</option>
                 {Object.entries(MAGIC_CARD_TYPES).map(([type, info]) => (
@@ -389,11 +389,11 @@ export default function MagicCollectionPage() {
 
             {/* Mana Cost Filter */}
             <div>
-              <label className="text-sm text-slate-400 mb-1 block">Mana Cost</label>
+              <label className="text-xs sm:text-sm text-slate-400 mb-1 block">Mana Cost</label>
               <select
                 value={selectedManaCost}
                 onChange={(e) => setSelectedManaCost(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All CMC</option>
                 {uniqueManaCosts.map(cmc => (
@@ -404,11 +404,11 @@ export default function MagicCollectionPage() {
 
             {/* Set Filter */}
             <div>
-              <label className="text-sm text-slate-400 mb-1 block">Set</label>
+              <label className="text-xs sm:text-sm text-slate-400 mb-1 block">Set</label>
               <select
                 value={selectedSet}
                 onChange={(e) => setSelectedSet(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All Sets</option>
                 {uniqueSets.map(set => (
@@ -419,11 +419,11 @@ export default function MagicCollectionPage() {
 
             {/* Rarity Filter */}
             <div>
-              <label className="text-sm text-slate-400 mb-1 block">Rarity</label>
+              <label className="text-xs sm:text-sm text-slate-400 mb-1 block">Rarity</label>
               <select
                 value={selectedRarity}
                 onChange={(e) => setSelectedRarity(e.target.value)}
-                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All Rarities</option>
                 {uniqueRarities.map(rarity => (
@@ -432,49 +432,13 @@ export default function MagicCollectionPage() {
               </select>
             </div>
 
-            {/* Graded Toggle */}
-            <div className="flex items-center gap-2 mt-6">
-              <input
-                type="checkbox"
-                id="graded"
-                checked={showGradedOnly}
-                onChange={(e) => setShowGradedOnly(e.target.checked)}
-                className="w-5 h-5 rounded border-slate-600 bg-slate-900/50"
-              />
-              <label htmlFor="graded" className="text-white">Nur Graded</label>
-            </div>
-
-            {/* View Mode */}
-            <div className="ml-auto flex gap-2">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                }`}
-              >
-                📱 Grid
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                }`}
-              >
-                📋 List
-              </button>
-            </div>
-
             {/* Sort */}
             <div>
-              <label className="text-sm text-slate-400 mb-1 block">Sort</label>
+              <label className="text-xs sm:text-sm text-slate-400 mb-1 block">Sort</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="recent">Neueste zuerst</option>
                 <option value="name">Name A-Z</option>
@@ -482,26 +446,66 @@ export default function MagicCollectionPage() {
                 <option value="price">Preis (hoch-niedrig)</option>
               </select>
             </div>
+
+            {/* Graded Toggle and View Mode */}
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="graded"
+                  checked={showGradedOnly}
+                  onChange={(e) => setShowGradedOnly(e.target.checked)}
+                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50"
+                />
+                <label htmlFor="graded" className="text-white text-sm sm:text-base">Nur Graded</label>
+              </div>
+
+              {/* View Mode */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`flex-1 px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
+                    viewMode === 'grid'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }`}
+                >
+                  <span className="hidden sm:inline">📱 Grid</span>
+                  <span className="sm:hidden">📱</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex-1 px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm sm:text-base ${
+                    viewMode === 'list'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  }`}
+                >
+                  <span className="hidden sm:inline">📋 List</span>
+                  <span className="sm:hidden">📋</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Cards Display */}
         {filteredCards.length === 0 ? (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-12 border border-slate-700 text-center">
-            <div className="text-6xl mb-4">🌟</div>
-            <h3 className="text-2xl font-bold text-white mb-2">Noch keine Magic-Karten</h3>
-            <p className="text-slate-400 mb-6">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding text-center">
+            <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🌟</div>
+            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Noch keine Magic-Karten</h3>
+            <p className="text-sm sm:text-base text-slate-400 mb-4 sm:mb-6">
               Füge deine ersten Magic: The Gathering Karten hinzu
             </p>
             <Link
               href="/tcg/prices"
-              className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-green-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
+              className="inline-block button-responsive bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
             >
               🔍 Karten suchen
             </Link>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6">
             {filteredCards.map((card) => (
               <Link
                 key={card.id}
@@ -538,23 +542,23 @@ export default function MagicCollectionPage() {
                 </div>
 
                 {/* Card Info */}
-                <div className="p-4">
-                  <h3 className="font-bold text-white mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors">
+                <div className="p-2 sm:p-4">
+                  <h3 className="text-sm sm:text-base font-bold text-white mb-1 line-clamp-2 group-hover:text-purple-400 transition-colors">
                     {card.name}
                   </h3>
 
                   {card.attributes.tcgSet && (
-                    <p className="text-xs text-slate-400 mb-2">{card.attributes.tcgSet}</p>
+                    <p className="text-xs text-slate-400 mb-1 sm:mb-2 truncate">{card.attributes.tcgSet}</p>
                   )}
 
                   {card.attributes.tcgRarity && (
-                    <p className={`text-xs font-semibold mb-2 ${getRarityColor(card.attributes.tcgRarity)}`}>
+                    <p className={`text-xs font-semibold mb-1 sm:mb-2 ${getRarityColor(card.attributes.tcgRarity)}`}>
                       ⭐ {card.attributes.tcgRarity}
                     </p>
                   )}
 
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-green-400">
+                    <span className="text-sm sm:text-lg font-bold text-green-400">
                       {card.price.toFixed(2)} €
                     </span>
                     <span className="text-xs text-slate-500">
@@ -566,17 +570,17 @@ export default function MagicCollectionPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl border border-slate-700 overflow-hidden">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-slate-700 overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-900/50">
-                <tr className="text-left text-sm text-slate-400">
-                  <th className="p-4">Card</th>
-                  <th className="p-4">Game</th>
-                  <th className="p-4">Set</th>
-                  <th className="p-4">Rarity</th>
-                  <th className="p-4">Qty</th>
-                  <th className="p-4">Price</th>
-                  <th className="p-4">Total</th>
+                <tr className="text-left text-xs sm:text-sm text-slate-400">
+                  <th className="p-2 sm:p-4">Card</th>
+                  <th className="p-2 sm:p-4 hidden sm:table-cell">Game</th>
+                  <th className="p-2 sm:p-4 hidden md:table-cell">Set</th>
+                  <th className="p-2 sm:p-4 hidden lg:table-cell">Rarity</th>
+                  <th className="p-2 sm:p-4">Qty</th>
+                  <th className="p-2 sm:p-4">Price</th>
+                  <th className="p-2 sm:p-4">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -585,20 +589,20 @@ export default function MagicCollectionPage() {
                     key={card.id}
                     className="border-t border-slate-700 hover:bg-slate-900/50 transition-colors"
                   >
-                    <td className="p-4">
+                    <td className="p-2 sm:p-4">
                       <Link
                         href={`/collections/${card.collection_id}/items/${card.id}`}
-                        className="flex items-center gap-3 hover:text-purple-400 transition-colors"
+                        className="flex items-center gap-2 sm:gap-3 hover:text-purple-400 transition-colors"
                       >
                         {card.image_url && (
                           <img
                             src={card.image_url}
                             alt={card.name}
-                            className="w-12 h-16 object-cover rounded border border-slate-600"
+                            className="w-8 h-10 sm:w-12 sm:h-16 object-cover rounded border border-slate-600"
                           />
                         )}
                         <div>
-                          <div className="font-semibold text-white">{card.name}</div>
+                          <div className="text-xs sm:text-sm font-semibold text-white">{card.name}</div>
                           {card.attributes.tcgGraded && (
                             <div className="text-xs text-yellow-400">
                               {card.attributes.tcgGradingCompany} {card.attributes.tcgGrade}
@@ -607,20 +611,20 @@ export default function MagicCollectionPage() {
                         </div>
                       </Link>
                     </td>
-                    <td className="p-4">
-                      <span className="capitalize text-white">
+                    <td className="p-2 sm:p-4 hidden sm:table-cell">
+                      <span className="text-xs sm:text-sm capitalize text-white">
                         🌟 {card.attributes.tcgGame}
                       </span>
                     </td>
-                    <td className="p-4 text-slate-300">{card.attributes.tcgSet || '-'}</td>
-                    <td className="p-4">
-                      <span className={getRarityColor(card.attributes.tcgRarity)}>
+                    <td className="p-2 sm:p-4 text-xs sm:text-sm text-slate-300 hidden md:table-cell">{card.attributes.tcgSet || '-'}</td>
+                    <td className="p-2 sm:p-4 hidden lg:table-cell">
+                      <span className={`text-xs sm:text-sm ${getRarityColor(card.attributes.tcgRarity)}`}>
                         {card.attributes.tcgRarity || '-'}
                       </span>
                     </td>
-                    <td className="p-4 text-white">{card.quantity}</td>
-                    <td className="p-4 text-green-400">{card.price.toFixed(2)} €</td>
-                    <td className="p-4 text-green-400 font-bold">
+                    <td className="p-2 sm:p-4 text-xs sm:text-sm text-white">{card.quantity}</td>
+                    <td className="p-2 sm:p-4 text-xs sm:text-sm text-green-400">{card.price.toFixed(2)} €</td>
+                    <td className="p-2 sm:p-4 text-xs sm:text-sm text-green-400 font-bold">
                       {(card.price * card.quantity).toFixed(2)} €
                     </td>
                   </tr>
@@ -631,7 +635,7 @@ export default function MagicCollectionPage() {
         )}
 
         {/* Results Count */}
-        <div className="mt-6 text-center text-slate-400">
+        <div className="mt-6 text-center text-sm sm:text-base text-slate-400">
           {filteredCards.length} von {cards.length} Karten angezeigt
         </div>
       </div>

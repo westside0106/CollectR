@@ -353,23 +353,23 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
   }
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="container-responsive max-w-3xl">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <Link
           href={`/collections/${collectionId}`}
-          className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1 mb-2"
+          className="text-slate-500 hover:text-slate-700 text-xs sm:text-sm flex items-center gap-1 mb-2"
         >
           ← Zurück zur Sammlung
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Import</h1>
-        <p className="text-slate-500 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Import</h1>
+        <p className="text-slate-500 mt-1 text-sm sm:text-base">
           {collection?.name} – Items aus CSV oder JSON importieren
         </p>
       </div>
 
       {/* Step Indicator */}
-      <div className="flex items-center gap-2 mb-8">
+      <div className="flex items-center gap-1 sm:gap-2 mb-6 sm:mb-8 overflow-x-auto">
         {['upload', 'mapping', 'preview', 'done'].map((s, i) => (
           <div key={s} className="flex items-center">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -387,10 +387,10 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
 
       {/* Step: Upload */}
       {step === 'upload' && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-8 shadow-sm border border-slate-200 dark:border-slate-700 text-center">
-          <span className="text-6xl mb-4 block">📄</span>
-          <h2 className="text-xl font-semibold mb-2 dark:text-white">Datei auswählen</h2>
-          <p className="text-slate-500 dark:text-slate-400 mb-6">CSV oder JSON Datei mit deinen Items</p>
+        <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700 text-center">
+          <span className="text-5xl sm:text-6xl mb-3 sm:mb-4 block">📄</span>
+          <h2 className="text-lg sm:text-xl font-semibold mb-2 dark:text-white">Datei auswählen</h2>
+          <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 mb-4 sm:mb-6">CSV oder JSON Datei mit deinen Items</p>
 
           <label className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors cursor-pointer touch-manipulation select-none min-h-[56px] min-w-[200px] flex items-center justify-center">
             <input
@@ -403,7 +403,7 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
             Datei auswählen
           </label>
 
-          <div className="mt-8 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg text-left text-sm">
+          <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-slate-50 dark:bg-slate-700 rounded-lg text-left text-xs sm:text-sm">
             <p className="font-medium mb-2 dark:text-white">Unterstützte Formate:</p>
             <ul className="text-slate-500 dark:text-slate-400 space-y-1">
               <li>• CSV (Semikolon oder Komma getrennt)</li>
@@ -415,15 +415,15 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
 
       {/* Step: Mapping */}
       {step === 'mapping' && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <h2 className="text-xl font-semibold mb-4">Spalten zuordnen</h2>
-          <p className="text-slate-500 mb-6">
+        <div className="bg-white rounded-xl card-padding shadow-sm border border-slate-200">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Spalten zuordnen</h2>
+          <p className="text-sm sm:text-base text-slate-500 mb-4 sm:mb-6">
             {fileData.length} Einträge gefunden. Ordne die Spalten den Feldern zu.
           </p>
 
           {/* Kategorie-Auswahl */}
           {categories.length > 0 && (
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
               <label className="block text-sm font-medium text-blue-800 mb-2">
                 Kategorie für Import
               </label>
@@ -444,17 +444,17 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
             </div>
           )}
 
-          <div className="space-y-3 mb-6">
+          <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
             {mappings.map(m => (
-              <div key={m.source} className="flex items-center gap-4">
-                <div className="w-1/3 p-3 bg-slate-50 rounded-lg text-sm font-mono truncate">
+              <div key={m.source} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                <div className="w-full sm:w-1/3 p-2 sm:p-3 bg-slate-50 rounded-lg text-xs sm:text-sm font-mono truncate">
                   {m.source}
                 </div>
-                <span className="text-slate-400">→</span>
+                <span className="hidden sm:inline text-slate-400">→</span>
                 <select
                   value={m.target}
                   onChange={(e) => updateMapping(m.source, e.target.value)}
-                  className="flex-1 px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="flex-1 w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
                 >
                   {TARGET_FIELDS.map(f => (
                     <option key={f.value} value={f.value}>
@@ -467,22 +467,22 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {!canProceed() && (
-            <p className="text-red-500 text-sm mb-4">
+            <p className="text-red-500 text-xs sm:text-sm mb-3 sm:mb-4">
               ⚠️ Mindestens "Name" muss zugeordnet werden
             </p>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               onClick={() => setStep('upload')}
-              className="px-6 py-3 rounded-lg border border-slate-300 hover:bg-slate-50"
+              className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-slate-300 hover:bg-slate-50"
             >
               Zurück
             </button>
             <button
               onClick={() => setStep('preview')}
               disabled={!canProceed()}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
+              className="flex-1 bg-blue-600 text-white py-2 sm:py-3 text-sm sm:text-base rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
             >
               Weiter zur Vorschau
             </button>
@@ -492,14 +492,14 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
 
       {/* Step: Preview */}
       {step === 'preview' && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
-          <h2 className="text-xl font-semibold mb-4">Vorschau</h2>
-          <p className="text-slate-500 mb-6">
+        <div className="bg-white rounded-xl card-padding shadow-sm border border-slate-200">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Vorschau</h2>
+          <p className="text-sm sm:text-base text-slate-500 mb-4 sm:mb-6">
             {fileData.length} Items werden importiert
           </p>
 
-          <div className="border rounded-lg overflow-hidden mb-6">
-            <table className="w-full text-sm">
+          <div className="border rounded-lg overflow-x-auto mb-4 sm:mb-6">
+            <table className="w-full text-xs sm:text-sm">
               <thead className="bg-slate-50">
                 <tr>
                   {mappings.filter(m => m.target).map(m => (
@@ -524,21 +524,21 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
           </div>
 
           {fileData.length > 5 && (
-            <p className="text-slate-400 text-sm mb-6">
+            <p className="text-slate-400 text-xs sm:text-sm mb-4 sm:mb-6">
               ... und {fileData.length - 5} weitere
             </p>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               onClick={() => setStep('mapping')}
-              className="px-6 py-3 rounded-lg border border-slate-300 hover:bg-slate-50"
+              className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-slate-300 hover:bg-slate-50"
             >
               Zurück
             </button>
             <button
               onClick={startImport}
-              className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700"
+              className="flex-1 bg-green-600 text-white py-2 sm:py-3 text-sm sm:text-base rounded-lg font-semibold hover:bg-green-700"
             >
               🚀 {fileData.length} Items importieren
             </button>
@@ -548,14 +548,14 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
 
       {/* Step: Importing */}
       {step === 'importing' && (
-        <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
-          <span className="text-6xl mb-4 block animate-bounce">⏳</span>
-          <h2 className="text-xl font-semibold mb-2">Importiere...</h2>
-          <p className="text-slate-500 mb-6">
+        <div className="bg-white rounded-xl card-padding shadow-sm border border-slate-200 text-center">
+          <span className="text-5xl sm:text-6xl mb-3 sm:mb-4 block animate-bounce">⏳</span>
+          <h2 className="text-lg sm:text-xl font-semibold mb-2">Importiere...</h2>
+          <p className="text-sm sm:text-base text-slate-500 mb-4 sm:mb-6">
             {importProgress.current} von {importProgress.total}
           </p>
-          
-          <div className="w-full bg-slate-200 rounded-full h-3 mb-4">
+
+          <div className="w-full bg-slate-200 rounded-full h-2 sm:h-3 mb-3 sm:mb-4">
             <div 
               className="bg-blue-600 h-3 rounded-full transition-all"
               style={{ width: `${(importProgress.current / importProgress.total) * 100}%` }}
@@ -572,10 +572,10 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
 
       {/* Step: Done */}
       {step === 'done' && (
-        <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center">
-          <span className="text-6xl mb-4 block">🎉</span>
-          <h2 className="text-xl font-semibold mb-2">Import abgeschlossen!</h2>
-          <p className="text-slate-500 mb-6">
+        <div className="bg-white rounded-xl card-padding shadow-sm border border-slate-200 text-center">
+          <span className="text-5xl sm:text-6xl mb-3 sm:mb-4 block">🎉</span>
+          <h2 className="text-lg sm:text-xl font-semibold mb-2">Import abgeschlossen!</h2>
+          <p className="text-sm sm:text-base text-slate-500 mb-4 sm:mb-6">
             {importedCount} Items erfolgreich importiert
             {importProgress.errors > 0 && (
               <span className="text-orange-500">
@@ -583,10 +583,10 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
               </span>
             )}
           </p>
-          
+
           <Link
             href={`/collections/${collectionId}`}
-            className="inline-block bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700"
+            className="inline-block bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base rounded-xl font-semibold hover:bg-blue-700"
           >
             Zur Sammlung
           </Link>

@@ -126,48 +126,48 @@ export default function CostsPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-48 mb-4" />
-          <div className="h-64 bg-slate-200 dark:bg-slate-700 rounded" />
+          <div className="h-6 sm:h-8 bg-slate-200 dark:bg-slate-700 rounded w-32 sm:w-48 mb-3 sm:mb-4" />
+          <div className="h-48 sm:h-64 bg-slate-200 dark:bg-slate-700 rounded" />
         </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6">
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
             💰 Service Kosten
           </h1>
           <Link
             href="/settings"
-            className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+            className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
           >
             ← Zurück
           </Link>
         </div>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-xs sm:text-sm md:text-base text-slate-600 dark:text-slate-400">
           Übersicht aller externen Services und deren Kosten
         </p>
       </div>
 
       {/* Total Overview Card */}
-      <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white mb-6 shadow-xl">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white mb-4 sm:mb-6 shadow-xl">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
           <div>
-            <p className="text-blue-100 text-sm mb-1">Aktueller Monat</p>
-            <p className="text-4xl font-bold">${totalCost.toFixed(2)}</p>
+            <p className="text-blue-100 text-xs sm:text-sm mb-1">Aktueller Monat</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold">${totalCost.toFixed(2)}</p>
             <p className="text-blue-100 text-xs mt-1">
               von ${totalLimit.toFixed(2)} Budget
             </p>
           </div>
           <div>
-            <p className="text-blue-100 text-sm mb-1">Auslastung</p>
-            <p className="text-4xl font-bold">{utilizationPercent.toFixed(1)}%</p>
+            <p className="text-blue-100 text-xs sm:text-sm mb-1">Auslastung</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold">{utilizationPercent.toFixed(1)}%</p>
             <div className="mt-2 bg-white/20 rounded-full h-2 overflow-hidden">
               <div
                 className="bg-white h-full rounded-full transition-all"
@@ -176,8 +176,8 @@ export default function CostsPage() {
             </div>
           </div>
           <div>
-            <p className="text-blue-100 text-sm mb-1">Verbleibend</p>
-            <p className="text-4xl font-bold">${(totalLimit - totalCost).toFixed(2)}</p>
+            <p className="text-blue-100 text-xs sm:text-sm mb-1">Verbleibend</p>
+            <p className="text-2xl sm:text-3xl md:text-4xl font-bold">${(totalLimit - totalCost).toFixed(2)}</p>
             <p className="text-blue-100 text-xs mt-1">
               {new Date(services[0]?.billing_cycle_end || new Date()).getDate() - new Date().getDate()} Tage bis Cycle-Ende
             </p>
@@ -191,18 +191,18 @@ export default function CostsPage() {
         if (categoryServices.length === 0) return null
 
         return (
-          <div key={category} className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl">{config.icon}</span>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+          <div key={category} className="mb-4 sm:mb-6">
+            <div className="flex items-center gap-2 mb-2 sm:mb-3">
+              <span className="text-xl sm:text-2xl">{config.icon}</span>
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white">
                 {config.label}
               </h2>
-              <span className="text-sm text-slate-500 dark:text-slate-400">
+              <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                 ({categoryServices.length})
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               {categoryServices.map(service => {
                 const percent = service.monthly_limit > 0
                   ? (service.current_cost / service.monthly_limit) * 100
@@ -213,11 +213,11 @@ export default function CostsPage() {
                 return (
                   <div
                     key={service.id}
-                    className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow"
+                    className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-5 border border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900 dark:text-white">
+                    <div className="flex items-start justify-between mb-2 sm:mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">
                           {service.service_name}
                         </h3>
                         {service.notes && (
@@ -228,7 +228,7 @@ export default function CostsPage() {
                       </div>
                       <button
                         onClick={() => setEditingService(service)}
-                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 text-sm sm:text-base"
                       >
                         ✏️
                       </button>
@@ -236,11 +236,11 @@ export default function CostsPage() {
 
                     <div className="space-y-2">
                       <div className="flex items-baseline justify-between">
-                        <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                        <span className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
                           ${service.current_cost.toFixed(2)}
                         </span>
                         {service.monthly_limit > 0 && (
-                          <span className="text-sm text-slate-500 dark:text-slate-400">
+                          <span className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                             / ${service.monthly_limit.toFixed(2)}
                           </span>
                         )}
@@ -293,11 +293,11 @@ export default function CostsPage() {
       })}
 
       {/* Quick Links */}
-      <div className="mt-8 bg-slate-50 dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
-        <h3 className="font-semibold text-slate-900 dark:text-white mb-4">
+      <div className="mt-6 sm:mt-8 bg-slate-50 dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+        <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">
           📊 Service Dashboards
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
           <a
             href="https://vercel.com/dashboard/usage"
             target="_blank"
@@ -342,8 +342,8 @@ export default function CostsPage() {
       </div>
 
       {/* Info Box */}
-      <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-        <p className="text-sm text-blue-800 dark:text-blue-200">
+      <div className="mt-4 sm:mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 sm:p-4 border border-blue-200 dark:border-blue-800">
+        <p className="text-xs sm:text-sm text-blue-800 dark:text-blue-200">
           💡 <strong>Tipp:</strong> Aktualisiere deine Kosten regelmäßig aus den Service-Dashboards.
           So behältst du die Kontrolle über dein Budget!
         </p>

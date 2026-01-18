@@ -73,24 +73,24 @@ export default function VinylLookupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 lg:p-8">
+    <div className="min-h-screen bg-gray-50 container-responsive">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link href="/" className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
             &larr; Zurück zum Dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Vinyl-Suche</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Vinyl-Suche</h1>
           <p className="text-gray-600 mt-2">
             Suche nach Schallplatten via Discogs - die größte Musikdatenbank der Welt
           </p>
         </div>
 
         {/* Search Form */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <form onSubmit={handleSearch} className="space-y-4">
+        <div className="bg-white rounded-xl shadow-sm card-padding mb-4 sm:mb-6">
+          <form onSubmit={handleSearch} className="space-y-3 sm:space-y-4">
             {/* Search Type Toggle */}
-            <div className="flex gap-4 mb-4">
+            <div className="flex gap-3 sm:gap-4 mb-4">
               <button
                 type="button"
                 onClick={() => setSearchType('barcode')}
@@ -121,12 +121,12 @@ export default function VinylLookupPage() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={searchType === 'barcode' ? 'Barcode eingeben...' : 'Titel oder Künstler eingeben...'}
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               />
               <button
                 type="submit"
                 disabled={loading || !query.trim()}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {loading ? 'Suche...' : 'Suchen'}
               </button>
@@ -143,14 +143,14 @@ export default function VinylLookupPage() {
 
         {/* Search Results List */}
         {searchResults.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4">Suchergebnisse ({searchResults.length})</h2>
+          <div className="bg-white rounded-xl shadow-sm card-padding mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Suchergebnisse ({searchResults.length})</h2>
             <div className="space-y-3">
               {searchResults.map((result) => (
                 <button
                   key={result.id}
                   onClick={() => handleSelectResult(result)}
-                  className="w-full flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition text-left border border-gray-200"
+                  className="w-full flex items-center gap-3 sm:gap-4 p-3 rounded-lg hover:bg-gray-50 transition text-left border border-gray-200"
                 >
                   {result.cover_image || result.thumb ? (
                     <img
@@ -183,9 +183,9 @@ export default function VinylLookupPage() {
 
         {/* Release Detail */}
         {release && (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">Release-Details</h2>
-            <div className="flex flex-col md:flex-row gap-6">
+          <div className="bg-white rounded-xl shadow-sm card-padding">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">Release-Details</h2>
+            <div className="flex flex-col md:flex-row gap-4 sm:gap-6">
               {/* Cover */}
               <div className="flex-shrink-0">
                 {release.coverUrl ? (
@@ -202,13 +202,13 @@ export default function VinylLookupPage() {
               </div>
 
               {/* Details */}
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 space-y-3 sm:space-y-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">{release.title}</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-gray-900">{release.title}</h3>
                   <p className="text-lg text-gray-600">{release.artist}</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {release.year && (
                     <div>
                       <span className="text-sm text-gray-500">Jahr:</span>
@@ -271,7 +271,7 @@ export default function VinylLookupPage() {
                 {(marketStats || release.lowestPrice !== undefined) && (
                   <div className="bg-green-50 rounded-lg p-4">
                     <span className="text-sm text-green-700 font-medium">Marktpreise (ca.):</span>
-                    <div className="grid grid-cols-3 gap-4 mt-2">
+                    <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-2">
                       {marketStats ? (
                         <>
                           <div className="text-center">
@@ -360,7 +360,7 @@ export default function VinylLookupPage() {
         )}
 
         {/* Info Box */}
-        <div className="mt-8 bg-purple-50 rounded-xl p-6">
+        <div className="mt-8 bg-purple-50 rounded-xl card-padding">
           <h3 className="font-semibold text-purple-900 mb-2">Über Discogs</h3>
           <p className="text-purple-800 text-sm">
             Discogs ist die weltweit größte Musik-Datenbank und Marktplatz für Vinyl, CDs und mehr.

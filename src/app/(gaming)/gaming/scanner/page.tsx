@@ -106,7 +106,7 @@ export default function GamingScannerPage() {
           <>
             {/* Scan Mode Selection */}
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl font-bold text-white text-center mb-8">
+              <h2 className="text-2xl font-bold text-white text-center mb-4 sm:mb-6 sm:mb-8">
                 Wähle eine Scan-Methode
               </h2>
 
@@ -115,7 +115,7 @@ export default function GamingScannerPage() {
                   <button
                     key={mode.id}
                     onClick={() => startScanning(mode.id)}
-                    className="group p-8 rounded-2xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-purple-500 transition-all duration-200"
+                    className="group card-padding rounded-2xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-purple-500 transition-all duration-200"
                   >
                     <div className="text-6xl mb-4 group-hover:scale-110 transition-transform">
                       {mode.icon}
@@ -132,7 +132,7 @@ export default function GamingScannerPage() {
             </div>
 
             {/* Info Box */}
-            <div className="max-w-4xl mx-auto mt-12 p-6 rounded-xl bg-blue-500/10 border border-blue-500/30">
+            <div className="max-w-4xl mx-auto mt-12 card-padding rounded-xl bg-blue-500/10 border border-blue-500/30">
               <h3 className="text-lg font-semibold text-blue-300 mb-3 flex items-center gap-2">
                 <span>💡</span> Scanner Info
               </h3>
@@ -149,8 +149,8 @@ export default function GamingScannerPage() {
             {/* Cover Upload Mode */}
             {selectedMode === 'cover' && (
               <div className="max-w-2xl mx-auto">
-                <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700">
-                  <h2 className="text-2xl font-bold text-white mb-6 text-center">
+                <div className="bg-slate-800/50 rounded-2xl card-padding border border-slate-700">
+                  <h2 className="text-2xl font-bold text-white mb-4 sm:mb-6 text-center">
                     📸 Spiel-Cover fotografieren
                   </h2>
 
@@ -171,8 +171,8 @@ export default function GamingScannerPage() {
             {/* Manual Input Mode */}
             {selectedMode === 'manual' && (
               <div className="max-w-2xl mx-auto">
-                <div className="bg-slate-800/50 rounded-2xl p-8 border border-slate-700">
-                  <h2 className="text-2xl font-bold text-white mb-6 text-center">
+                <div className="bg-slate-800/50 rounded-2xl card-padding border border-slate-700">
+                  <h2 className="text-2xl font-bold text-white mb-4 sm:mb-6 text-center">
                     ✍️ Spieldetails manuell eingeben
                   </h2>
 
@@ -227,8 +227,8 @@ export default function GamingScannerPage() {
         {showBarcodeScanner && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-700">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
+              <div className="card-padding">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
                   <h2 className="text-2xl font-bold text-white">Barcode Scannen</h2>
                   <button
                     onClick={() => setShowBarcodeScanner(false)}

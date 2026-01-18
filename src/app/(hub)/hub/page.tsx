@@ -102,68 +102,68 @@ export default function HubLandingPage() {
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="relative max-w-7xl mx-auto container-responsive py-8 sm:py-12 md:py-20">
           {/* Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-3 mb-6">
-              <span className="text-7xl">{theme.emoji}</span>
+          <div className="text-center mb-8 sm:mb-12 md:mb-16">
+            <div className="flex flex-col sm:inline-flex sm:flex-row items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <span className="text-5xl sm:text-6xl md:text-7xl">{theme.emoji}</span>
               <div>
-                <h1 className="text-6xl font-bold">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold">
                   <span className={`bg-gradient-to-r ${theme.darkColors.gradient} bg-clip-text text-transparent`}>
                     {theme.name}
                   </span>
                 </h1>
-                <p className="text-xl text-slate-400 mt-2">Universal Collection Manager</p>
+                <p className="text-base sm:text-lg md:text-xl text-slate-400 mt-1 sm:mt-2">Universal Collection Manager</p>
               </div>
             </div>
-            <p className="text-2xl text-slate-300 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto px-4">
               Deine zentrale Plattform für alle Sammlungen
             </p>
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12 md:mb-16">
             {quickActions.map((action) => (
               <button
                 key={action.title}
                 onClick={action.action}
-                className="group p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 transition-all duration-200 text-left"
+                className="group p-4 sm:p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 transition-all duration-200 text-left"
               >
-                <div className="text-4xl mb-3">{action.icon}</div>
-                <h3 className="font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors">
+                <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{action.icon}</div>
+                <h3 className="text-sm sm:text-base font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors">
                   {action.title}
                 </h3>
-                <p className="text-sm text-slate-400">{action.description}</p>
+                <p className="text-xs sm:text-sm text-slate-400">{action.description}</p>
               </button>
             ))}
           </div>
 
           {/* Spheres */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold text-white text-center mb-8">
+          <div className="mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-6 sm:mb-8">
               Entdecke die Spheres
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {spheres.map((sphere) => (
                 <Link
                   key={sphere.id}
                   href={sphere.link}
-                  className="group relative p-8 rounded-2xl transition-all duration-300 transform hover:scale-105 bg-slate-800/30 border border-slate-700 hover:border-slate-500"
+                  className="group relative p-6 sm:p-8 rounded-xl sm:rounded-2xl transition-all duration-300 transform hover:scale-105 bg-slate-800/30 border border-slate-700 hover:border-slate-500"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${sphere.darkColors.gradient} opacity-5 group-hover:opacity-10 rounded-2xl transition-opacity`}></div>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${sphere.darkColors.gradient} opacity-5 group-hover:opacity-10 rounded-xl sm:rounded-2xl transition-opacity`}></div>
 
                   <div className="relative z-10">
-                    <div className="text-6xl mb-4 text-center">{sphere.emoji}</div>
-                    <h3 className="text-2xl font-bold text-white text-center mb-2">
+                    <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 text-center">{sphere.emoji}</div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white text-center mb-2">
                       {sphere.displayName}
                     </h3>
-                    <p className="text-center text-slate-300 mb-4">
+                    <p className="text-sm sm:text-base text-center text-slate-300 mb-3 sm:mb-4">
                       {sphere.description}
                     </p>
 
                     <div className="flex justify-center">
-                      <span className="inline-flex items-center gap-2 text-sm text-slate-400 group-hover:text-slate-300 transition-colors">
+                      <span className="inline-flex items-center gap-2 text-xs sm:text-sm text-slate-400 group-hover:text-slate-300 transition-colors">
                         <span>Mehr erfahren</span>
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -177,49 +177,49 @@ export default function HubLandingPage() {
           </div>
 
           {/* Features */}
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 mb-16">
-            <h2 className="text-3xl font-bold text-white text-center mb-12">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-8 sm:mb-12 md:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-8 sm:mb-10 md:mb-12">
               Warum CollectR HUB?
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {features.map((feature) => (
                 <div key={feature.title} className="text-center">
-                  <div className="text-5xl mb-4">{feature.icon}</div>
-                  <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-slate-400">{feature.description}</p>
+                  <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">{feature.icon}</div>
+                  <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">{feature.title}</h3>
+                  <p className="text-sm sm:text-base text-slate-400">{feature.description}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Stats Preview */}
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700">
-            <h2 className="text-2xl font-bold text-white mb-6">Quick Stats</h2>
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Quick Stats</h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Total Collections</div>
+                <div className="text-2xl sm:text-3xl font-bold text-blue-400 mb-1">0</div>
+                <div className="text-xs sm:text-sm text-slate-400">Total Collections</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Total Items</div>
+                <div className="text-2xl sm:text-3xl font-bold text-green-400 mb-1">0</div>
+                <div className="text-xs sm:text-sm text-slate-400">Total Items</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400 mb-1">0.00 €</div>
-                <div className="text-sm text-slate-400">Total Value</div>
+                <div className="text-2xl sm:text-3xl font-bold text-purple-400 mb-1">0.00 €</div>
+                <div className="text-xs sm:text-sm text-slate-400">Total Value</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-amber-400 mb-1">0</div>
-                <div className="text-sm text-slate-400">Active Spheres</div>
+                <div className="text-2xl sm:text-3xl font-bold text-amber-400 mb-1">0</div>
+                <div className="text-xs sm:text-sm text-slate-400">Active Spheres</div>
               </div>
             </div>
 
-            <div className="mt-6 text-center">
+            <div className="mt-4 sm:mt-6 text-center">
               <Link
                 href="/collections"
-                className="inline-flex items-center gap-2 text-slate-300 hover:text-white transition-colors"
+                className="inline-flex items-center gap-2 text-sm sm:text-base text-slate-300 hover:text-white transition-colors"
               >
                 <span>Zu meinen Sammlungen</span>
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -230,20 +230,20 @@ export default function HubLandingPage() {
           </div>
 
           {/* CTA */}
-          <div className="mt-16 text-center">
-            <h2 className="text-3xl font-bold text-white mb-6">
+          <div className="mt-8 sm:mt-12 md:mt-16 text-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4 sm:mb-6">
               Bereit loszulegen?
             </h2>
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
               <button
                 onClick={() => router.push('/collections/new')}
-                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg font-semibold text-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg font-semibold text-base sm:text-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
               >
                 Erste Sammlung Erstellen
               </button>
               <button
                 onClick={() => router.push('/')}
-                className="px-8 py-4 bg-slate-700 text-white rounded-lg font-semibold text-lg hover:bg-slate-600 transition-all"
+                className="px-6 sm:px-8 py-3 sm:py-4 bg-slate-700 text-white rounded-lg font-semibold text-base sm:text-lg hover:bg-slate-600 transition-all"
               >
                 Zum Dashboard
               </button>

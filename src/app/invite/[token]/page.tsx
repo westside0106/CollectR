@@ -133,7 +133,7 @@ export default function InvitePage({ params }: PageProps) {
   if (error) {
     return (
       <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg card-padding max-w-md w-full text-center">
           <div className="w-16 h-16 bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -142,7 +142,7 @@ export default function InvitePage({ params }: PageProps) {
           <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
             Einladung ungültig
           </h1>
-          <p className="text-slate-600 dark:text-slate-400 mb-6">
+          <p className="text-slate-600 dark:text-slate-400 mb-4 sm:mb-6">
             {error}
           </p>
           <Link
@@ -159,7 +159,7 @@ export default function InvitePage({ params }: PageProps) {
   if (success) {
     return (
       <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg card-padding max-w-md w-full text-center">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -168,7 +168,7 @@ export default function InvitePage({ params }: PageProps) {
           <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
             Erfolgreich beigetreten!
           </h1>
-          <p className="text-slate-600 dark:text-slate-400 mb-6">
+          <p className="text-slate-600 dark:text-slate-400 mb-4 sm:mb-6">
             Du hast jetzt Zugriff auf "{invitation?.collection_name}".
           </p>
           <Link
@@ -184,8 +184,8 @@ export default function InvitePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8 max-w-md w-full">
-        <div className="text-center mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg card-padding max-w-md w-full">
+        <div className="text-center mb-4 sm:mb-6">
           <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -199,7 +199,7 @@ export default function InvitePage({ params }: PageProps) {
           </p>
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-6">
+        <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-4 sm:mb-6">
           <div className="mb-3">
             <div className="text-sm text-slate-500 dark:text-slate-400">Sammlung</div>
             <div className="font-semibold text-slate-900 dark:text-white">

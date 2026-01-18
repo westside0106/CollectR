@@ -65,30 +65,30 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
   }
 
   return (
-    <div className="p-8 max-w-2xl">
+    <div className="container-responsive max-w-2xl">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <Link
           href={`/collections/${collectionId}`}
-          className="text-slate-500 hover:text-slate-700 text-sm flex items-center gap-1 mb-2"
+          className="text-slate-500 hover:text-slate-700 text-xs sm:text-sm flex items-center gap-1 mb-2"
         >
           ← Zurück zur Sammlung
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900">Export</h1>
-        <p className="text-slate-500 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Export</h1>
+        <p className="text-slate-500 mt-1 text-sm sm:text-base">
           {collection?.name} – {filteredItems.length} Items exportieren
         </p>
       </div>
 
       {/* Export Options */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 space-y-6">
+      <div className="bg-white rounded-xl card-padding shadow-sm border border-slate-200 space-y-4 sm:space-y-6">
         {/* Format */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-3">
+          <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2 sm:mb-3">
             Format
           </label>
-          <div className="flex gap-4">
-            <label className={`flex-1 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+          <div className="flex gap-3 sm:gap-4">
+            <label className={`flex-1 p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${
               format === 'csv' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'
             }`}>
               <input
@@ -99,11 +99,11 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
                 onChange={() => setFormat('csv')}
                 className="sr-only"
               />
-              <span className="text-2xl block mb-2">📊</span>
-              <span className="font-semibold">CSV</span>
+              <span className="text-xl sm:text-2xl block mb-1 sm:mb-2">📊</span>
+              <span className="text-sm sm:text-base font-semibold">CSV</span>
               <p className="text-xs text-slate-500 mt-1">Für Excel, Google Sheets</p>
             </label>
-            <label className={`flex-1 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+            <label className={`flex-1 p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all ${
               format === 'json' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'
             }`}>
               <input
@@ -114,8 +114,8 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
                 onChange={() => setFormat('json')}
                 className="sr-only"
               />
-              <span className="text-2xl block mb-2">📦</span>
-              <span className="font-semibold">JSON</span>
+              <span className="text-xl sm:text-2xl block mb-1 sm:mb-2">📦</span>
+              <span className="text-sm sm:text-base font-semibold">JSON</span>
               <p className="text-xs text-slate-500 mt-1">Für Backup, Entwickler</p>
             </label>
           </div>
@@ -123,13 +123,13 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
 
         {/* Status Filter */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">
             Status filtern
           </label>
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
           >
             <option value="">Alle Status ({items.length} Items)</option>
             <option value="in_collection">📦 In Sammlung ({items.filter(i => i.status === 'in_collection').length})</option>
@@ -142,20 +142,20 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
 
         {/* Preview */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
+          <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-2">
             Vorschau (erste 5 Items)
           </label>
-          <div className="bg-slate-50 rounded-lg p-4 max-h-48 overflow-auto">
+          <div className="bg-slate-50 rounded-lg p-3 sm:p-4 max-h-48 overflow-auto">
             {filteredItems.slice(0, 5).map(item => (
-              <div key={item.id} className="flex justify-between py-1 text-sm">
+              <div key={item.id} className="flex justify-between py-1 text-xs sm:text-sm">
                 <span className="truncate">{item.name}</span>
-                <span className="text-slate-400 ml-4">
+                <span className="text-slate-400 ml-4 flex-shrink-0">
                   {item.purchase_price ? `${item.purchase_price}€` : '-'}
                 </span>
               </div>
             ))}
             {filteredItems.length > 5 && (
-              <p className="text-slate-400 text-sm mt-2">
+              <p className="text-slate-400 text-xs sm:text-sm mt-2">
                 ... und {filteredItems.length - 5} weitere
               </p>
             )}
@@ -166,7 +166,7 @@ export default function ExportPage({ params }: { params: Promise<{ id: string }>
         <button
           onClick={handleExport}
           disabled={exporting || filteredItems.length === 0}
-          className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full bg-blue-600 text-white py-3 sm:py-4 text-sm sm:text-base rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {exporting ? (
             'Exportiere...'

@@ -108,11 +108,11 @@ export default function NewsPage() {
 
   if (!mounted) {
     return (
-      <div className="p-4 sm:p-8 max-w-4xl mx-auto">
+      <div className="p-4 sm:card-padding max-w-4xl mx-auto">
         <div className="animate-pulse">
           <div className="h-10 bg-slate-200 rounded w-48 mb-4"></div>
-          <div className="h-6 bg-slate-200 rounded w-64 mb-8"></div>
-          <div className="space-y-4">
+          <div className="h-6 bg-slate-200 rounded w-64 mb-6 sm:mb-8"></div>
+          <div className="space-y-3 sm:space-y-4">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="h-24 bg-slate-200 rounded-xl"></div>
             ))}
@@ -123,10 +123,10 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="p-4 sm:p-8 max-w-4xl mx-auto">
+    <div className="p-4 sm:card-padding max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">📰 Sammler-News</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">📰 Sammler-News</h1>
           <p className="text-slate-500 mt-1">Aktuelle Nachrichten aus der Sammlerwelt</p>
         </div>
         <div className="flex items-center gap-2">
@@ -149,7 +149,7 @@ export default function NewsPage() {
       </div>
 
       {showSettings && (
-        <div className="mb-6 bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+        <div className="mb-6 bg-white rounded-xl card-padding shadow-sm border border-slate-200">
           <h3 className="font-semibold text-slate-900 mb-4">⚙️ Meine Sammelgebiete</h3>
           <p className="text-sm text-slate-500 mb-4">
             Wähle die Kategorien, die dich interessieren:
@@ -207,12 +207,12 @@ export default function NewsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Suche nach News..."
-            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
           />
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+            className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
           >
             Suchen
           </button>
@@ -226,7 +226,7 @@ export default function NewsPage() {
       )}
 
       {loading ? (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="bg-white rounded-xl p-5 shadow-sm border border-slate-200 animate-pulse">
               <div className="h-5 bg-slate-200 rounded w-3/4 mb-3"></div>
@@ -247,7 +247,7 @@ export default function NewsPage() {
           )}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {articles.map((article, index) => (<a
             
               key={index}
@@ -256,7 +256,7 @@ export default function NewsPage() {
               rel="noopener noreferrer"
               className="block bg-white rounded-xl p-5 shadow-sm border border-slate-200 hover:shadow-md hover:border-slate-300 transition-all group"
             >
-              <div className="flex gap-4">
+              <div className="flex gap-3 sm:gap-4">
                 {article.image && (
                   <img
                     src={article.image}

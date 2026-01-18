@@ -166,9 +166,9 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
 
   if (loading) {
     return (
-      <div className="p-4 sm:p-8 max-w-3xl dark:bg-slate-900 min-h-screen">
+      <div className="container-responsive max-w-3xl dark:bg-slate-900 min-h-screen">
         {/* Header Skeleton */}
-        <div className="mb-8">
+        <div className="mb-3 sm:mb-4 sm:mb-6 sm:mb-8">
           <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-2" />
           <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
         </div>
@@ -176,9 +176,9 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         {/* Form Sections Skeleton */}
         <div className="space-y-6">
           {/* Images */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
-            <div className="flex gap-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+            <div className="h-5 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-3 sm:mb-4" />
+            <div className="flex gap-3 sm:gap-4">
               {[1, 2, 3].map(i => (
                 <div key={i} className="w-24 h-24 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
               ))}
@@ -186,12 +186,12 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
           </div>
 
           {/* Basic Info */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-            <div className="h-5 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
+          <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+            <div className="h-5 w-40 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-3 sm:mb-4" />
             <div className="space-y-4">
               <div className="h-12 w-full bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
               <div className="h-20 w-full bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
                 <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
               </div>
@@ -199,9 +199,9 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
           </div>
 
           {/* Purchase Info */}
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-            <div className="h-5 w-36 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4" />
-            <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+            <div className="h-5 w-36 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-3 sm:mb-4" />
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
               ))}
@@ -209,7 +209,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-4">
+          <div className="flex gap-3 sm:gap-4">
             <div className="flex-1 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
             <div className="w-32 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse" />
           </div>
@@ -219,25 +219,25 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
   }
 
   if (!item) {
-    return <div className="p-8 dark:bg-slate-900 dark:text-white min-h-screen">Item nicht gefunden</div>
+    return <div className="card-padding dark:bg-slate-900 dark:text-white min-h-screen">Item nicht gefunden</div>
   }
 
   return (
-    <div className="p-8 max-w-3xl dark:bg-slate-900 min-h-screen">
+    <div className="card-padding max-w-3xl dark:bg-slate-900 min-h-screen">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-3 sm:mb-4 sm:mb-6 sm:mb-8">
         <Link
           href={`/collections/${collectionId}/items/${itemId}`}
           className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm flex items-center gap-1 mb-2"
         >
           ← Zurück zum Item
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Item bearbeiten</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Item bearbeiten</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Bilder */}
-        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+        <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
           <ImageUpload
             itemId={itemId}
             existingImages={existingImages}
@@ -245,8 +245,8 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         </section>
 
         {/* Basis-Informationen */}
-        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="text-lg font-semibold mb-4 dark:text-white">Basis-Informationen</h2>
+        <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-lg font-semibold mb-3 sm:mb-4 dark:text-white">Basis-Informationen</h2>
 
           <div className="space-y-4">
             <div>
@@ -318,7 +318,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
           </div>
 
           {/* Sphere-Spezifische Felder */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mt-4">
             <div>
               <label htmlFor="geoType" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Geo Sphere Type <span className="text-xs text-slate-500">(optional)</span>
@@ -360,10 +360,10 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         </section>
 
         {/* Kauf-Informationen */}
-        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="text-lg font-semibold mb-4 dark:text-white">Kauf-Informationen</h2>
+        <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-lg font-semibold mb-3 sm:mb-4 dark:text-white">Kauf-Informationen</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label htmlFor="purchase_price" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Kaufpreis / EK (€)
@@ -424,8 +424,8 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
 
         {/* Dynamische Attribute */}
         {attributes.length > 0 && (
-          <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-            <h2 className="text-lg font-semibold mb-4 dark:text-white">Kategorie-Attribute</h2>
+          <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+            <h2 className="text-lg font-semibold mb-3 sm:mb-4 dark:text-white">Kategorie-Attribute</h2>
 
             <div className="space-y-4">
               {attributes.map((attr) => (
@@ -441,8 +441,8 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
         )}
 
         {/* Notizen */}
-        <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="text-lg font-semibold mb-4 dark:text-white">Notizen</h2>
+        <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-lg font-semibold mb-3 sm:mb-4 dark:text-white">Notizen</h2>
           <textarea
             id="notes"
             name="notes"
@@ -458,7 +458,7 @@ export default function EditItemPage({ params }: { params: Promise<{ id: string;
           </div>
         )}
 
-        <div className="flex gap-4">
+        <div className="flex gap-3 sm:gap-4">
           <button
             type="submit"
             disabled={saving}
