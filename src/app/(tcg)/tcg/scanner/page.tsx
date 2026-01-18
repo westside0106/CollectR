@@ -103,7 +103,7 @@ export default function TCGScannerPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900">
       <div className="max-w-4xl mx-auto container-responsive py-6 sm:py-12">
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
+        <div className="text-center mb-4 sm:mb-6 sm:mb-8 sm:mb-12">
           <div className="flex flex-col sm:inline-flex sm:flex-row items-center gap-2 sm:gap-3 mb-4">
             <span className="text-4xl sm:text-6xl">📸</span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold">
@@ -126,9 +126,9 @@ export default function TCGScannerPage() {
         {!selectedMode && !showBarcodeScanner && (
           <>
             {/* Game Selection */}
-            <div className="mb-6 sm:mb-8">
+            <div className="mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
               <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">Wähle dein Game:</h2>
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                 {[
                   { id: 'pokemon', name: 'Pokémon', emoji: '🎴', color: 'red' },
                   { id: 'yugioh', name: 'Yu-Gi-Oh!', emoji: '🃏', color: 'purple' },
@@ -153,9 +153,9 @@ export default function TCGScannerPage() {
             </div>
 
             {/* Scan Mode Selection */}
-            <div className="mb-6 sm:mb-8">
+            <div className="mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
               <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">Scan-Methode:</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3 sm:gap-4">
                 {scanModes.map((mode) => (
                   <button
                     key={mode.id}
@@ -174,7 +174,7 @@ export default function TCGScannerPage() {
 
         {/* Active Scanner */}
         {selectedMode && (selectedMode === 'camera' || selectedMode === 'upload') && (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
             <TCGCardScanner
               mode={selectedMode}
               game={selectedGame}
@@ -224,7 +224,7 @@ export default function TCGScannerPage() {
         {/* Features Info */}
         {!selectedMode && !showBarcodeScanner && (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 sm:gap-6 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
               <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
                 <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🤖</div>
                 <h3 className="text-sm sm:text-base font-semibold text-white mb-2">AI Recognition</h3>

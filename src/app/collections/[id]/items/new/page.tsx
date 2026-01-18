@@ -265,14 +265,14 @@ export default function NewItemPage({ params }: PageProps) {
         >
           ← Zurück zur Sammlung
         </Link>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Neues Item</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">{collection?.name}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Neues Item</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm sm:text-base">{collection?.name}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* NEU: Bilder-Upload Sektion */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-          <div className="flex items-start justify-between gap-4 mb-4">
+        <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+          <div className="flex items-start justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
             <ImageUpload
               onImagesChange={(images) => setPendingImages(images)}
             />
@@ -310,8 +310,8 @@ export default function NewItemPage({ params }: PageProps) {
         </div>
 
         {/* Basis-Infos */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="font-semibold mb-4 dark:text-white">Basis-Informationen</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-3 sm:mb-4 dark:text-white">Basis-Informationen</h2>
 
           <div className="space-y-4">
             <div>
@@ -341,7 +341,7 @@ export default function NewItemPage({ params }: PageProps) {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kategorie</label>
                 <CategorySelect
@@ -370,7 +370,7 @@ export default function NewItemPage({ params }: PageProps) {
             </div>
 
             {/* Sphere-Spezifische Felder */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Geo Sphere Type <span className="text-xs text-slate-500">(optional)</span>
@@ -422,10 +422,10 @@ export default function NewItemPage({ params }: PageProps) {
         </div>
 
         {/* Kauf-Infos */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="font-semibold mb-4 dark:text-white">Kauf-Informationen</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-3 sm:mb-4 dark:text-white">Kauf-Informationen</h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kaufpreis / EK (€)</label>
               <input
@@ -508,8 +508,8 @@ export default function NewItemPage({ params }: PageProps) {
 
         {/* KI-generierte Attribute (falls vorhanden) */}
         {aiApplied && aiResult?.attributes && Object.keys(aiResult.attributes).length > 0 && (
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl p-6 shadow-sm border border-purple-200 dark:border-purple-800">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl card-padding shadow-sm border border-purple-200 dark:border-purple-800">
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <span className="text-lg">✨</span>
               <h2 className="font-semibold dark:text-white">KI-erkannte Attribute</h2>
               <span className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full">
@@ -517,7 +517,7 @@ export default function NewItemPage({ params }: PageProps) {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {Object.entries(aiResult.attributes).map(([key, value]) => (
                 <div key={key}>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1 capitalize">
@@ -549,8 +549,8 @@ export default function NewItemPage({ params }: PageProps) {
 
         {/* Dynamische Attribute */}
         {attributes.length > 0 && (
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-            <h2 className="font-semibold mb-4 dark:text-white">Kategorie-Attribute</h2>
+          <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+            <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-3 sm:mb-4 dark:text-white">Kategorie-Attribute</h2>
 
             <div className="space-y-4">
               {attributes.map(attr => (
@@ -646,8 +646,8 @@ export default function NewItemPage({ params }: PageProps) {
         )}
 
         {/* Notizen */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="font-semibold mb-4 dark:text-white">Notizen</h2>
+        <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-3 sm:mb-4 dark:text-white">Notizen</h2>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -665,7 +665,7 @@ export default function NewItemPage({ params }: PageProps) {
         )}
 
         {/* Buttons */}
-        <div className="flex gap-4">
+        <div className="flex gap-3 sm:gap-4">
           <button
             type="submit"
             disabled={loading || !userId}

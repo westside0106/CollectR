@@ -65,9 +65,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="p-4 sm:p-8 max-w-5xl mx-auto">
+    <div className="container-responsive max-w-5xl mx-auto">
       {/* Breadcrumb Navigation */}
-      <nav className="flex items-center gap-2 text-sm mb-6 text-slate-500 dark:text-slate-400">
+      <nav className="flex items-center gap-2 text-sm mb-3 sm:mb-4 sm:mb-6 text-slate-500 dark:text-slate-400">
         <Link href="/collections" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
           Sammlungen
         </Link>
@@ -85,9 +85,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
       </nav>
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4 mb-3 sm:mb-4 sm:mb-6 sm:mb-8">
         <div className="flex-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">
+          <h1 className="text-2xl sm:text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">
             {item.name}
           </h1>
           <div className="flex flex-wrap items-center gap-2">
@@ -123,7 +123,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
         <div className="space-y-6">
           {/* Description */}
           {item.description && (
-            <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+            <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
               <h2 className="text-lg font-semibold mb-3 text-slate-900 dark:text-white">Beschreibung</h2>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{item.description}</p>
             </section>
@@ -136,9 +136,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
           <ReminderSection itemId={itemId} itemName={item.name} />
 
           {/* Purchase Info & Value */}
-          <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-            <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Kauf-Informationen</h2>
-            <div className="grid grid-cols-2 gap-4">
+          <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+            <h2 className="text-lg font-semibold mb-3 sm:mb-4 text-slate-900 dark:text-white">Kauf-Informationen</h2>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {item.purchase_price !== null && item.purchase_price !== undefined && (
                 <div>
                   <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Kaufpreis (EK)</p>
@@ -178,7 +178,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
 
                         return (
                           <div className="flex items-center gap-3">
-                            <p className={`text-2xl font-bold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                            <p className={`text-xl sm:text-2xl font-bold ${isProfit ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                               {isProfit ? '+' : ''}{margin.toLocaleString('de-DE', {
                                 style: 'currency',
                                 currency: item._value_currency || 'EUR'
@@ -240,9 +240,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
 
           {/* Dynamic Attributes */}
           {item.attributes && Object.keys(item.attributes).length > 0 && (
-            <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Attribute</h2>
-              <div className="grid grid-cols-2 gap-4">
+            <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
+              <h2 className="text-lg font-semibold mb-3 sm:mb-4 text-slate-900 dark:text-white">Attribute</h2>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {Object.entries(item.attributes).map(([key, value]) => (
                   <div key={key}>
                     <p className="text-slate-500 dark:text-slate-400 text-sm mb-1 capitalize">
@@ -274,7 +274,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
 
           {/* Notes */}
           {item.notes && (
-            <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
+            <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
               <h2 className="text-lg font-semibold mb-3 text-slate-900 dark:text-white">Notizen</h2>
               <p className="text-slate-600 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">{item.notes}</p>
             </section>

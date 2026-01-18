@@ -50,7 +50,7 @@ export default function GamingPricesPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4 sm:mb-6 sm:mb-8">
           <div className="inline-flex items-center gap-3 mb-4">
             <span className="text-6xl">💰</span>
             <h1 className="text-5xl font-bold">
@@ -71,7 +71,7 @@ export default function GamingPricesPage() {
         </div>
 
         {/* Platform Selection */}
-        <div className="mb-8">
+        <div className="mb-4 sm:mb-6 sm:mb-8">
           <div className="flex justify-center gap-3">
             {[
               { id: 'all', name: 'Alle', emoji: '🎮' },
@@ -99,8 +99,8 @@ export default function GamingPricesPage() {
         </div>
 
         {/* Search Bar */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
-          <div className="flex gap-4">
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
+          <div className="flex gap-3 sm:gap-4">
             <input
               type="text"
               placeholder="Suche nach Spiel..."
@@ -137,16 +137,16 @@ export default function GamingPricesPage() {
 
         {/* Search Results */}
         {searchResults.length > 0 && (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
+          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
             <h2 className="text-2xl font-bold text-white mb-4">Preisvergleich</h2>
             {/* Results would go here */}
           </div>
         )}
 
         {/* Trending Games */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 mb-8">
+        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">🔥 Trending Spiele</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {trendingGames.map((game, index) => (
               <div
                 key={index}
@@ -170,9 +170,9 @@ export default function GamingPricesPage() {
         </div>
 
         {/* Retailers */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6 sm:mb-8">
           {['Amazon', 'MediaMarkt', 'GameStop', 'Steam'].map((retailer) => (
-            <div key={retailer} className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
+            <div key={retailer} className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
               <div className="text-4xl mb-3">🏪</div>
               <h3 className="font-semibold text-white">{retailer}</h3>
               <p className="text-xs text-slate-400 mt-1">Preise werden verglichen</p>
@@ -182,7 +182,7 @@ export default function GamingPricesPage() {
 
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
             <div className="text-4xl mb-3">📊</div>
             <h3 className="font-semibold text-white mb-2">Echtzeit-Preise</h3>
             <p className="text-sm text-slate-400">
@@ -190,7 +190,7 @@ export default function GamingPricesPage() {
             </p>
           </div>
 
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
             <div className="text-4xl mb-3">📈</div>
             <h3 className="font-semibold text-white mb-2">Preisverlauf</h3>
             <p className="text-sm text-slate-400">
@@ -198,7 +198,7 @@ export default function GamingPricesPage() {
             </p>
           </div>
 
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
             <div className="text-4xl mb-3">🔔</div>
             <h3 className="font-semibold text-white mb-2">Preis-Alerts</h3>
             <p className="text-sm text-slate-400">
@@ -208,7 +208,7 @@ export default function GamingPricesPage() {
         </div>
 
         {/* Info Box */}
-        <div className="mt-8 p-6 rounded-xl bg-blue-500/10 border border-blue-500/30">
+        <div className="mt-8 card-padding rounded-xl bg-blue-500/10 border border-blue-500/30">
           <h3 className="text-lg font-semibold text-blue-300 mb-3 flex items-center gap-2">
             <span>💡</span> Price Checker Info
           </h3>
