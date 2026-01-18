@@ -43,11 +43,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-6 sm:mb-8">
           <Image
-            src="/icons/icon-192.png"
+            src="/icons/icon-512.png"
             alt="CollectR Logo"
             width={96}
             height={96}
-            className="mx-auto mb-3 sm:mb-4"
+            className="mx-auto mb-3 sm:mb-4 rounded-[22%] shadow-lg"
           />
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">CollectR</h1>
           <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 mt-2">Melde dich an</p>

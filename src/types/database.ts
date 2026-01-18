@@ -166,6 +166,7 @@ export type ReminderUpdate = Partial<Omit<ReminderInsert, 'user_id'>>
 
 export type TileType =
   | 'stats'           // Statistik-Kacheln (Sammlungen, Items, Wert)
+  | 'spheres'         // Spheres Quick-Access
   | 'recent_items'    // Kürzlich hinzugefügt
   | 'top_items'       // Wertvollste Items
   | 'chart_category'  // Kategorie-Verteilung

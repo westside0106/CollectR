@@ -62,7 +62,7 @@ export function Sidebar() {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-slate-900 text-white h-14 flex items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <Image
-            src="/brand/collectr-hero.png"
+            src="/icons/icon-512.png"
             alt="CollectR"
             width={32}
             height={32}
@@ -111,7 +111,7 @@ export function Sidebar() {
         <div className="hidden lg:block p-6 border-b border-slate-700">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/brand/collectr-hero.png"
+              src="/icons/icon-512.png"
               alt="CollectR"
               width={44}
               height={44}
