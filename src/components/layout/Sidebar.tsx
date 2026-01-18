@@ -128,12 +128,12 @@ export function Sidebar() {
         <div className="lg:hidden h-14 border-b border-slate-700" />
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav className="flex-1 p-3 sm:p-4 overflow-y-auto">
           {/* Haupt-Navigation */}
-          <p className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <p className="px-3 sm:px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Navigation
           </p>
-          <ul className="space-y-1 mb-6">
+          <ul className="space-y-1 mb-4 sm:mb-6">
             {mainLinks.map(link => {
               const isActive = pathname === link.href
               return (
@@ -141,15 +141,16 @@ export function Sidebar() {
                   <Link
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    className={`flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-colors touch-manipulation ${
                       isActive
                         ? 'bg-blue-600 text-white'
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        : 'text-slate-300 hover:bg-slate-800 active:bg-slate-700 hover:text-white'
                     }`}
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">{link.icon}</span>
-                      <span className="font-medium">{link.label}</span>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <span className="text-base sm:text-lg">{link.icon}</span>
+                      <span className="font-medium text-sm sm:text-base">{link.label}</span>
                     </div>
                     {link.description && !isActive && (
                       <span className="text-xs text-slate-500 hidden xl:inline">{link.description}</span>
@@ -161,8 +162,8 @@ export function Sidebar() {
           </ul>
 
           {/* Spheres Section */}
-          <div className="mb-6">
-            <p className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <div className="mb-4 sm:mb-6">
+            <p className="px-3 sm:px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
               Spheres
             </p>
             <ul className="space-y-1">
@@ -173,15 +174,16 @@ export function Sidebar() {
                     <Link
                       href={link.href}
                       onClick={() => setIsOpen(false)}
-                      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      className={`flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg transition-colors touch-manipulation ${
                         isActive
                           ? 'bg-slate-800 text-white border-l-2 border-blue-500'
-                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                          : 'text-slate-300 hover:bg-slate-800 active:bg-slate-700 hover:text-white'
                       }`}
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{link.icon}</span>
-                        <span className="font-medium">{link.label}</span>
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <span className="text-base sm:text-lg">{link.icon}</span>
+                        <span className="font-medium text-sm sm:text-base">{link.label}</span>
                       </div>
                       {link.description && !isActive && (
                         <span className={`text-xs hidden xl:inline ${link.color || 'text-slate-500'}`}>
@@ -199,7 +201,7 @@ export function Sidebar() {
           <div className="my-4 border-t border-slate-700" />
 
           {/* Tools */}
-          <p className="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <p className="px-3 sm:px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Tools
           </p>
           <ul className="space-y-1">
@@ -210,14 +212,15 @@ export function Sidebar() {
                   <Link
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors ${
+                    className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors touch-manipulation ${
                       isActive
                         ? 'bg-blue-600 text-white'
-                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        : 'text-slate-300 hover:bg-slate-800 active:bg-slate-700 hover:text-white'
                     }`}
+                    style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
-                    <span className="text-base">{link.icon}</span>
-                    <span className="text-sm">{link.label}</span>
+                    <span className="text-sm sm:text-base">{link.icon}</span>
+                    <span className="text-xs sm:text-sm">{link.label}</span>
                   </Link>
                 </li>
               )
