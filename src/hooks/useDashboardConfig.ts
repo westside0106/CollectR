@@ -144,6 +144,7 @@ export function useDashboardConfig() {
 export function getTileIcon(type: TileType): string {
   const icons: Record<TileType, string> = {
     stats: '📊',
+    spheres: '🌟',
     recent_items: '🕐',
     top_items: '⭐',
     chart_category: '📈',
@@ -161,6 +162,7 @@ export function getTileIcon(type: TileType): string {
 export function getTileDescription(type: TileType): string {
   const descriptions: Record<TileType, string> = {
     stats: 'Zeigt Gesamtstatistiken: Sammlungen, Items, Wert',
+    spheres: 'Schnellzugriff auf alle 5 Spheres (TCG, Gaming, Official, Geo, Shop)',
     recent_items: 'Die zuletzt hinzugefügten Items',
     top_items: 'Die wertvollsten Items deiner Sammlung',
     chart_category: 'Verteilung der Items nach Kategorien',
