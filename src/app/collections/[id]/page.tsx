@@ -472,8 +472,11 @@ export default function CollectionDetailPage({ params }: PageProps) {
           {/* More Menu */}
           <div className="relative flex-shrink-0">
             <button
+              type="button"
               onClick={(e) => {
+                e.preventDefault()
                 e.stopPropagation()
+                console.log('Menu button clicked, current state:', showMenu)
                 setShowMenu(!showMenu)
               }}
               className="px-3 sm:px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 transition-colors text-slate-700 dark:text-slate-200 text-sm touch-manipulation"
@@ -486,13 +489,19 @@ export default function CollectionDetailPage({ params }: PageProps) {
               <>
                 <div
                   className="fixed inset-0 z-40"
-                  onClick={() => setShowMenu(false)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setShowMenu(false)
+                  }}
                 />
                 <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 py-1 overflow-hidden">
                   <Link
                     href={`/collections/${id}/import`}
                     className="block px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 text-sm text-slate-700 dark:text-slate-200 transition-colors touch-manipulation"
-                    onClick={() => setShowMenu(false)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowMenu(false)
+                    }}
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     📥 Import (CSV/JSON)
@@ -500,7 +509,10 @@ export default function CollectionDetailPage({ params }: PageProps) {
                   <Link
                     href={`/collections/${id}/export`}
                     className="block px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 text-sm text-slate-700 dark:text-slate-200 transition-colors touch-manipulation"
-                    onClick={() => setShowMenu(false)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowMenu(false)
+                    }}
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     📤 Export
@@ -509,7 +521,10 @@ export default function CollectionDetailPage({ params }: PageProps) {
                   <Link
                     href={`/collections/${id}/categories`}
                     className="block px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 text-sm text-slate-700 dark:text-slate-200 transition-colors touch-manipulation"
-                    onClick={() => setShowMenu(false)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setShowMenu(false)
+                    }}
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                   >
                     🏷️ Kategorien verwalten
