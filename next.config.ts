@@ -1,9 +1,5 @@
 import type { NextConfig } from "next";
 
-// Get Supabase hostname from environment variable
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://oferxxqoeshilqhwtyqf.supabase.co'
-const supabaseHostname = supabaseUrl.replace('https://', '').replace('http://', '')
-
 const nextConfig: NextConfig = {
   // Turbopack Config (Next.js 16+)
   turbopack: {},
@@ -40,7 +36,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: supabaseHostname,
+        hostname: "*.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
     ],
