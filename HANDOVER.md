@@ -14,7 +14,7 @@ CollectR ist eine Next.js/React-App zur Verwaltung von Sammlungen (Hot Wheels, V
 - Frontend: Next.js 14, React, TypeScript, Tailwind CSS
 - Backend: Supabase (PostgreSQL, Auth, Storage, RLS)
 - Deployment: Vercel
-- User: philipp.lahn@web.de (User-ID: `3934964a-1bbb-4e24-ba30-73b4d2ec2044`)
+- User: <YOUR_EMAIL> (User-ID: `<YOUR_USER_ID>`)
 
 ---
 
@@ -342,7 +342,7 @@ npm run lint         # ESLint
 
 ### Supabase (falls CLI installiert)
 ```bash
-supabase link --project-ref oferxxqoeshilqhwtyqf
+supabase link --project-ref your-project-ref
 supabase db pull     # Schema pullen
 supabase db push     # Migrationen anwenden
 ```
@@ -401,7 +401,7 @@ WHERE cm.user_id = auth.uid();
 - Environment Variables in Vercel Dashboard setzen
 
 **Supabase:**
-- Projekt: oferxxqoeshilqhwtyqf
+- Projekt: your-project-ref
 - Region: EU (vermutlich Frankfurt)
 - Dashboard: https://supabase.com/dashboard
 

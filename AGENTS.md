@@ -33,7 +33,7 @@ CollectR ist eine Progressive Web App (PWA) zum Verwalten von Sammlungen aller A
 ### Backend & Database
 - **Supabase** (@supabase/supabase-js 2.87.1, @supabase/ssr 0.8.0)
   - PostgreSQL Database mit Row Level Security (RLS) aktiviert
-  - Storage für Bilder (oferxxqoeshilqhwtyqf.supabase.co)
+  - Storage für Bilder (your-project.supabase.co)
   - Realtime Subscriptions
   - Auth (email/password, OAuth)
 
@@ -313,8 +313,8 @@ vercel env pull .env.local
 **Benötigte Environment Variables (automatisch via Vercel):**
 ```bash
 # Supabase (Public - dürfen im Browser sein)
-NEXT_PUBLIC_SUPABASE_URL=https://oferxxqoeshilqhwtyqf.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_bk3unybngbGrvZHDce4VLA_...
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 
 # Externe APIs (Optional - für Tools)
 NEXT_PUBLIC_CURRENCYLAYER_API_KEY=...

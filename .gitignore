@@ -29,3 +29,4 @@ next-env.d.ts
 .vercel
 .env*.local
 tsconfig.tsbuildinfo
+.backup-old-anon-key.txt
