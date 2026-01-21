@@ -63,6 +63,15 @@ export function TCGPriceLookupButton({
     setLoading(true)
 
     try {
+      // Get user session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) {
+        showToast('Bitte melde dich an, um Preise abzurufen', 'error')
+        setLoading(false)
+        return
+      }
+
       // Get Supabase URL from environment
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 
@@ -70,6 +79,7 @@ export function TCGPriceLookupButton({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           cardName: cardName.trim(),

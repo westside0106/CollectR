@@ -36,6 +36,16 @@ export function TCGBulkPriceUpdate({ collectionId, onComplete }: TCGBulkPriceUpd
     setProgress({ total: 0, current: 0, updated: 0, failed: 0 })
 
     try {
+      // Get user session for authentication
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (!session) {
+        showToast('Bitte melde dich an, um Preise zu aktualisieren', 'error')
+        setLoading(false)
+        setProgress(null)
+        return
+      }
+
       // 1. Fetch all TCG items (items with grading attribute)
       const { data: items, error: fetchError } = await supabase
         .from('items')
@@ -80,6 +90,7 @@ export function TCGBulkPriceUpdate({ collectionId, onComplete }: TCGBulkPriceUpd
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
             },
             body: JSON.stringify({
               cardName: item.name,

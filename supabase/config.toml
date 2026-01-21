@@ -19,19 +19,19 @@ enabled = true
 site_url = "http://localhost:3000"
 
 [functions.analyze-image]
-verify_jwt = false
+verify_jwt = true
 
 [realtime]
 enabled = true
 
 [functions.tcg-price-lookup]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/tcg-price-lookup/deno.json"
 entrypoint = "./functions/tcg-price-lookup/index.ts"
 
 [functions.tcg-price-updater]
 enabled = true
-verify_jwt = false
+verify_jwt = true
 import_map = "./functions/tcg-price-updater/deno.json"
 entrypoint = "./functions/tcg-price-updater/index.ts"
