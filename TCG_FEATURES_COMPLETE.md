@@ -112,7 +112,7 @@ SELECT cron.schedule(
   '0 3 * * *',
   $$
   SELECT net.http_post(
-    url := 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-updater',
+    url := 'https://your-project.supabase.co/functions/v1/tcg-price-updater',
     headers := '{"Content-Type": "application/json"}'::jsonb
   );
   $$
@@ -121,7 +121,7 @@ SELECT cron.schedule(
 
 **Manuelle Ausführung:**
 ```bash
-curl -X POST 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-updater'
+curl -X POST 'https://your-project.supabase.co/functions/v1/tcg-price-updater'
 ```
 
 ---
@@ -230,17 +230,17 @@ supabase db push
 ### 1. Price Lookup testen
 ```bash
 # Pokémon
-curl -X POST 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-lookup' \
+curl -X POST 'https://your-project.supabase.co/functions/v1/tcg-price-lookup' \
   --header 'Content-Type: application/json' \
   --data '{"cardName":"Pikachu","setName":"Base Set","game":"pokemon"}'
 
 # Yu-Gi-Oh!
-curl -X POST 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-lookup' \
+curl -X POST 'https://your-project.supabase.co/functions/v1/tcg-price-lookup' \
   --header 'Content-Type: application/json' \
   --data '{"cardName":"Dark Magician","game":"yugioh"}'
 
 # Magic
-curl -X POST 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-lookup' \
+curl -X POST 'https://your-project.supabase.co/functions/v1/tcg-price-lookup' \
   --header 'Content-Type: application/json' \
   --data '{"cardName":"Black Lotus","game":"magic"}'
 ```
@@ -260,7 +260,7 @@ npm run dev
 ### 3. Cron Job testen (nach Setup)
 ```bash
 # Manuell aufrufen
-curl -X POST 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-updater'
+curl -X POST 'https://your-project.supabase.co/functions/v1/tcg-price-updater'
 
 # Logs anschauen
 supabase functions logs tcg-price-updater --tail
@@ -272,7 +272,7 @@ supabase functions logs tcg-price-updater --tail
 
 ### Environment Variables (.env.local)
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=https://oferxxqoeshilqhwtyqf.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 
 # Optional: Für höhere Rate Limits

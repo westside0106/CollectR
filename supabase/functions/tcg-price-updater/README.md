@@ -34,7 +34,7 @@ SELECT cron.schedule(
   $$
   SELECT
     net.http_post(
-      url := 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-updater',
+      url := 'https://your-project.supabase.co/functions/v1/tcg-price-updater',
       headers := '{"Content-Type": "application/json", "Authorization": "Bearer ' || current_setting('app.service_role_key') || '"}'::jsonb
     ) as request_id;
   $$
@@ -82,7 +82,7 @@ Online Generator: https://crontab.guru/
 Du kannst die Function auch manuell aufrufen:
 
 ```bash
-curl -X POST 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-updater' \
+curl -X POST 'https://your-project.supabase.co/functions/v1/tcg-price-updater' \
   --header 'Content-Type: application/json' \
   --data '{}'
 ```
