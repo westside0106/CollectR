@@ -41,7 +41,7 @@ export function CollectionFolderCard({
   ))
 
   return (
-    <div className="group relative bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all overflow-hidden">
+    <div className="group relative rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all overflow-hidden">
       {/* Aurora Background */}
       <div className="absolute inset-0 z-0">
         <Aurora
@@ -50,9 +50,9 @@ export function CollectionFolderCard({
               ? ['#7c3aed', '#a855f7', '#c084fc', '#e9d5ff', '#ffffff']
               : ['#4785ff', '#5227ff', '#8061ff', '#93e3fd', '#ffffff']
           }
-          amplitude={0.5}
-          blend={0.3}
-          className="opacity-70 dark:opacity-60"
+          amplitude={0.6}
+          blend={0.5}
+          className="opacity-90"
         />
       </div>
 
@@ -117,7 +117,7 @@ export function CollectionFolderCard({
       <Link href={`/collections/${collection.id}`}>
         <div className="relative p-4 sm:p-6 min-h-[160px] sm:min-h-[200px] flex flex-col items-center justify-center z-10">
           {/* 3D Folder */}
-          <div className="mb-3 sm:mb-4 transform hover:scale-110 transition-transform relative z-10 scale-90 sm:scale-100">
+          <div className="mb-3 sm:mb-4 transform hover:scale-110 transition-transform relative z-10 scale-90 sm:scale-100 drop-shadow-xl">
             <Folder
               color={getFolderColor()}
               size={1.5}
@@ -126,16 +126,16 @@ export function CollectionFolderCard({
           </div>
 
           {/* Collection Info */}
-          <div className="text-center relative z-10">
-            <h3 className="text-sm sm:text-base md:text-lg font-semibold dark:text-white mb-1">
+          <div className="text-center relative z-10 px-2 py-2 rounded-lg bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+            <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-1">
               {collection.name}
             </h3>
             {collection.description && (
-              <p className="text-gray-600 dark:text-slate-400 text-xs sm:text-sm line-clamp-2 mb-1.5 sm:mb-2">
+              <p className="text-gray-700 dark:text-slate-300 text-xs sm:text-sm line-clamp-2 mb-1.5 sm:mb-2">
                 {collection.description}
               </p>
             )}
-            <p className="text-gray-500 dark:text-slate-500 text-[11px] sm:text-xs flex items-center justify-center gap-1">
+            <p className="text-gray-600 dark:text-slate-400 text-[11px] sm:text-xs flex items-center justify-center gap-1">
               <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
