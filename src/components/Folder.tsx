@@ -43,9 +43,9 @@ export function Folder({
   )
 
   const folderBackColor = darkenColor(color, 0.08)
-  const paper1 = darkenColor('#ffffff', 0.1)
-  const paper2 = darkenColor('#ffffff', 0.05)
-  const paper3 = '#ffffff'
+  const paper1 = '#E8E8E8' // Slightly gray for depth
+  const paper2 = '#F2F2F2' // Lighter gray
+  const paper3 = '#FFFFFF' // Pure white
 
   const handleClick = () => {
     if (onClick) {
@@ -71,7 +71,7 @@ export function Folder({
       className={`relative inline-block ${className}`}
       onClick={handleClick}
     >
-      <div className="relative w-24 h-20 transition-all duration-200 ease-in-out cursor-pointer">
+      <div className="relative w-24 h-20 transition-all duration-200 ease-in-out cursor-pointer drop-shadow-lg">
         {/* Papers flying out */}
         <div className="absolute z-[2] bottom-2.5 left-[50%] translate-x-[-50%]">
           {items.slice(0, 3).map((item, i) => (
