@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import './Folder.css'
 
 interface FolderProps {
   color?: string
@@ -37,9 +38,15 @@ export function Folder({
   className = '',
   onClick
 }: FolderProps) {
+  const maxItems = 3
+  const papers = items.slice(0, maxItems)
+  while (papers.length < maxItems) {
+    papers.push(null)
+  }
+
   const [open, setOpen] = useState(false)
   const [paperOffsets, setPaperOffsets] = useState<Array<{ x: number; y: number }>>(
-    Array.from({ length: Math.min(items.length, 3) }, () => ({ x: 0, y: 0 }))
+    Array.from({ length: maxItems }, () => ({ x: 0, y: 0 }))
   )
 
   const folderBackColor = darkenColor(color, 0.08)
@@ -52,101 +59,74 @@ export function Folder({
       onClick()
     } else {
       setOpen(prev => !prev)
-      if (!open) {
-        setPaperOffsets(Array.from({ length: Math.min(items.length, 3) }, (_, i) => ({
-          x: (i * 0.15) * 100,
-          y: 0
-        })))
-      } else {
-        setPaperOffsets(prev => prev.map(() => ({ x: 0, y: 0 })))
+      if (open) {
+        setPaperOffsets(Array.from({ length: maxItems }, () => ({ x: 0, y: 0 })))
       }
     }
   }
 
+  const handlePaperMouseMove = (e: React.MouseEvent<HTMLDivElement>, index: number) => {
+    if (!open) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+    const offsetX = (e.clientX - centerX) * 0.15
+    const offsetY = (e.clientY - centerY) * 0.15
+    setPaperOffsets(prev => {
+      const newOffsets = [...prev]
+      newOffsets[index] = { x: offsetX, y: offsetY }
+      return newOffsets
+    })
+  }
+
+  const handlePaperMouseLeave = (e: React.MouseEvent<HTMLDivElement>, index: number) => {
+    setPaperOffsets(prev => {
+      const newOffsets = [...prev]
+      newOffsets[index] = { x: 0, y: 0 }
+      return newOffsets
+    })
+  }
+
+  const folderStyle = {
+    '--folder-color': color,
+    '--folder-back-color': folderBackColor,
+    '--paper-1': paper1,
+    '--paper-2': paper2,
+    '--paper-3': paper3
+  } as React.CSSProperties
+
+  const folderClassName = `folder ${open ? 'open' : ''}`.trim()
   const scaleStyle = { transform: `scale(${size})` }
 
   return (
-    <div
-      style={scaleStyle}
-      className={`relative inline-block ${className}`}
-      onClick={handleClick}
-    >
-      <div className="relative w-24 h-20 transition-all duration-200 ease-in-out cursor-pointer">
-        {/* Papers flying out */}
-        <div className="absolute z-[2] bottom-2.5 left-[50%] translate-x-[-50%]">
-          {items.slice(0, 3).map((item, i) => (
+    <div style={scaleStyle} className={className}>
+      <div className={folderClassName} style={folderStyle} onClick={handleClick}>
+        <div className="folder__back">
+          {papers.map((item, i) => (
             <div
               key={i}
-              className={`absolute w-[70px] h-20 rounded-[10px] transition-all duration-300 ease-in-out ${
-                open ? 'opacity-100' : 'opacity-0'
-              }`}
-              style={{
-                background: i === 0 ? paper1 : i === 1 ? paper2 : paper3,
-                bottom: '10%',
-                left: '50%',
-                transform: open
-                  ? `translate(${-120 - i * 15}%, ${-70 - i * 10}%) rotateZ(${-15 - i * 5}deg)`
-                  : `translate(-50%, 0%) rotateZ(0deg)`,
-                zIndex: 2 - i
-              }}
+              className={`paper paper-${i + 1}`}
+              onMouseMove={e => handlePaperMouseMove(e, i)}
+              onMouseLeave={e => handlePaperMouseLeave(e, i)}
+              style={
+                open
+                  ? {
+                      '--magnet-x': `${paperOffsets[i]?.x || 0}px`,
+                      '--magnet-y': `${paperOffsets[i]?.y || 0}px`
+                    } as React.CSSProperties
+                  : {}
+              }
             >
-              <div className="flex items-center justify-center h-full text-xs overflow-hidden p-2">
-                {item}
-              </div>
+              {item && (
+                <div className="flex items-center justify-center h-full text-xs overflow-hidden p-2">
+                  {item}
+                </div>
+              )}
             </div>
           ))}
+          <div className="folder__front"></div>
+          <div className="folder__front right"></div>
         </div>
-
-        {/* Folder back */}
-        <div
-          className="absolute w-full h-20 rounded-[10px_10px_10px_10px] transition-all duration-300 ease-in-out"
-          style={{
-            background: folderBackColor,
-            position: 'relative',
-            zIndex: 0,
-            width: '100px',
-            height: '80px'
-          }}
-        >
-          {/* Pseudo-element for after */}
-          <div
-            className="absolute z-0 bottom-[98%] left-0 w-[30px] h-2.5 rounded-[5px_5px_0_0]"
-            style={{
-              background: folderBackColor,
-              content: '""'
-            }}
-          />
-        </div>
-
-        {/* Folder front */}
-        <div
-          className="absolute w-full h-full rounded-[10px_10px_10px_10px] transition-all duration-300 ease-in-out"
-          style={{
-            position: 'absolute',
-            zIndex: 3,
-            width: '100%',
-            height: '100%',
-            background: color,
-            transformOrigin: 'bottom',
-            transform: open ? 'translateY(-8px)' : 'translateY(0)',
-            borderRadius: '5px 10px 10px 10px'
-          }}
-        />
-
-        {/* Right side */}
-        <div
-          className="absolute z-[1] transition-all duration-300 ease-in-out"
-          style={{
-            width: '100%',
-            height: '100%',
-            background: color,
-            position: 'absolute',
-            transform: open ? 'skew(-15deg) scale(0.6)' : 'skew(-15deg) scale(0.6)',
-            transformOrigin: 'bottom',
-            right: '-15%',
-            borderRadius: '5px 10px 10px 10px'
-          }}
-        />
       </div>
     </div>
   )

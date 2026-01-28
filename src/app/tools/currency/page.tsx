@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { 
-  SUPPORTED_CURRENCIES, 
-  convertCurrency, 
+import { useState, useEffect, useCallback } from 'react'
+import {
+  SUPPORTED_CURRENCIES,
+  convertCurrency,
   formatCurrency,
-  type CurrencyCode 
+  type CurrencyCode
 } from '@/services/currencyService'
 
 export default function CurrencyPage() {
@@ -26,10 +26,10 @@ export default function CurrencyPage() {
     }
   }, [])
 
-  async function handleConvert() {
+  const handleConvert = useCallback(async () => {
     setLoading(true)
     setError(null)
-    
+
     try {
       const converted = await convertCurrency(amount, from, to)
       if (converted !== null) {
@@ -42,7 +42,7 @@ export default function CurrencyPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [amount, from, to])
 
   // Auto-convert bei Änderungen
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function CurrencyPage() {
       }
     }, 500)
     return () => clearTimeout(timer)
-  }, [amount, from, to])
+  }, [amount, from, to, handleConvert])
 
   function swapCurrencies() {
     setFrom(to)

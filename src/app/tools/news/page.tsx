@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { 
-  getCollectionNews, 
+import { useState, useEffect, useCallback } from 'react'
+import {
+  getCollectionNews,
   searchNews,
   getRelativeTime,
   type NewsArticle,
@@ -56,32 +56,32 @@ export default function NewsPage() {
     }
   }, [mounted])
 
-  async function loadNews() {
+  const loadNews = useCallback(async () => {
     setLoading(true)
     setError(null)
-    
+
     try {
       let news: NewsArticle[]
-      
+
       if (searchQuery.trim()) {
         news = await searchNews(searchQuery, 15)
       } else {
         news = await getCollectionNews(activeCategory, 15)
       }
-      
+
       setArticles(news)
     } catch (err) {
       setError('Fehler beim Laden der News')
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchQuery, activeCategory])
 
   useEffect(() => {
-    if (mounted) {
+    if (mounted && !searchQuery) {
       loadNews()
     }
-  }, [activeCategory, mounted])
+  }, [activeCategory, mounted, searchQuery, loadNews])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
