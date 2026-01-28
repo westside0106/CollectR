@@ -10,6 +10,10 @@
   transition: transform 0.3s ease-out;
   cursor: pointer;
   will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 .folder:not(.folder--click):hover {
@@ -33,29 +37,29 @@
 }
 
 .folder.open .paper:nth-child(1) {
-  transform: translate(calc(-120% + var(--magnet-x, 0px)), calc(-70% + var(--magnet-y, 0px))) rotateZ(-15deg);
+  transform: translate(calc(-120% + var(--magnet-x, 0px)), calc(-70% + var(--magnet-y, 0px))) rotateZ(-15deg) translateZ(0);
 }
 
 .folder.open .paper:nth-child(1):hover {
-  transform: translate(calc(-120% + var(--magnet-x, 0px)), calc(-70% + var(--magnet-y, 0px))) rotateZ(-15deg) scale(1.1);
+  transform: translate(calc(-120% + var(--magnet-x, 0px)), calc(-70% + var(--magnet-y, 0px))) rotateZ(-15deg) scale(1.1) translateZ(0);
 }
 
 .folder.open .paper:nth-child(2) {
-  transform: translate(calc(10% + var(--magnet-x, 0px)), calc(-70% + var(--magnet-y, 0px))) rotateZ(15deg);
+  transform: translate(calc(10% + var(--magnet-x, 0px)), calc(-70% + var(--magnet-y, 0px))) rotateZ(15deg) translateZ(0);
   height: 80%;
 }
 
 .folder.open .paper:nth-child(2):hover {
-  transform: translate(calc(10% + var(--magnet-x, 0px)), calc(-70% + var(--magnet-y, 0px))) rotateZ(15deg) scale(1.1);
+  transform: translate(calc(10% + var(--magnet-x, 0px)), calc(-70% + var(--magnet-y, 0px))) rotateZ(15deg) scale(1.1) translateZ(0);
 }
 
 .folder.open .paper:nth-child(3) {
-  transform: translate(calc(-50% + var(--magnet-x, 0px)), calc(-100% + var(--magnet-y, 0px))) rotateZ(5deg);
+  transform: translate(calc(-50% + var(--magnet-x, 0px)), calc(-100% + var(--magnet-y, 0px))) rotateZ(5deg) translateZ(0);
   height: 80%;
 }
 
 .folder.open .paper:nth-child(3):hover {
-  transform: translate(calc(-50% + var(--magnet-x, 0px)), calc(-100% + var(--magnet-y, 0px))) rotateZ(5deg) scale(1.1);
+  transform: translate(calc(-50% + var(--magnet-x, 0px)), calc(-100% + var(--magnet-y, 0px))) rotateZ(5deg) scale(1.1) translateZ(0);
 }
 
 .folder.open .folder__front {
@@ -91,13 +95,17 @@
   z-index: 2;
   bottom: 10%;
   left: 50%;
-  transform: translate(-50%, 10%);
+  transform: translate(-50%, 10%) translateZ(0);
   width: 70%;
   height: 80%;
   background: var(--paper-1);
   border-radius: 10px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .paper:nth-child(2) {
@@ -122,4 +130,36 @@
   transform-origin: bottom;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  .folder {
+    transition: transform 0.2s ease-out;
+  }
+
+  .paper {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .folder__front {
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Reduce hover lift on mobile for better touch experience */
+  .folder:not(.folder--click):hover {
+    transform: translateY(-4px);
+  }
+
+  .folder.open {
+    transform: translateY(-4px);
+  }
+}
+
+/* Improve touch targets on mobile */
+@media (hover: none) and (pointer: coarse) {
+  .folder {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
 }

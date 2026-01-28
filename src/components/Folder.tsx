@@ -118,7 +118,7 @@ export function Folder({
               }
             >
               {item && (
-                <div className="flex items-center justify-center h-full text-xs overflow-hidden p-2">
+                <div className="flex items-center justify-center h-full overflow-hidden">
                   {item}
                 </div>
               )}
