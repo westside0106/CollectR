@@ -1,8 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { Folder } from './Folder'
 import { Aurora } from './Aurora'
+import { createClient } from '@/lib/supabase/client'
 
 interface Collection {
   id: string
@@ -27,21 +29,69 @@ export function CollectionFolderCard({
   onDelete,
   onShare
 }: CollectionFolderCardProps) {
+  const [previewImages, setPreviewImages] = useState<string[]>([])
+  const supabase = createClient()
+
+  // Fetch preview images when component mounts
+  useEffect(() => {
+    async function fetchPreviewImages() {
+      if (!collection.item_count || collection.item_count === 0) return
+
+      const { data } = await supabase
+        .from('items')
+        .select('item_images(thumbnail_url, original_url)')
+        .eq('collection_id', collection.id)
+        .limit(3)
+
+      if (data) {
+        const images: string[] = []
+        for (const item of data) {
+          const itemImages = item.item_images as any[]
+          if (itemImages && itemImages.length > 0) {
+            const firstImage = itemImages[0]
+            images.push(firstImage.thumbnail_url || firstImage.original_url)
+            if (images.length === 3) break
+          }
+        }
+        setPreviewImages(images)
+      }
+    }
+
+    fetchPreviewImages()
+  }, [collection.id, collection.item_count, supabase])
+
   // Color based on collection or default
   const getFolderColor = () => {
     if (collection.is_shared) return '#9333ea' // purple for shared
     return '#5227FF' // default blue-purple
   }
 
-  // Sample items to show in folder (first 3 categories or generic items)
-  const folderItems = Array.from({ length: Math.min(3, collection.item_count || 0) }, (_, i) => (
-    <div key={i} className="text-[10px] text-gray-700 dark:text-gray-300 truncate">
-      Item {i + 1}
-    </div>
-  ))
+  // Create folder items with images or placeholders
+  const folderItems = Array.from({ length: Math.min(3, collection.item_count || 0) }, (_, i) => {
+    if (previewImages[i]) {
+      return (
+        <img
+          key={i}
+          src={previewImages[i]}
+          alt={`Preview ${i + 1}`}
+          className="w-full h-full object-cover rounded-lg"
+          loading="lazy"
+          style={{
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden'
+          }}
+        />
+      )
+    }
+    return (
+      <div key={i} className="w-full h-full flex items-center justify-center text-2xl text-gray-300 dark:text-gray-500 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-700">
+        📷
+      </div>
+    )
+  })
 
   return (
-    <div className="group relative rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all">
+    <div className="group relative rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-lg active:shadow-md transition-all touch-manipulation" style={{ WebkitTapHighlightColor: 'transparent' }}>
       {/* Aurora Background */}
       <div className="absolute inset-0 z-0 overflow-hidden rounded-xl">
         <Aurora
@@ -115,12 +165,12 @@ export function CollectionFolderCard({
 
       {/* Card Content */}
       <Link href={`/collections/${collection.id}`}>
-        <div className="relative px-4 py-8 sm:px-6 sm:py-10 min-h-[200px] sm:min-h-[240px] flex flex-col items-center justify-center z-10">
+        <div className="relative px-4 py-8 sm:px-6 sm:py-10 min-h-[220px] sm:min-h-[240px] flex flex-col items-center justify-center z-10">
           {/* 3D Folder */}
-          <div className="mb-3 sm:mb-4 transform hover:scale-110 transition-transform duration-300 relative z-10 scale-90 sm:scale-100 drop-shadow-xl will-change-transform">
+          <div className="mb-3 sm:mb-4 transform hover:scale-105 active:scale-95 transition-transform duration-300 ease-out relative z-10 scale-95 sm:scale-100 drop-shadow-xl will-change-transform touch-manipulation">
             <Folder
               color={getFolderColor()}
-              size={1.5}
+              size={1.4}
               items={folderItems}
             />
           </div>
