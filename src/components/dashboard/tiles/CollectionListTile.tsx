@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { Folder } from '@/components/Folder'
+import { Aurora } from '@/components/Aurora'
 
 interface CollectionSummary {
   id: string
@@ -93,21 +95,30 @@ export function CollectionListTile() {
           <Link
             key={collection.id}
             href={`/collections/${collection.id}`}
-            className="group relative aspect-square rounded-xl overflow-hidden bg-gray-200 dark:bg-slate-700
-                       hover:ring-2 hover:ring-blue-500 transition-all"
+            className="group relative aspect-square rounded-xl overflow-hidden bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700
+                       hover:shadow-lg hover:border-blue-400 dark:hover:border-blue-500 transition-all"
           >
-            {collection.cover_image ? (
-              <img
-                src={collection.cover_image}
-                alt={collection.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            {/* Aurora Background */}
+            <Aurora
+              colorStops={['#4785ff', '#5227ff', '#8061ff', '#93e3fd', '#ffffff']}
+              amplitude={0.3}
+              blend={0.15}
+              className="opacity-40 dark:opacity-30"
+            />
+
+            {/* Folder */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Folder
+                color="#5227FF"
+                size={1.2}
+                items={Array.from({ length: Math.min(3, collection.item_count) }, (_, i) => (
+                  <div key={i} className="text-[8px] text-gray-600">Item</div>
+                ))}
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-4xl text-gray-400">
-                📦
-              </div>
-            )}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+            </div>
+
+            {/* Collection Info */}
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-3 z-10">
               <p className="text-white font-medium text-sm truncate">{collection.name}</p>
               <p className="text-white/70 text-xs">{collection.item_count} Items</p>
             </div>
