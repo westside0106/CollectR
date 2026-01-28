@@ -10,6 +10,7 @@ import { ShareModal } from '@/components/ShareModal'
 import { CollectionCardSkeleton } from '@/components/Skeleton'
 import EmojiPicker from '@/components/EmojiPicker'
 import { CollectionFolderCard } from '@/components/CollectionFolderCard'
+import Dither from '@/components/Dither'
 
 interface Collection {
   id: string
@@ -340,7 +341,22 @@ export default function CollectionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900" data-pull-refresh>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 relative" data-pull-refresh>
+      {/* Dither Background */}
+      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20">
+        <Dither
+          waveColor={[0.3, 0.4, 0.6]}
+          colorNum={4}
+          waveAmplitude={0.3}
+          waveFrequency={3}
+          waveSpeed={0.05}
+          enableMouseInteraction={true}
+          mouseRadius={0.3}
+          disableAnimation={false}
+          pixelSize={2}
+        />
+      </div>
+
       {/* Pull-to-Refresh Indicator */}
       {(isPulling || isPullRefreshing) && (
         <div
@@ -374,7 +390,7 @@ export default function CollectionsPage() {
         </div>
       )}
 
-      <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
+      <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700 relative z-10">
         <div className="max-w-7xl mx-auto container-responsive py-3 sm:py-4 flex justify-between items-center">
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">📦 CollectR</Link>
@@ -384,7 +400,7 @@ export default function CollectionsPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto container-responsive py-6 sm:py-8">
+      <main className="max-w-7xl mx-auto container-responsive py-6 sm:py-8 relative z-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <h1 className="heading-responsive font-bold dark:text-white">Meine Sammlungen</h1>
           <Link

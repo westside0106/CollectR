@@ -176,6 +176,7 @@ export type TileType =
   | 'quick_actions'   // Schnellaktionen
   | 'collection_list' // Sammlungs-Übersicht
   | 'tcg_highlights'  // TCG Top-Karten nach Grade (Phase 5)
+  | 'favorites'       // Favoriten / Benutzerdefinierte Kategorien
 
 export type TileSize = 'small' | 'medium' | 'large' | 'full'
 
