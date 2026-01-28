@@ -43,7 +43,14 @@ export default function RegisterPage() {
       })
 
       if (error) {
-        setError(error.message)
+        // Provide more user-friendly error messages
+        if (error.message.includes('email')) {
+          setError('Fehler beim Senden der Bestätigungs-E-Mail. Bitte überprüfe deine E-Mail-Adresse oder versuche es später erneut.')
+        } else if (error.message.includes('password')) {
+          setError('Das Passwort erfüllt nicht die Sicherheitsanforderungen. Bitte verwende mindestens 6 Zeichen.')
+        } else {
+          setError(`Registrierung fehlgeschlagen: ${error.message}`)
+        }
         setLoading(false)
       } else if (data.user && !data.user.identities?.length) {
         setError('Ein Konto mit dieser E-Mail existiert bereits')
@@ -52,7 +59,8 @@ export default function RegisterPage() {
         setSuccess(true)
       }
     } catch (err) {
-      setError('Ein unerwarteter Fehler ist aufgetreten')
+      console.error('Registration error:', err)
+      setError('Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später erneut.')
       setLoading(false)
     }
   }

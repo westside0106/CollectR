@@ -7,8 +7,9 @@
 }
 
 .folder {
-  transition: all 0.2s ease-in;
+  transition: transform 0.3s ease-out;
   cursor: pointer;
+  will-change: transform;
 }
 
 .folder:not(.folder--click):hover {
@@ -95,7 +96,8 @@
   height: 80%;
   background: var(--paper-1);
   border-radius: 10px;
-  transition: all 0.3s ease-in-out;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 .paper:nth-child(2) {
@@ -118,5 +120,6 @@
   background: var(--folder-color);
   border-radius: 5px 10px 10px 10px;
   transform-origin: bottom;
-  transition: all 0.3s ease-in-out;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }

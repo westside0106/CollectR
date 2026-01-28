@@ -41,9 +41,9 @@ export function CollectionFolderCard({
   ))
 
   return (
-    <div className="group relative rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all overflow-hidden">
+    <div className="group relative rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all">
       {/* Aurora Background */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 overflow-hidden rounded-xl">
         <Aurora
           colorStops={
             collection.is_shared
@@ -115,9 +115,9 @@ export function CollectionFolderCard({
 
       {/* Card Content */}
       <Link href={`/collections/${collection.id}`}>
-        <div className="relative p-4 sm:p-6 min-h-[160px] sm:min-h-[200px] flex flex-col items-center justify-center z-10">
+        <div className="relative px-4 py-8 sm:px-6 sm:py-10 min-h-[200px] sm:min-h-[240px] flex flex-col items-center justify-center z-10">
           {/* 3D Folder */}
-          <div className="mb-3 sm:mb-4 transform hover:scale-110 transition-transform relative z-10 scale-90 sm:scale-100 drop-shadow-xl">
+          <div className="mb-3 sm:mb-4 transform hover:scale-110 transition-transform duration-300 relative z-10 scale-90 sm:scale-100 drop-shadow-xl will-change-transform">
             <Folder
               color={getFolderColor()}
               size={1.5}
