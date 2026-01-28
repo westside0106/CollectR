@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/brand/collectr-r.png" alt="CollectR Logo" width="200">
+  <img src="public/icons/icon-512.png" alt="Collectorssphere Logo" width="200">
 </p>
 
-<h1 align="center">CollectR</h1>
+<h1 align="center">Collectors Sphere</h1>
 
 <p align="center">
   <strong>Die intelligente Multi-Sphere Sammlungsplattform für leidenschaftliche Sammler</strong>
@@ -26,18 +26,18 @@
 
 ---
 
-## 🌟 Was ist CollectR?
+## 🌟 Was ist die Collectors Sphere?
 
-CollectR ist eine moderne, datenschutzfreundliche Multi-Sphere Plattform zur Verwaltung deiner wertvollsten Sammlungen. Mit spezialisierten "Spheres" für verschiedene Sammelgebiete bietet CollectR maßgeschneiderte Tools für TCG, Gaming, Dokumente, Geologie und mehr.
+Die Collectors Sphere ist eine moderne, datenschutzfreundliche Multi-Sphere Plattform zur Verwaltung deiner wertvollsten Sammlungen. Mit spezialisierten "Spheres" für verschiedene Sammelgebiete bietet Collectorssphere maßgeschneiderte Tools für TCG, Gaming, Dokumente, Geologie und mehr.
 
 ### Sphere-Konzept
 
-CollectR organisiert sich in spezialisierte **Spheres** (Sphären), von denen jede optimiert ist für spezifische Sammelkategorien:
+Die Collectors Sphere organisiert sich in spezialisierte **Spheres** (Sphären), von denen jede optimiert ist für spezifische Sammelkategorien:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    CollectR HUB (🏠)                        │
-│              Universal Collection Manager                    │
+│             Collectorssphere HUB (🏠)                       │
+│           Universal Collection Manager                      │
 └───────────┬─────────────────────────────────────────────────┘
             │
     ┌───────┴────────┬─────────┬──────────┬──────────┐
@@ -154,7 +154,7 @@ Komplette E-Commerce Lösung:
 
 ```
 +─────────────────────────────────────────────────────────+
-│  CollectR Dashboard                                     │
+│  Collectorssphere Dashboard                            │
 ├─────────────┬─────────────┬─────────────┬───────────────┤
 │ 5 Spheres   │ 847 Items   │ €25,430     │ 18 Categories │
 │ Active      │ Total       │ Total Value │ Across All    │
