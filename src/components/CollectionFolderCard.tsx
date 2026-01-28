@@ -43,20 +43,22 @@ export function CollectionFolderCard({
   return (
     <div className="group relative bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 hover:shadow-lg transition-all overflow-hidden">
       {/* Aurora Background */}
-      <Aurora
-        colorStops={
-          collection.is_shared
-            ? ['#7c3aed', '#a855f7', '#c084fc', '#e9d5ff', '#ffffff']
-            : ['#4785ff', '#5227ff', '#8061ff', '#93e3fd', '#ffffff']
-        }
-        amplitude={0.3}
-        blend={0.15}
-        className="opacity-40 dark:opacity-30"
-      />
+      <div className="absolute inset-0 z-0">
+        <Aurora
+          colorStops={
+            collection.is_shared
+              ? ['#7c3aed', '#a855f7', '#c084fc', '#e9d5ff', '#ffffff']
+              : ['#4785ff', '#5227ff', '#8061ff', '#93e3fd', '#ffffff']
+          }
+          amplitude={0.5}
+          blend={0.3}
+          className="opacity-70 dark:opacity-60"
+        />
+      </div>
 
       {/* Action Buttons - only for own collections */}
       {!collection.is_shared && (
-        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
           {onShare && (
             <button
               onClick={(e) => {
@@ -104,7 +106,7 @@ export function CollectionFolderCard({
 
       {/* Shared Badge */}
       {collection.is_shared && (
-        <div className="absolute top-3 right-3 z-10">
+        <div className="absolute top-3 right-3 z-20">
           <span className="px-2 py-1 text-xs font-medium bg-purple-100 dark:bg-purple-900/70 text-purple-700 dark:text-purple-300 rounded-full backdrop-blur-sm">
             {collection.role === 'viewer' ? 'Betrachter' : collection.role === 'editor' ? 'Bearbeiter' : 'Admin'}
           </span>
@@ -113,9 +115,9 @@ export function CollectionFolderCard({
 
       {/* Card Content */}
       <Link href={`/collections/${collection.id}`}>
-        <div className="relative p-6 min-h-[200px] flex flex-col items-center justify-center">
+        <div className="relative p-6 min-h-[200px] flex flex-col items-center justify-center z-10">
           {/* 3D Folder */}
-          <div className="mb-4 transform hover:scale-110 transition-transform">
+          <div className="mb-4 transform hover:scale-110 transition-transform relative z-10">
             <Folder
               color={getFolderColor()}
               size={1.5}
@@ -124,7 +126,7 @@ export function CollectionFolderCard({
           </div>
 
           {/* Collection Info */}
-          <div className="text-center relative z-[1]">
+          <div className="text-center relative z-10">
             <h3 className="text-base sm:text-lg font-semibold dark:text-white mb-1">
               {collection.name}
             </h3>
