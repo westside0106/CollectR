@@ -14,6 +14,7 @@ import { AIBatchUpload } from '@/components/AIBatchUpload'
 import { useToast } from '@/components/Toast'
 import { ItemCardSkeleton } from '@/components/Skeleton'
 import { TCGBulkPriceUpdate } from '@/components/TCGBulkPriceUpdate'
+import Dither from '@/components/Dither'
 
 type ViewMode = 'grid' | 'list'
 type TabMode = 'items' | 'goals'
@@ -408,7 +409,22 @@ export default function CollectionDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 dark:bg-slate-900 min-h-screen" data-pull-refresh>
+    <div className="p-4 sm:p-6 md:p-8 dark:bg-slate-900 min-h-screen relative" data-pull-refresh>
+      {/* Dither Background */}
+      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20">
+        <Dither
+          waveColor={[0.3, 0.4, 0.6]}
+          colorNum={4}
+          waveAmplitude={0.3}
+          waveFrequency={3}
+          waveSpeed={0.05}
+          enableMouseInteraction={true}
+          mouseRadius={0.3}
+          disableAnimation={false}
+          pixelSize={2}
+        />
+      </div>
+
       {/* Pull-to-Refresh Indicator */}
       {(isPulling || isPullRefreshing) && (
         <div
@@ -443,7 +459,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4 sm:mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4 sm:mb-6 relative z-10">
         <div className="w-full sm:w-auto">
           <Link
             href="/collections"

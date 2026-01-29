@@ -17,6 +17,7 @@ const DEFAULT_TILES: DashboardTile[] = [
   { id: 'recent_items', type: 'recent_items', title: 'Kürzlich hinzugefügt', size: 'medium', position: 7, visible: true },
   { id: 'top_items', type: 'top_items', title: 'Wertvollste Items', size: 'medium', position: 8, visible: true },
   { id: 'collection_list', type: 'collection_list', title: 'Sammlungen', size: 'large', position: 9, visible: true },
+  { id: 'favorites', type: 'favorites', title: 'Favoriten', size: 'large', position: 10, visible: false },
 ]
 
 const DEFAULT_CONFIG: DashboardConfig = {
@@ -154,6 +155,7 @@ export function getTileIcon(type: TileType): string {
     quick_actions: '⚡',
     collection_list: '📦',
     tcg_highlights: '🃏',
+    favorites: '⭐',
   }
   return icons[type] || '📋'
 }
@@ -172,6 +174,7 @@ export function getTileDescription(type: TileType): string {
     quick_actions: 'Schnellzugriff auf häufige Aktionen',
     collection_list: 'Übersicht aller Sammlungen',
     tcg_highlights: 'Top Trading Cards nach Grading (PSA/BGS/CGC/SGC)',
+    favorites: 'Deine Lieblings-Sammlungen mit animierten Karten',
   }
   return descriptions[type] || ''
 }

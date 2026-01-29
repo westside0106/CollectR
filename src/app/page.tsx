@@ -21,6 +21,8 @@ import {
   TCGHighlightsTile,
   SpheresTile,
 } from '@/components/dashboard'
+import { FavoritesTile } from '@/components/dashboard/tiles/FavoritesTile'
+import Dither from '@/components/Dither'
 
 interface ChartData {
   categoryDistribution: { label: string; value: number; color: string }[]
@@ -380,6 +382,8 @@ function DashboardContent() {
         return <CollectionListTile />
       case 'tcg_highlights':
         return <TCGHighlightsTile />
+      case 'favorites':
+        return <FavoritesTile />
       case 'chart_category':
         return chartData.categoryDistribution.length > 0 ? (
           <DashboardCharts
@@ -432,7 +436,22 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors" data-pull-refresh>
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors relative" data-pull-refresh>
+      {/* Dither Background */}
+      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20">
+        <Dither
+          waveColor={[0.3, 0.4, 0.6]}
+          colorNum={4}
+          waveAmplitude={0.3}
+          waveFrequency={3}
+          waveSpeed={0.05}
+          enableMouseInteraction={true}
+          mouseRadius={0.3}
+          disableAnimation={false}
+          pixelSize={2}
+        />
+      </div>
+
       {/* Pull-to-Refresh Indicator */}
       {(isPulling || isPullRefreshing) && (
         <div
@@ -467,7 +486,7 @@ function DashboardContent() {
       )}
 
       {/* Header */}
-      <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700">
+      <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700 relative z-10">
         <div className="max-w-7xl mx-auto container-responsive py-3 sm:py-4 flex justify-between items-center">
           <div className="flex items-center gap-2 sm:gap-3">
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
@@ -505,7 +524,7 @@ function DashboardContent() {
       </header>
 
       {/* Main Content - Tile Grid */}
-      <main className="max-w-7xl mx-auto container-responsive py-4 sm:py-6 md:py-8">
+      <main className="max-w-7xl mx-auto container-responsive py-4 sm:py-6 md:py-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {visibleTiles.map(tile => (
             <DashboardTile
