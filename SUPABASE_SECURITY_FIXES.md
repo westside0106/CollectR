@@ -50,7 +50,7 @@
 **Location:** Supabase Dashboard → Authentication → Policies
 
 **Steps:**
-1. Go to https://supabase.com/dashboard/project/oferxxqoeshilqhwtyqf/auth/policies
+1. Go to https://supabase.com/dashboard/project/YOUR_PROJECT_ID/auth/policies
 2. Find **"Leaked Password Protection"**
 3. Toggle it **ON**
 
@@ -91,7 +91,7 @@ CREATE VIEW item_price_history_view AS
 
 ### Option 1: Supabase Dashboard (Easiest)
 
-1. Go to https://supabase.com/dashboard/project/oferxxqoeshilqhwtyqf/database/migrations
+1. Go to https://supabase.com/dashboard/project/YOUR_PROJECT_ID/database/migrations
 2. Click **"New migration"**
 3. Copy contents of `20260121_fix_rls_security_issues.sql`
 4. Click **"Run"**
@@ -109,7 +109,7 @@ supabase migration up
 
 ### Option 3: SQL Editor
 
-1. Go to https://supabase.com/dashboard/project/oferxxqoeshilqhwtyqf/sql
+1. Go to https://supabase.com/dashboard/project/YOUR_PROJECT_ID/sql
 2. Copy-paste each migration file
 3. Click **"Run"**
 

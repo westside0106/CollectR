@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { USD_TO_EUR } from '@/lib/constants'
 
 const POKEMON_TCG_API_BASE = 'https://api.pokemontcg.io/v2'
@@ -213,6 +214,17 @@ async function fetchMagicPrice(cardName: string, setName?: string, cardNumber?: 
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check - require authenticated user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const { cardName, setName, cardNumber, game } = body
 
@@ -245,10 +257,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('API route error:', error)
     return NextResponse.json(
-      {
-        error: 'Failed to fetch price data',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to fetch price data' },
       { status: 500 }
     )
   }

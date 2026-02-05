@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY || ''
 
@@ -51,6 +52,17 @@ function getMockNews(): NewsArticle[] {
 
 export async function GET(request: NextRequest) {
   try {
+    // Auth check - require authenticated user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category') as CollectionCategory | null
     const query = searchParams.get('query')

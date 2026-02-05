@@ -1,7 +1,7 @@
 # CollectR Backups
 
 ## Project Backup
-- **Full project backup**: `/Users/flip/Downloads/CollectR_backup_20260106_172410.tar.gz` (472KB)
+- **Full project backup**: `/path/to/your/downloads/CollectR_backup_20260106_172410.tar.gz` (472KB)
 - Created: 2026-01-06 17:24:10
 - Excludes: node_modules, .next, git objects
 
@@ -29,7 +29,7 @@ pg_dump -h db.YOUR_PROJECT.supabase.co -U postgres -d postgres > backups/db/coll
 
 ### Restore Project Files
 ```bash
-cd /Users/flip/Downloads
+cd /path/to/your/downloads
 tar -xzf CollectR_backup_20260106_172410.tar.gz
 cd CollectR_clean
 npm install

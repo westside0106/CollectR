@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 const CURRENCYLAYER_API_KEY = process.env.CURRENCYLAYER_API_KEY || ''
 
@@ -32,6 +33,17 @@ interface ExchangeRates {
 
 export async function GET(request: NextRequest) {
   try {
+    // Auth check - require authenticated user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const amount = searchParams.get('amount')
     const from = searchParams.get('from')
@@ -124,11 +136,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result)
 
   } catch (error) {
+    console.error('Currency API error:', error)
     return NextResponse.json(
-      {
-        error: 'Failed to process currency request',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to process currency request' },
       { status: 500 }
     )
   }

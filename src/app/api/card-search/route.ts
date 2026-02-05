@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 const POKEMON_TCG_API_KEY = process.env.POKEMON_TCG_API_KEY || ''
 
@@ -196,6 +197,17 @@ async function getCardDetails(game: string, cardId: string): Promise<CardSearchR
 
 export async function GET(request: NextRequest) {
   try {
+    // Auth check - require authenticated user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const { searchParams } = new URL(request.url)
     const game = searchParams.get('game')
     const query = searchParams.get('query')
@@ -252,10 +264,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('[Card Search Error]', error)
     return NextResponse.json(
-      {
-        error: 'Failed to search cards',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to search cards' },
       { status: 500 }
     )
   }

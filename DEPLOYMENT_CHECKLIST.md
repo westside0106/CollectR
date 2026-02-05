@@ -51,7 +51,7 @@ Open Browser DevTools (F12) → Network → Reload page → Check response heade
 ### Edge Functions Auth Test
 ```bash
 # This should FAIL (401 Unauthorized):
-curl -X POST 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-lookup' \
+curl -X POST 'https://YOUR_PROJECT_ID.supabase.co/functions/v1/tcg-price-lookup' \
   -H 'Content-Type: application/json' \
   -d '{"cardName":"Pikachu","game":"pokemon"}'
 
@@ -90,7 +90,7 @@ curl -X POST 'https://oferxxqoeshilqhwtyqf.supabase.co/functions/v1/tcg-price-lo
 - ✅ PR #30 merged
 - ✅ All commits in main
 
-**Supabase:** https://supabase.com/dashboard/project/oferxxqoeshilqhwtyqf
+**Supabase:** https://supabase.com/dashboard/project/YOUR_PROJECT_ID
 - ✅ New API keys active
 - ✅ Edge Functions configured with JWT
 
