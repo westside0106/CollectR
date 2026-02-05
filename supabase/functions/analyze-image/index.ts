@@ -1,8 +1,22 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'https://collectr.app',
+  'https://www.collectr.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
+]
+
+// Max image size: 10MB (base64 encoded)
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  }
 }
 
 interface AnalyzeRequest {
@@ -12,6 +26,9 @@ interface AnalyzeRequest {
 }
 
 serve(async (req) => {
+  const origin = req.headers.get('origin')
+  const corsHeaders = getCorsHeaders(origin)
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -27,6 +44,14 @@ serve(async (req) => {
 
     if (!imageBase64) {
       throw new Error('No image provided')
+    }
+
+    // Check image size to prevent DoS and excessive API costs
+    if (imageBase64.length > MAX_IMAGE_SIZE) {
+      return new Response(
+        JSON.stringify({ error: 'Image too large. Maximum size is 10MB.' }),
+        { status: 413, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
     // Baue den Prompt basierend auf Sammlungstyp
@@ -99,7 +124,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Failed to analyze image' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

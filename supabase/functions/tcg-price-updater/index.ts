@@ -14,11 +14,25 @@ interface TCGItem {
   _computed_value: number | null
 }
 
-Deno.serve(async (req) => {
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'https://collectr.app',
+  'https://www.collectr.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
+]
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   }
+}
+
+Deno.serve(async (req) => {
+  const origin = req.headers.get('origin')
+  const corsHeaders = getCorsHeaders(origin)
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -174,10 +188,7 @@ Deno.serve(async (req) => {
     console.error('Price update job failed:', error)
 
     return new Response(
-      JSON.stringify({
-        error: 'Failed to run price update job',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }),
+      JSON.stringify({ error: 'Failed to run price update job' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

@@ -424,12 +424,25 @@ async function fetchPokemonPrice(request: PriceLookupRequest): Promise<PriceLook
   return result
 }
 
-Deno.serve(async (req) => {
-  // CORS headers
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'https://collectr.app',
+  'https://www.collectr.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
+]
+
+function getCorsHeaders(origin: string | null): Record<string, string> {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   }
+}
+
+Deno.serve(async (req) => {
+  const origin = req.headers.get('origin')
+  const corsHeaders = getCorsHeaders(origin)
 
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -523,10 +536,7 @@ Deno.serve(async (req) => {
     console.error('Error in tcg-price-lookup:', error)
 
     return new Response(
-      JSON.stringify({
-        error: 'Failed to fetch price data',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }),
+      JSON.stringify({ error: 'Failed to fetch price data' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
@@ -538,13 +548,13 @@ Deno.serve(async (req) => {
   2. Make an HTTP request:
 
   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/tcg-price-lookup' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
+    --header 'Authorization: Bearer YOUR_SUPABASE_ANON_KEY' \
     --header 'Content-Type: application/json' \
     --data '{"cardName":"Charizard","setName":"Base Set","game":"pokemon"}'
 
   Example with grading:
   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/tcg-price-lookup' \
-    --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
+    --header 'Authorization: Bearer YOUR_SUPABASE_ANON_KEY' \
     --header 'Content-Type: application/json' \
     --data '{"cardName":"Charizard","setName":"Base Set","game":"pokemon","grading":{"company":"PSA","grade":"10"}}'
 

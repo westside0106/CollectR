@@ -1,13 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
-export const runtime = 'edge'
 
 /**
  * TCG Barcode Lookup API
  * Searches for trading cards by product barcode/UPC
  */
 export async function GET(request: NextRequest) {
+  // Auth check - require authenticated user
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   const searchParams = request.nextUrl.searchParams
   const barcode = searchParams.get('barcode')
   const game = searchParams.get('game') || 'pokemon'
@@ -97,10 +108,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Barcode lookup error:', error)
     return NextResponse.json(
-      {
-        error: 'Failed to lookup barcode',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to lookup barcode' },
       { status: 500 }
     )
   }
@@ -108,6 +116,17 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check - require authenticated user
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const body = await request.json()
     const { barcode, game = 'pokemon' } = body
 
@@ -125,7 +144,8 @@ export async function POST(request: NextRequest) {
     url.searchParams.set('game', game)
 
     const response = await fetch(url.toString(), {
-      method: 'GET'
+      method: 'GET',
+      headers: request.headers
     })
 
     return new NextResponse(response.body, {

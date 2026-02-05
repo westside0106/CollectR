@@ -30,3 +30,6 @@ next-env.d.ts
 .env*.local
 tsconfig.tsbuildinfo
 .backup-old-anon-key.txt
+
+# Supabase local temp files
+supabase/.temp/

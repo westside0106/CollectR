@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
-export const runtime = 'edge'
 
 interface SetInfo {
   id: string
@@ -17,6 +17,17 @@ interface SetInfo {
  * Returns information about TCG sets including total card counts
  */
 export async function GET(request: NextRequest) {
+  // Auth check - require authenticated user
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   const searchParams = request.nextUrl.searchParams
   const game = searchParams.get('game') || 'pokemon'
   const setId = searchParams.get('setId')
@@ -197,10 +208,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Set info lookup error:', error)
     return NextResponse.json(
-      {
-        error: 'Failed to fetch set information',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to fetch set information' },
       { status: 500 }
     )
   }
