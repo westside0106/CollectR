@@ -82,7 +82,7 @@ const CardSwap = ({
   const order = useRef(Array.from({ length: childArr.length }, (_, i) => i));
 
   const tlRef = useRef<gsap.core.Timeline | null>(null);
-  const intervalRef = useRef<number>();
+  const intervalRef = useRef<number | undefined>(undefined);
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -186,9 +186,9 @@ const CardSwap = ({
       ? cloneElement(child, {
           key: i,
           ref: refs[i],
-          style: { width, height, ...(child.props.style ?? {}) },
+          style: { width, height, ...((child.props as any).style ?? {}) },
           onClick: (e: React.MouseEvent) => {
-            if (child.props.onClick) child.props.onClick(e);
+            if ((child.props as any).onClick) (child.props as any).onClick(e);
             if (onCardClick) onCardClick(i);
           }
         } as any)
