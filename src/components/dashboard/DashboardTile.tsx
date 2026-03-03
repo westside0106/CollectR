@@ -21,13 +21,13 @@ export function DashboardTile({ tile, children, onSettings, className = '' }: Da
   return (
     <div
       className={`
-        bg-white dark:bg-slate-800 rounded-xl shadow-sm
+        bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden
         transition-all duration-200 hover:shadow-md
         ${sizeClasses[tile.size]}
         ${className}
       `}
     >
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 h-full">
         {/* Tile Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
