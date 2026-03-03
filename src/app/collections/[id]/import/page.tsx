@@ -26,8 +26,10 @@ const BASE_TARGET_FIELDS = [
   { value: 'name', label: 'Name *', required: true },
   { value: 'description', label: 'Beschreibung' },
   { value: 'status', label: 'Status' },
-  { value: 'purchase_price', label: 'Kaufpreis' },
-  { value: 'purchase_currency', label: 'Währung' },
+  { value: 'purchase_price', label: 'Kaufpreis (EK)' },
+  { value: 'purchase_currency', label: 'Währung (EK)' },
+  { value: '_computed_value', label: 'Geschätzter Wert (VK)' },
+  { value: '_value_currency', label: 'Währung (VK)' },
   { value: 'purchase_date', label: 'Kaufdatum' },
   { value: 'purchase_location', label: 'Gekauft bei' },
   { value: 'barcode', label: 'Barcode' },
@@ -319,7 +321,7 @@ export default function ImportPage({ params }: { params: Promise<{ id: string }>
             }
           } else {
             // Standard-Felder
-            if (m.target === 'purchase_price') {
+            if (m.target === 'purchase_price' || m.target === '_computed_value') {
               const stringValue = String(value).replace(',', '.')
               value = parseFloat(stringValue) || null
             }

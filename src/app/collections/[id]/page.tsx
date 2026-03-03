@@ -411,7 +411,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
   return (
     <div className="p-4 sm:p-6 md:p-8 dark:bg-slate-900 min-h-screen relative" data-pull-refresh>
       {/* Dither Background */}
-      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20">
+      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20 pointer-events-none">
         <Dither
           waveColor={[0.3, 0.4, 0.6]}
           colorNum={4}
@@ -787,7 +787,12 @@ export default function CollectionDetailPage({ params }: PageProps) {
                     {bulkEditMode && <th className="w-12"></th>}
                     <th className="text-left px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400">Item</th>
                     <th className="text-left px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hidden sm:table-cell">Status</th>
-                    <th className="text-right px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400">Preis</th>
+                    <th className="text-right px-4 py-3 text-sm font-medium">
+                      <div className="flex flex-col items-end gap-0.5">
+                        <span className="text-blue-600 dark:text-blue-400">EK</span>
+                        <span className="text-purple-600 dark:text-purple-400">VK</span>
+                      </div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
@@ -1004,9 +1009,15 @@ function ItemCard({ item, collectionId, bulkEditMode, isSelected, onToggleSelect
       </div>
       <div className="p-4">
         <h3 className="font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">{item.name}</h3>
-        {item.purchase_price && (
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{item.purchase_price.toFixed(2)} {item.purchase_currency}</p>
-        )}
+        <div className="flex gap-2 mt-2 flex-wrap">
+          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+            {item.purchase_price != null ? `${item.purchase_price.toFixed(2)} ${item.purchase_currency || 'EUR'}` : '-'}
+          </span>
+          <span className="text-xs text-slate-300 dark:text-slate-600">·</span>
+          <span className="text-xs font-semibold text-purple-600 dark:text-purple-400">
+            {item._computed_value != null ? `${item._computed_value.toFixed(2)} ${item._value_currency || 'EUR'}` : '-'}
+          </span>
+        </div>
       </div>
     </>
   )
@@ -1125,13 +1136,14 @@ function ItemRow({ item, collectionId, bulkEditMode, isSelected, onToggleSelect 
         </span>
       </td>
       <td className="px-4 py-3 text-right">
-        {item.purchase_price ? (
-          <span className="font-medium text-green-600 dark:text-green-400">
-            {item.purchase_price.toFixed(2)} {item.purchase_currency || 'EUR'}
+        <div className="flex flex-col items-end gap-0.5">
+          <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+            {item.purchase_price != null ? `${item.purchase_price.toFixed(2)} ${item.purchase_currency || 'EUR'}` : '-'}
           </span>
-        ) : (
-          <span className="text-slate-400 dark:text-slate-500">-</span>
-        )}
+          <span className="text-xs font-semibold text-purple-600 dark:text-purple-400">
+            {item._computed_value != null ? `${item._computed_value.toFixed(2)} ${item._value_currency || 'EUR'}` : '-'}
+          </span>
+        </div>
       </td>
     </tr>
   )
