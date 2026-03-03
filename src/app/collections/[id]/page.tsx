@@ -291,8 +291,9 @@ export default function CollectionDetailPage({ params }: PageProps) {
 
   const stats = useMemo(() => {
     const totalItems = filteredItems.length
-    const totalValue = filteredItems.reduce((sum, item) => sum + (item.purchase_price || 0), 0)
-    return { totalItems, totalValue }
+    const totalPurchaseValue = filteredItems.reduce((sum, item) => sum + (item.purchase_price || 0), 0)
+    const totalEstimatedValue = filteredItems.reduce((sum, item) => sum + (item._computed_value || 0), 0)
+    return { totalItems, totalPurchaseValue, totalEstimatedValue }
   }, [filteredItems])
 
   // Calculate category counts for goals
@@ -577,14 +578,20 @@ export default function CollectionDetailPage({ params }: PageProps) {
       </div>
 
       {/* Stats Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-6 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 sm:mb-6">
+      <div className="relative z-10 flex flex-col sm:flex-row gap-3 sm:gap-6 p-3 sm:p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 sm:mb-6">
         <div>
           <span className="text-xl sm:text-2xl font-bold dark:text-white">{stats.totalItems}</span>
           <span className="text-sm sm:text-base text-slate-500 dark:text-slate-400 ml-2">Items</span>
         </div>
-        <div className="sm:border-l border-slate-200 dark:border-slate-700 sm:pl-6">
-          <span className="text-xl sm:text-2xl font-bold dark:text-white">{stats.totalValue.toFixed(2)}</span>
-          <span className="text-sm sm:text-base text-slate-500 dark:text-slate-400 ml-2">EUR</span>
+        <div className="sm:border-l border-slate-200 dark:border-slate-700 sm:pl-6 flex flex-col gap-0.5">
+          <div>
+            <span className="text-lg sm:text-xl font-bold text-blue-600 dark:text-blue-400">{stats.totalPurchaseValue.toFixed(2)}</span>
+            <span className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 ml-1">EUR EK</span>
+          </div>
+          <div>
+            <span className="text-lg sm:text-xl font-bold text-purple-600 dark:text-purple-400">{stats.totalEstimatedValue.toFixed(2)}</span>
+            <span className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 ml-1">EUR VK</span>
+          </div>
         </div>
         <div className="sm:border-l border-slate-200 dark:border-slate-700 sm:pl-6">
           <span className="text-xl sm:text-2xl font-bold dark:text-white">{categories.length}</span>
@@ -593,7 +600,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mb-4 sm:mb-6 w-full sm:w-fit">
+      <div className="relative z-10 flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1 mb-4 sm:mb-6 w-full sm:w-fit">
         <button
           onClick={() => setActiveTab('items')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition ${
@@ -628,7 +635,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
 
       {/* Items Tab Content */}
       {activeTab === 'items' && (
-        <>
+        <div className="relative z-10">
           {/* Search */}
           <div className="mb-4">
             <SearchBar
@@ -810,7 +817,7 @@ export default function CollectionDetailPage({ params }: PageProps) {
               </table>
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* Share Modal */}
