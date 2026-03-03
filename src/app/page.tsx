@@ -81,6 +81,7 @@ function DashboardContent() {
     hiddenTiles,
     toggleTile,
     updateTileSize,
+    reorderTiles,
     resetConfig,
     isLoaded: configLoaded,
   } = useDashboardConfig()
@@ -387,6 +388,7 @@ function DashboardContent() {
       case 'chart_category':
         return chartData.categoryDistribution.length > 0 ? (
           <DashboardCharts
+            compact
             categoryDistribution={chartData.categoryDistribution}
             collectionValues={[]}
             topItems={[]}
@@ -401,6 +403,7 @@ function DashboardContent() {
       case 'chart_status':
         return chartData.statusDistribution.length > 0 ? (
           <DashboardCharts
+            compact
             categoryDistribution={[]}
             collectionValues={[]}
             topItems={[]}
@@ -415,6 +418,7 @@ function DashboardContent() {
       case 'chart_financial':
         return chartData.collectionFinancials.length > 0 ? (
           <DashboardCharts
+            compact
             categoryDistribution={[]}
             collectionValues={[]}
             topItems={[]}
@@ -438,7 +442,7 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors relative" data-pull-refresh>
       {/* Dither Background */}
-      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20">
+      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20 pointer-events-none">
         <Dither
           waveColor={[0.3, 0.4, 0.6]}
           colorNum={4}
@@ -563,6 +567,7 @@ function DashboardContent() {
         hiddenTiles={hiddenTiles}
         onToggleTile={toggleTile}
         onUpdateSize={updateTileSize}
+        onReorder={reorderTiles}
         onReset={resetConfig}
       />
     </div>

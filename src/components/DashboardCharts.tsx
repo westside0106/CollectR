@@ -35,6 +35,8 @@ interface DashboardChartsProps {
   }[]
   statusDistribution: PieChartData[]
   collectionFinancials?: CollectionFinancials[]
+  /** When true, renders without outer 2-col grid wrapper (for use inside tiles) */
+  compact?: boolean
 }
 
 // Color palette for charts
@@ -232,32 +234,32 @@ function FinancialSummary({ data }: { data: CollectionFinancials[] }) {
   }
 
   return (
-    <div className="grid grid-cols-3 gap-3 mb-4">
-      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 text-center">
-        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+    <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 text-center min-w-0">
+        <div className="text-xs font-bold text-blue-600 dark:text-blue-400 truncate leading-tight">
           {formatCurrency(totals.spent)}
         </div>
-        <div className="text-xs text-blue-600/70 dark:text-blue-400/70">Ausgaben</div>
+        <div className="text-xs text-blue-600/70 dark:text-blue-400/70 mt-0.5">Ausgaben</div>
       </div>
-      <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 text-center">
-        <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+      <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2 text-center min-w-0">
+        <div className="text-xs font-bold text-purple-600 dark:text-purple-400 truncate leading-tight">
           {formatCurrency(totals.value)}
         </div>
-        <div className="text-xs text-purple-600/70 dark:text-purple-400/70">Wert</div>
+        <div className="text-xs text-purple-600/70 dark:text-purple-400/70 mt-0.5">Wert</div>
       </div>
-      <div className={`rounded-lg p-3 text-center ${
+      <div className={`rounded-lg p-2 text-center min-w-0 ${
         totals.profit >= 0
           ? 'bg-green-50 dark:bg-green-900/20'
           : 'bg-red-50 dark:bg-red-900/20'
       }`}>
-        <div className={`text-lg font-bold ${
+        <div className={`text-xs font-bold truncate leading-tight ${
           totals.profit >= 0
             ? 'text-green-600 dark:text-green-400'
             : 'text-red-600 dark:text-red-400'
         }`}>
           {totals.profit >= 0 ? '+' : ''}{formatCurrency(totals.profit)}
         </div>
-        <div className={`text-xs ${
+        <div className={`text-xs mt-0.5 ${
           totals.profit >= 0
             ? 'text-green-600/70 dark:text-green-400/70'
             : 'text-red-600/70 dark:text-red-400/70'
@@ -275,6 +277,7 @@ export default function DashboardCharts({
   topItems,
   statusDistribution,
   collectionFinancials = [],
+  compact = false,
 }: DashboardChartsProps) {
   const [distributionTab, setDistributionTab] = useState<'category' | 'status'>('category')
   const [financialTab, setFinancialTab] = useState<'spent' | 'value' | 'profit'>('spent')
@@ -290,13 +293,13 @@ export default function DashboardCharts({
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div className={compact ? 'space-y-4' : 'grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'}>
       {/* Distribution Chart with Tabs (Category / Status) */}
       {(hasCategories || hasStatus) && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Verteilung</h3>
-            <div className="flex gap-1 bg-gray-100 dark:bg-slate-700 rounded-lg p-1">
+        <div className={compact ? '' : 'bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6'}>
+          <div className="flex items-center justify-between mb-3">
+            {!compact && <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Verteilung</h3>}
+            <div className={`flex gap-1 bg-gray-100 dark:bg-slate-700 rounded-lg p-1 ${compact ? 'w-full justify-center' : ''}`}>
               <TabButton
                 active={distributionTab === 'category'}
                 onClick={() => setDistributionTab('category')}
@@ -314,14 +317,14 @@ export default function DashboardCharts({
 
           {distributionTab === 'category' && hasCategories && (
             <>
-              <PieChart data={categoryDistribution} />
+              <PieChart data={categoryDistribution} size={compact ? 160 : 200} />
               <ChartLegend data={categoryDistribution} />
             </>
           )}
 
           {distributionTab === 'status' && hasStatus && (
             <>
-              <PieChart data={statusDistribution} size={180} />
+              <PieChart data={statusDistribution} size={compact ? 160 : 180} />
               <ChartLegend data={statusDistribution} />
             </>
           )}
@@ -338,10 +341,10 @@ export default function DashboardCharts({
 
       {/* Financial Overview with Tabs (Ausgaben / Wert / Gewinn) */}
       {hasFinancials && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Finanzen</h3>
-            <div className="flex gap-1 bg-gray-100 dark:bg-slate-700 rounded-lg p-1">
+        <div className={compact ? '' : 'bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6'}>
+          <div className="flex items-center justify-between mb-3">
+            {!compact && <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Finanzen</h3>}
+            <div className={`flex gap-1 bg-gray-100 dark:bg-slate-700 rounded-lg p-1 ${compact ? 'w-full justify-center' : ''}`}>
               <TabButton
                 active={financialTab === 'spent'}
                 onClick={() => setFinancialTab('spent')}
@@ -370,8 +373,8 @@ export default function DashboardCharts({
 
       {/* Value by Collection Bar Chart (fallback if no financials) */}
       {hasCollectionValues && !hasFinancials && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Wert nach Sammlung</h3>
+        <div className={compact ? '' : 'bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6'}>
+          {!compact && <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Wert nach Sammlung</h3>}
           <BarChart data={collectionValues} />
         </div>
       )}
