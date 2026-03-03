@@ -149,19 +149,29 @@
 
 .focus\:ring-accent-500:focus { --tw-ring-color: rgb(var(--accent-500)); }
 
-/* iOS Safe Area Support */
+/* iOS Safe Area Support
+   env() defined as CSS custom properties so they can be used reliably
+   via var() in both stylesheets and React inline styles (element.style).
+   env() set directly via JS DOM may not resolve on some iOS Safari/PWA versions. */
+:root {
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
 @supports (padding: env(safe-area-inset-top)) {
   .safe-area-top {
-    padding-top: env(safe-area-inset-top);
+    padding-top: var(--safe-area-inset-top);
   }
   .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: var(--safe-area-inset-bottom);
   }
   .safe-area-left {
-    padding-left: env(safe-area-inset-left);
+    padding-left: var(--safe-area-inset-left);
   }
   .safe-area-right {
-    padding-right: env(safe-area-inset-right);
+    padding-right: var(--safe-area-inset-right);
   }
 }
 
