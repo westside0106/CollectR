@@ -50,7 +50,10 @@ export function TopHeader() {
   return (
     <>
       {/* Top Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 safe-area-top">
+      <header
+        className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
         <div className="h-16 px-4 lg:px-6 flex items-center justify-between gap-4">
           {/* Logo - Links */}
           <Link href="/" className="flex items-center gap-3 flex-shrink-0">
