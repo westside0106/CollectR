@@ -52,7 +52,7 @@ export function TopHeader() {
       {/* Top Header */}
       <header
         className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700"
-        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        style={{ paddingTop: 'var(--safe-area-inset-top)' }}
       >
         <div className="h-16 px-4 lg:px-6 flex items-center justify-between gap-4">
           {/* Logo - Links */}
@@ -163,14 +163,14 @@ export function TopHeader() {
           {/* Backdrop */}
           <div
             className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-            style={{ top: 'calc(4rem + env(safe-area-inset-top, 0px))' }}
+            style={{ top: 'calc(4rem + var(--safe-area-inset-top))' }}
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
           {/* Mobile Slide-in Menu */}
           <div
             className="lg:hidden fixed right-0 bottom-0 z-50 w-80 max-w-[85vw] bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 shadow-2xl overflow-y-auto"
-            style={{ top: 'calc(4rem + env(safe-area-inset-top, 0px))' }}
+            style={{ top: 'calc(4rem + var(--safe-area-inset-top))' }}
           >
             <nav className="p-4">
               {/* Sphere Navigation - Mobile */}
@@ -241,7 +241,7 @@ export function TopHeader() {
       )}
 
       {/* Spacer to prevent content from going under fixed header */}
-      <div style={{ height: 'calc(4rem + env(safe-area-inset-top, 0px))' }} />
+      <div style={{ height: 'calc(4rem + var(--safe-area-inset-top))' }} />
     </>
   )
 }
