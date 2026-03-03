@@ -33,9 +33,10 @@ export function useGamingStats(platform: GamePlatform = 'all') {
     recentGames: []
   })
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
 
   useEffect(() => {
+    const supabase = createClient()
+
     async function fetchStats() {
       setLoading(true)
 
@@ -151,7 +152,7 @@ export function useGamingStats(platform: GamePlatform = 'all') {
     }
 
     fetchStats()
-  }, [platform, supabase])
+  }, [platform])
 
   return { stats, loading }
 }
