@@ -45,7 +45,6 @@ export function useRealtime<T extends Record<string, unknown>>({
   onDelete,
   onChange
 }: UseRealtimeOptions<T>) {
-  const supabase = createClient()
   const channelRef = useRef<RealtimeChannel | null>(null)
 
   const handleChange = useCallback(
@@ -69,6 +68,7 @@ export function useRealtime<T extends Record<string, unknown>>({
   )
 
   useEffect(() => {
+    const supabase = createClient()
     // Eindeutiger Channel-Name
     const channelName = `${table}-${filter || 'all'}-${Date.now()}`
 
@@ -98,7 +98,7 @@ export function useRealtime<T extends Record<string, unknown>>({
         channelRef.current = null
       }
     }
-  }, [table, schema, event, filter, handleChange, supabase])
+  }, [table, schema, event, filter, handleChange])
 
   return channelRef.current
 }
