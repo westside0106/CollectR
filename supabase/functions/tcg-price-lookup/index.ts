@@ -424,13 +424,18 @@ async function fetchPokemonPrice(request: PriceLookupRequest): Promise<PriceLook
   return result
 }
 
-// Allowed origins for CORS
-const ALLOWED_ORIGINS = [
-  'https://collectr.app',
-  'https://www.collectr.app',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
-]
+// Production origins are always allowed.
+// In development, set ALLOWED_DEV_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+// in your local .env.local or supabase/functions/.env – never in production secrets.
+const PROD_ORIGINS = ['https://collectr.app', 'https://www.collectr.app']
+const devOrigins = Deno.env.get('ALLOWED_DEV_ORIGINS')
+  ?.split(',').map(o => o.trim()).filter(Boolean) ?? []
+const ALLOWED_ORIGINS = [...PROD_ORIGINS, ...devOrigins]
+
+// Rate limit: 60 price lookups per IP per hour.
+// Prevents API bans on external TCG services and protects cache.
+const RATE_LIMIT_MAX = 60
+const RATE_LIMIT_WINDOW_SECONDS = 3600
 
 function getCorsHeaders(origin: string | null): Record<string, string> {
   const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
@@ -438,6 +443,14 @@ function getCorsHeaders(origin: string | null): Record<string, string> {
     'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   }
+}
+
+function getClientIp(req: Request): string {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown'
+  )
 }
 
 Deno.serve(async (req) => {
@@ -454,6 +467,33 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Rate limiting (checked before cache to prevent cache-bypass spam)
+    const clientIp = getClientIp(req)
+    const { data: rlData, error: rlError } = await supabase.rpc('check_rate_limit', {
+      p_key: `tcg-price-lookup:${clientIp}`,
+      p_max_requests: RATE_LIMIT_MAX,
+      p_window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+    })
+
+    if (rlError) {
+      console.error('Rate limit check failed:', rlError)
+      // Fail open – do not block requests when rate limit check itself fails
+    } else if (rlData?.[0] && !rlData[0].allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+            'Retry-After': String(RATE_LIMIT_WINDOW_SECONDS),
+            'X-RateLimit-Limit': String(RATE_LIMIT_MAX),
+            'X-RateLimit-Remaining': '0',
+          },
+        }
+      )
+    }
 
     // Parse request
     const requestData: PriceLookupRequest = await req.json()

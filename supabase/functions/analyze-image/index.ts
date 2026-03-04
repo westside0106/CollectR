@@ -1,12 +1,18 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
-// Allowed origins for CORS
-const ALLOWED_ORIGINS = [
-  'https://collectr.app',
-  'https://www.collectr.app',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
-]
+// Production origins are always allowed.
+// In development, set ALLOWED_DEV_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+// in your local .env.local or supabase/functions/.env – never in production secrets.
+const PROD_ORIGINS = ['https://collectr.app', 'https://www.collectr.app']
+const devOrigins = Deno.env.get('ALLOWED_DEV_ORIGINS')
+  ?.split(',').map(o => o.trim()).filter(Boolean) ?? []
+const ALLOWED_ORIGINS = [...PROD_ORIGINS, ...devOrigins]
+
+// Rate limit: 10 analyze-image calls per IP per hour.
+// Protects Anthropic API costs from abuse.
+const RATE_LIMIT_MAX = 10
+const RATE_LIMIT_WINDOW_SECONDS = 3600
 
 // Max image size: 10MB (base64 encoded)
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024
@@ -19,10 +25,18 @@ function getCorsHeaders(origin: string | null): Record<string, string> {
   }
 }
 
+function getClientIp(req: Request): string {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown'
+  )
+}
+
 interface AnalyzeRequest {
   imageBase64: string
-  collectionType?: string // z.B. "hot-wheels", "coins", "stamps"
-  existingAttributes?: string[] // Vorhandene Attribute der Kategorie
+  collectionType?: string
+  existingAttributes?: string[]
 }
 
 serve(async (req) => {
@@ -40,13 +54,45 @@ serve(async (req) => {
       throw new Error('ANTHROPIC_API_KEY not configured')
     }
 
+    // Rate limiting via Supabase DB (atomic, works across Edge Function instances)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    const clientIp = getClientIp(req)
+    const rateLimitKey = `analyze-image:${clientIp}`
+
+    const { data: rlData, error: rlError } = await supabase.rpc('check_rate_limit', {
+      p_key: rateLimitKey,
+      p_max_requests: RATE_LIMIT_MAX,
+      p_window_seconds: RATE_LIMIT_WINDOW_SECONDS,
+    })
+
+    if (rlError) {
+      console.error('Rate limit check failed:', rlError)
+      // Fail open – do not block requests when rate limit check itself fails
+    } else if (rlData?.[0] && !rlData[0].allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+        {
+          status: 429,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+            'Retry-After': String(RATE_LIMIT_WINDOW_SECONDS),
+            'X-RateLimit-Limit': String(RATE_LIMIT_MAX),
+            'X-RateLimit-Remaining': '0',
+          },
+        }
+      )
+    }
+
     const { imageBase64, collectionType, existingAttributes } = await req.json() as AnalyzeRequest
 
     if (!imageBase64) {
       throw new Error('No image provided')
     }
 
-    // Check image size to prevent DoS and excessive API costs
     if (imageBase64.length > MAX_IMAGE_SIZE) {
       return new Response(
         JSON.stringify({ error: 'Image too large. Maximum size is 10MB.' }),
@@ -54,11 +100,8 @@ serve(async (req) => {
       )
     }
 
-    // Baue den Prompt basierend auf Sammlungstyp
     const systemPrompt = buildSystemPrompt(collectionType, existingAttributes)
 
-    // Claude API Call
-    // Detect media type from base64 string
     let mediaType = 'image/jpeg'
     if (imageBase64.startsWith('data:image/png')) {
       mediaType = 'image/png'
@@ -109,7 +152,6 @@ serve(async (req) => {
     const data = await response.json()
     const content = data.content[0]?.text || ''
 
-    // Parse JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
       throw new Error('Could not parse AI response')
