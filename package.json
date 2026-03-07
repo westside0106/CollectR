@@ -14,11 +14,14 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.87.1",
     "@vercel/analytics": "^1.6.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.4.7",
     "gsap": "^3.12.5",
     "next": "16.1.6",
     "postprocessing": "^6.36.4",
     "react": "19.2.1",
     "react-dom": "19.2.1",
+    "tailwind-merge": "^2.6.0",
     "three": "^0.171.0"
   },
   "devDependencies": {
