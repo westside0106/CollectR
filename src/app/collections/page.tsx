@@ -10,7 +10,6 @@ import { ShareModal } from '@/components/ShareModal'
 import { CollectionCardSkeleton } from '@/components/Skeleton'
 import EmojiPicker from '@/components/EmojiPicker'
 import { CollectionFolderCard } from '@/components/CollectionFolderCard'
-import Dither from '@/components/Dither'
 
 interface Collection {
   id: string
@@ -342,20 +341,6 @@ export default function CollectionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 relative" data-pull-refresh>
-      {/* Dither Background */}
-      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20">
-        <Dither
-          waveColor={[0.3, 0.4, 0.6]}
-          colorNum={4}
-          waveAmplitude={0.3}
-          waveFrequency={3}
-          waveSpeed={0.05}
-          enableMouseInteraction={true}
-          mouseRadius={0.3}
-          disableAnimation={false}
-          pixelSize={2}
-        />
-      </div>
 
       {/* Pull-to-Refresh Indicator */}
       {(isPulling || isPullRefreshing) && (
