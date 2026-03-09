@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext'
 import { ToastProvider } from '@/components/Toast'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Analytics } from '@vercel/analytics/next'
+import { GlobalDitherBackground } from '@/components/GlobalDitherBackground'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -142,6 +143,7 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
             <ErrorBoundary>
+              <GlobalDitherBackground />
               <ServiceWorkerRegistration />
               <TopHeader />
               <main className="min-h-screen min-h-[100dvh]">
