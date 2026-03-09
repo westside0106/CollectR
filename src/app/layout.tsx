@@ -146,7 +146,7 @@ export default function RootLayout({
               <GlobalDitherBackground />
               <ServiceWorkerRegistration />
               <TopHeader />
-              <main className="min-h-screen min-h-[100dvh]">
+              <main className="relative z-10 min-h-screen min-h-[100dvh]">
                 {children}
               </main>
               <InstallPrompt />
