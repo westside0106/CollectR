@@ -250,7 +250,7 @@ export default function BooksLookupPage() {
                       book.publishers.length > 0 && { label: 'Verlag', value: book.publishers.join(', '), mono: false },
                       book.pageCount && { label: 'Seiten', value: String(book.pageCount), mono: false },
                     ].filter(Boolean).map((item, i) => item && (
-                      <div key={i} className="bg-slate-50 dark:bg-slate-700/50 rounded-xl px-3 py-2">
+                      <div key={i} className="bg-slate-50 dark:bg-slate-700 rounded-xl px-3 py-2">
                         <div className="text-xs text-slate-500 dark:text-slate-400">{item.label}</div>
                         <div className={`font-medium text-slate-900 dark:text-white text-sm mt-0.5 ${item.mono ? 'font-mono' : ''}`}>
                           {item.value}

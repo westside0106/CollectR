@@ -175,7 +175,7 @@ export default function MarketPage() {
                 return (
                   <div
                     key={quote.id}
-                    className={`flex items-center justify-between p-4 sm:p-5 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition ${
+                    className={`flex items-center justify-between p-4 sm:p-5 hover:bg-slate-50 dark:hover:bg-slate-700 transition ${
                       index !== filteredQuotes.length - 1 ? 'border-b border-slate-100 dark:border-slate-700' : ''
                     }`}
                   >

@@ -100,14 +100,14 @@ export function PriceHistoryChart({ itemId, itemName }: PriceHistoryChartProps) 
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+        <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Aktuell</p>
           <p className="text-lg font-bold text-slate-900 dark:text-white">
             {latestPrice.toFixed(2)} €
           </p>
         </div>
 
-        <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+        <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Veränderung</p>
           <p className={`text-lg font-bold ${totalChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {totalChange >= 0 ? '+' : ''}{totalChange.toFixed(2)} €
@@ -115,14 +115,14 @@ export function PriceHistoryChart({ itemId, itemName }: PriceHistoryChartProps) 
           </p>
         </div>
 
-        <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+        <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Maximum</p>
           <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
             {maxPrice.toFixed(2)} €
           </p>
         </div>
 
-        <div className="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+        <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Minimum</p>
           <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
             {minPrice.toFixed(2)} €
@@ -199,7 +199,7 @@ export function PriceHistoryChart({ itemId, itemName }: PriceHistoryChartProps) 
           {displayHistory.map((entry, index) => (
             <div
               key={entry.id}
-              className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2">

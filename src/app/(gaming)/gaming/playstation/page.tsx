@@ -48,7 +48,7 @@ export default function PlayStationPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">🎮</div>
             <div className="text-3xl font-bold text-blue-400 mb-1">
               {loading ? '...' : stats.totalGames}
@@ -56,7 +56,7 @@ export default function PlayStationPage() {
             <div className="text-sm text-slate-400">PlayStation Spiele</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">💰</div>
             <div className="text-3xl font-bold text-green-400 mb-1">
               {loading ? '...' : `${stats.totalValue.toFixed(2)} €`}
@@ -64,7 +64,7 @@ export default function PlayStationPage() {
             <div className="text-sm text-slate-400">Sammlungswert</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">🏆</div>
             <div className="text-3xl font-bold text-amber-400 mb-1">
               {loading ? '...' : stats.topGames.length}
@@ -72,7 +72,7 @@ export default function PlayStationPage() {
             <div className="text-sm text-slate-400">Top Spiele</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">⭐</div>
             <div className="text-3xl font-bold text-purple-400 mb-1">
               {loading ? '...' : stats.recentGames.length}
@@ -85,7 +85,7 @@ export default function PlayStationPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
           <Link
             href="/gaming/scanner"
-            className="group p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all duration-200 text-center"
+            className="group p-6 rounded-xl bg-slate-800 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all duration-200 text-center"
           >
             <div className="text-4xl mb-3">📸</div>
             <h3 className="font-semibold text-white mb-1 group-hover:text-blue-400 transition-colors">
@@ -96,7 +96,7 @@ export default function PlayStationPage() {
 
           <Link
             href="/gaming/prices"
-            className="group p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all duration-200 text-center"
+            className="group p-6 rounded-xl bg-slate-800 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all duration-200 text-center"
           >
             <div className="text-4xl mb-3">💰</div>
             <h3 className="font-semibold text-white mb-1 group-hover:text-blue-400 transition-colors">
@@ -107,7 +107,7 @@ export default function PlayStationPage() {
 
           <Link
             href="/collections"
-            className="group p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all duration-200 text-center"
+            className="group p-6 rounded-xl bg-slate-800 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all duration-200 text-center"
           >
             <div className="text-4xl mb-3">📊</div>
             <h3 className="font-semibold text-white mb-1 group-hover:text-blue-400 transition-colors">
@@ -118,7 +118,7 @@ export default function PlayStationPage() {
 
           <Link
             href="/gaming/wishlist"
-            className="group p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all duration-200 text-center"
+            className="group p-6 rounded-xl bg-slate-800 hover:bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all duration-200 text-center"
           >
             <div className="text-4xl mb-3">🎯</div>
             <h3 className="font-semibold text-white mb-1 group-hover:text-blue-400 transition-colors">
@@ -135,7 +135,7 @@ export default function PlayStationPage() {
             {generations.map((gen) => (
               <div
                 key={gen.name}
-                className="p-6 rounded-xl bg-slate-800/30 border border-slate-700 hover:border-blue-500/50 transition-all cursor-pointer"
+                className="p-6 rounded-xl bg-slate-800 border border-slate-700 hover:border-blue-500/50 transition-all cursor-pointer"
               >
                 <div className="text-4xl mb-3">{gen.emoji}</div>
                 <h3 className="text-lg font-bold text-white mb-1">{gen.name}</h3>
@@ -152,7 +152,7 @@ export default function PlayStationPage() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="p-6 rounded-xl bg-slate-800/30 border border-slate-700 text-center"
+                className="p-6 rounded-xl bg-slate-800 border border-slate-700 text-center"
               >
                 <div className="text-5xl mb-4">{feature.icon}</div>
                 <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>

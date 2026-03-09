@@ -204,13 +204,13 @@ export function PortfolioTab() {
       {/* Portfolio Übersicht */}
       {holdings.length > 0 && totalInvested > 0 && (
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 text-center">
+          <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
             <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Investiert</div>
             <div className="font-semibold text-slate-900 dark:text-white text-sm">
               {formatCurrency(totalInvested)}
             </div>
           </div>
-          <div className="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 text-center">
+          <div className="bg-slate-50 dark:bg-slate-700 rounded-xl p-3 text-center">
             <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">Aktuell {pricesLoading && '⟳'}</div>
             <div className="font-semibold text-slate-900 dark:text-white text-sm">
               {totalCurrentValue > 0 ? formatCurrency(totalCurrentValue) : '—'}
@@ -248,7 +248,7 @@ export function PortfolioTab() {
             return (
               <div
                 key={holding.id}
-                className={`flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition ${
+                className={`flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700 transition ${
                   index !== holdings.length - 1 ? 'border-b border-slate-100 dark:border-slate-700' : ''
                 }`}
               >

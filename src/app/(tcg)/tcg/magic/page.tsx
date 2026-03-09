@@ -293,25 +293,25 @@ export default function MagicCollectionPage() {
 
         {/* Statistics */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-purple-500/30">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-purple-500/30">
             <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">🎴</div>
             <div className="text-xl sm:text-3xl font-bold text-white">{stats.totalCards}</div>
             <div className="text-xs sm:text-sm text-slate-400">Total Cards</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-green-500/30">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-green-500/30">
             <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">💰</div>
             <div className="text-xl sm:text-3xl font-bold text-green-400">{stats.totalValue.toFixed(2)} €</div>
             <div className="text-xs sm:text-sm text-slate-400">Collection Value</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-blue-500/30">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-blue-500/30">
             <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">⭐</div>
             <div className="text-xl sm:text-3xl font-bold text-blue-400">{stats.gradedCards}</div>
             <div className="text-xs sm:text-sm text-slate-400">Graded Cards</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-yellow-500/30">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-yellow-500/30">
             <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">💎</div>
             <div className="text-xl sm:text-3xl font-bold text-yellow-400">{stats.averageManaCost}</div>
             <div className="text-xs sm:text-sm text-slate-400">Avg. Mana Cost</div>
@@ -319,7 +319,7 @@ export default function MagicCollectionPage() {
         </div>
 
         {/* Color Distribution */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Color Distribution</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
             {Object.entries(MAGIC_COLORS).map(([colorCode, color]) => {
@@ -337,14 +337,14 @@ export default function MagicCollectionPage() {
         </div>
 
         {/* Card Type Distribution */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Card Type Distribution</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
             {Object.entries(stats.cardTypeDistribution).map(([type, count]) => {
               const typeInfo = MAGIC_CARD_TYPES[type as keyof typeof MAGIC_CARD_TYPES]
               if (!typeInfo) return null
               return (
-                <div key={type} className="text-center p-2 sm:p-4 rounded-lg bg-slate-900/50 border border-slate-700">
+                <div key={type} className="text-center p-2 sm:p-4 rounded-lg bg-slate-900 border border-slate-700">
                   <div className="text-2xl sm:text-3xl mb-1 sm:mb-2">{typeInfo.emoji}</div>
                   <div className="text-lg sm:text-2xl font-bold text-white">{count}</div>
                   <div className={`text-xs sm:text-sm ${typeInfo.color}`}>{type}</div>
@@ -355,7 +355,7 @@ export default function MagicCollectionPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-6 sm:mb-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4">
             {/* Color Filter */}
             <div>
@@ -363,7 +363,7 @@ export default function MagicCollectionPage() {
               <select
                 value={selectedColor}
                 onChange={(e) => setSelectedColor(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All Colors</option>
                 {Object.entries(MAGIC_COLORS).map(([code, color]) => (
@@ -378,7 +378,7 @@ export default function MagicCollectionPage() {
               <select
                 value={selectedCardType}
                 onChange={(e) => setSelectedCardType(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All Types</option>
                 {Object.entries(MAGIC_CARD_TYPES).map(([type, info]) => (
@@ -393,7 +393,7 @@ export default function MagicCollectionPage() {
               <select
                 value={selectedManaCost}
                 onChange={(e) => setSelectedManaCost(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All CMC</option>
                 {uniqueManaCosts.map(cmc => (
@@ -408,7 +408,7 @@ export default function MagicCollectionPage() {
               <select
                 value={selectedSet}
                 onChange={(e) => setSelectedSet(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All Sets</option>
                 {uniqueSets.map(set => (
@@ -423,7 +423,7 @@ export default function MagicCollectionPage() {
               <select
                 value={selectedRarity}
                 onChange={(e) => setSelectedRarity(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="all">All Rarities</option>
                 {uniqueRarities.map(rarity => (
@@ -438,7 +438,7 @@ export default function MagicCollectionPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base"
+                className="w-full px-3 sm:px-4 py-2 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base"
               >
                 <option value="recent">Neueste zuerst</option>
                 <option value="name">Name A-Z</option>
@@ -455,7 +455,7 @@ export default function MagicCollectionPage() {
                   id="graded"
                   checked={showGradedOnly}
                   onChange={(e) => setShowGradedOnly(e.target.checked)}
-                  className="w-5 h-5 rounded border-slate-600 bg-slate-900/50"
+                  className="w-5 h-5 rounded border-slate-600 bg-slate-900"
                 />
                 <label htmlFor="graded" className="text-white text-sm sm:text-base">Nur Graded</label>
               </div>
@@ -491,7 +491,7 @@ export default function MagicCollectionPage() {
 
         {/* Cards Display */}
         {filteredCards.length === 0 ? (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding text-center">
             <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">🌟</div>
             <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Noch keine Magic-Karten</h3>
             <p className="text-sm sm:text-base text-slate-400 mb-4 sm:mb-6">
@@ -510,10 +510,10 @@ export default function MagicCollectionPage() {
               <Link
                 key={card.id}
                 href={`/collections/${card.collection_id}/items/${card.id}`}
-                className="group relative bg-slate-800/50 backdrop-blur-lg rounded-xl border border-slate-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20"
+                className="group relative bg-slate-800 backdrop-blur-lg rounded-xl border border-slate-700 hover:border-purple-500/50 transition-all duration-300 overflow-hidden hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20"
               >
                 {/* Card Image */}
-                <div className="aspect-[3/4] bg-slate-900/50 relative overflow-hidden">
+                <div className="aspect-[3/4] bg-slate-900 relative overflow-hidden">
                   {card.image_url ? (
                     <img
                       src={card.image_url}
@@ -570,9 +570,9 @@ export default function MagicCollectionPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-slate-700 overflow-x-auto">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl border border-slate-700 overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-900/50">
+              <thead className="bg-slate-900">
                 <tr className="text-left text-xs sm:text-sm text-slate-400">
                   <th className="p-2 sm:p-4">Card</th>
                   <th className="p-2 sm:p-4 hidden sm:table-cell">Game</th>
@@ -587,7 +587,7 @@ export default function MagicCollectionPage() {
                 {filteredCards.map((card) => (
                   <tr
                     key={card.id}
-                    className="border-t border-slate-700 hover:bg-slate-900/50 transition-colors"
+                    className="border-t border-slate-700 hover:bg-slate-900 transition-colors"
                   >
                     <td className="p-2 sm:p-4">
                       <Link

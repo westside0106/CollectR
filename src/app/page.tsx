@@ -439,7 +439,9 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors relative" data-pull-refresh>
+    <div className="min-h-screen transition-colors relative" data-pull-refresh>
+      {/* Grid Background overlay like other pages */}
+      <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-5 dark:opacity-10 pointer-events-none z-0" aria-hidden="true" />
       {/* Pull-to-Refresh Indicator */}
       {(isPulling || isPullRefreshing) && (
         <div

@@ -130,7 +130,7 @@ export default function PokemonMetaDecksPage() {
                   px-6 py-3 rounded-xl transition-all duration-200 font-semibold
                   ${selectedTier === tier
                     ? 'bg-red-600 text-white ring-4 ring-red-500/50'
-                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                   }
                 `}
               >
@@ -145,7 +145,7 @@ export default function PokemonMetaDecksPage() {
           {filteredDecks.map((deck, index) => (
             <div
               key={index}
-              className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 hover:border-red-500/50 transition-all"
+              className="bg-slate-800 backdrop-blur-lg rounded-2xl p-6 border border-slate-700 hover:border-red-500/50 transition-all"
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
@@ -160,7 +160,7 @@ export default function PokemonMetaDecksPage() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 gap-4 mb-4 p-4 rounded-lg bg-slate-900/50">
+              <div className="grid grid-cols-2 gap-4 mb-4 p-4 rounded-lg bg-slate-900">
                 <div>
                   <div className="text-sm text-slate-400">Win Rate</div>
                   <div className="text-2xl font-bold text-green-400">{deck.winRate}%</div>

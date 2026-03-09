@@ -160,10 +160,10 @@ export function ReminderSection({ itemId, itemName }: ReminderSectionProps) {
               key={reminder.id}
               className={`flex items-center gap-3 p-3 rounded-lg transition ${
                 reminder.is_completed
-                  ? 'bg-slate-50 dark:bg-slate-700/30 opacity-60'
+                  ? 'bg-slate-50 dark:bg-slate-700 opacity-60'
                   : isOverdue(reminder.reminder_date)
                   ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
-                  : 'bg-slate-50 dark:bg-slate-700/50'
+                  : 'bg-slate-50 dark:bg-slate-700'
               }`}
             >
               {/* Checkbox */}

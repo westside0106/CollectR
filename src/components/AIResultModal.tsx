@@ -120,7 +120,7 @@ export function AIResultModal({ result, onApply, onClose }: AIResultModalProps) 
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+        <div className="flex gap-3 p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
           <button
             onClick={onClose}
             className="flex-1 px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
@@ -149,7 +149,7 @@ function ResultField({
   onApply: () => void
 }) {
   return (
-    <div className="flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+    <div className="flex items-start justify-between gap-3 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
       <div className="flex-1 min-w-0">
         <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">{label}</span>
         <span className="text-sm text-slate-900 dark:text-white font-medium break-words">{value}</span>

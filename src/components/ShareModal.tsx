@@ -321,7 +321,7 @@ export function ShareModal({ collectionId, collectionName, isOwner, onClose }: S
                 {members.map(member => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 font-medium text-sm">
