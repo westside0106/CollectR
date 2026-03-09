@@ -85,7 +85,7 @@ export default function NewsPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen">
         <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 h-32" />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-3">
           {[...Array(5)].map((_, i) => (
@@ -97,7 +97,7 @@ export default function NewsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen">
       {/* Gradient Hero */}
       <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 dark:from-violet-700 dark:via-purple-700 dark:to-pink-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
