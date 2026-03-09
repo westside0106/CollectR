@@ -16,6 +16,14 @@ export function LandingNavbar() {
   }, [])
 
   return (
+    <>
+    <svg style={{ display: 'none' }} aria-hidden>
+      <defs>
+        <filter id="wax-remove-white" colorInterpolationFilters="sRGB">
+          <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -0.9 -0.9 -0.9 0 2.7" />
+        </filter>
+      </defs>
+    </svg>
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
@@ -32,7 +40,8 @@ export function LandingNavbar() {
               alt="Collectorssphere"
               width={32}
               height={32}
-              className="rounded-full group-hover:scale-105 transition-transform duration-200 drop-shadow-[0_0_6px_rgba(212,160,56,0.5)]"
+              className="rounded-full group-hover:scale-105 transition-transform duration-200"
+              style={{ filter: 'url(#wax-remove-white) drop-shadow(0 0 6px rgba(212,160,56,0.6))' }}
             />
             <span className="font-bold text-white text-lg hidden sm:block tracking-tight">
               Collectors<span className="text-[#d4a038]">sphere</span>
@@ -93,5 +102,6 @@ export function LandingNavbar() {
         </div>
       )}
     </nav>
+    </>
   )
 }
