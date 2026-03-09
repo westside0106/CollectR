@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-const CURRENCYLAYER_API_KEY = process.env.CURRENCYLAYER_API_KEY || ''
+// Frankfurter.app – EZB-Kurse, komplett kostenlos, kein API-Key nötig
+// Docs: https://www.frankfurter.app/docs/
+const FRANKFURTER_BASE = 'https://api.frankfurter.app'
 
 const SUPPORTED_CURRENCIES = [
   { code: 'EUR', symbol: '€', name: 'Euro' },
@@ -14,15 +16,13 @@ const SUPPORTED_CURRENCIES = [
   { code: 'CAD', symbol: 'C$', name: 'Kanadischer Dollar' },
 ] as const
 
-interface CurrencyLayerResponse {
-  success: boolean
-  timestamp: number
-  source: string
-  quotes: Record<string, number>
-  error?: {
-    code: number
-    info: string
-  }
+type CurrencyCode = typeof SUPPORTED_CURRENCIES[number]['code']
+
+interface FrankfurterResponse {
+  amount: number
+  base: string
+  date: string
+  rates: Record<string, number>
 }
 
 interface ExchangeRates {
@@ -33,78 +33,59 @@ interface ExchangeRates {
 
 export async function GET(request: NextRequest) {
   try {
-    // Auth check - require authenticated user
+    // Auth-Check
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
     const amount = searchParams.get('amount')
-    const from = searchParams.get('from')
-    const to = searchParams.get('to')
+    const from = searchParams.get('from') as CurrencyCode | null
+    const to = searchParams.get('to') as CurrencyCode | null
 
-    if (!CURRENCYLAYER_API_KEY) {
-      return NextResponse.json(
-        { error: 'Currency API key not configured' },
-        { status: 503 }
-      )
-    }
+    // Alle Währungen außer EUR abrufen (EUR ist Base)
+    const symbols = SUPPORTED_CURRENCIES
+      .filter(c => c.code !== 'EUR')
+      .map(c => c.code)
+      .join(',')
 
-    // Get exchange rates
-    const currencies = SUPPORTED_CURRENCIES.map(c => c.code).join(',')
     const response = await fetch(
-      `https://api.currencylayer.com/live?access_key=${CURRENCYLAYER_API_KEY}&currencies=${currencies}`,
-      { next: { revalidate: 3600 } } // Cache for 1 hour
+      `${FRANKFURTER_BASE}/latest?base=EUR&symbols=${symbols}`,
+      { next: { revalidate: 3600 } } // 1 Stunde Cache
     )
 
-    const data: CurrencyLayerResponse = await response.json()
-
-    if (!data.success) {
+    if (!response.ok) {
       return NextResponse.json(
-        { error: 'Failed to fetch exchange rates', details: data.error },
-        { status: 500 }
+        { error: 'Fehler beim Abrufen der Wechselkurse' },
+        { status: 502 }
       )
     }
 
-    // Convert currencylayer format (USDEUR) to simple format (EUR)
-    const rates: Record<string, number> = {}
-    for (const [key, value] of Object.entries(data.quotes)) {
-      const currency = key.replace('USD', '')
-      rates[currency] = value
-    }
-    rates['USD'] = 1 // USD is always 1 (base)
+    const data: FrankfurterResponse = await response.json()
+
+    // EUR immer mit Rate 1 ergänzen
+    const rates: Record<string, number> = { ...data.rates, EUR: 1 }
 
     const result: ExchangeRates = {
-      base: 'USD',
-      timestamp: data.timestamp,
-      rates
+      base: 'EUR',
+      timestamp: Math.floor(new Date(data.date).getTime() / 1000),
+      rates,
     }
 
-    // If conversion parameters provided, calculate conversion
+    // Wenn Umrechnungsparameter vorhanden → direkt umrechnen
     if (amount && from && to) {
       const amountNum = parseFloat(amount)
       if (isNaN(amountNum)) {
-        return NextResponse.json(
-          { error: 'Invalid amount' },
-          { status: 400 }
-        )
+        return NextResponse.json({ error: 'Ungültiger Betrag' }, { status: 400 })
       }
 
       if (from === to) {
         return NextResponse.json({
           ...result,
-          conversion: {
-            amount: amountNum,
-            from,
-            to,
-            result: amountNum
-          }
+          conversion: { amount: amountNum, from, to, result: amountNum },
         })
       }
 
@@ -113,32 +94,27 @@ export async function GET(request: NextRequest) {
 
       if (!fromRate || !toRate) {
         return NextResponse.json(
-          { error: `Exchange rate not found for ${from} or ${to}` },
+          { error: `Kurs nicht gefunden für ${from} oder ${to}` },
           { status: 400 }
         )
       }
 
-      const amountInUSD = amountNum / fromRate
-      const convertedAmount = Math.round(amountInUSD * toRate * 100) / 100
+      // Umrechnung über EUR als Zwischenwährung
+      const amountInEUR = amountNum / fromRate
+      const convertedAmount = Math.round(amountInEUR * toRate * 100) / 100
 
       return NextResponse.json({
         ...result,
-        conversion: {
-          amount: amountNum,
-          from,
-          to,
-          result: convertedAmount
-        }
+        conversion: { amount: amountNum, from, to, result: convertedAmount },
       })
     }
 
-    // Return just the rates
     return NextResponse.json(result)
 
   } catch (error) {
     console.error('Currency API error:', error)
     return NextResponse.json(
-      { error: 'Failed to process currency request' },
+      { error: 'Fehler beim Verarbeiten der Währungsanfrage' },
       { status: 500 }
     )
   }

@@ -1,20 +1,5 @@
-// Open Library API Service - Kostenlos, kein API Key nötig
+// Open Library API Service – läuft über /api/books Proxy (server-seitig, kein CORS)
 // Docs: https://openlibrary.org/developers/api
-
-// Internal API response types
-interface OpenLibraryAuthor {
-  name: string
-  url?: string
-}
-
-interface OpenLibraryPublisher {
-  name: string
-}
-
-interface OpenLibrarySubject {
-  name: string
-  url?: string
-}
 
 export interface OpenLibraryBook {
   title: string
@@ -39,66 +24,61 @@ export interface OpenLibrarySearchResult {
   publisher?: string[]
 }
 
-// Suche nach ISBN (10 oder 13 stellig)
+// ISBN-Suche (10 oder 13 Stellen)
 export async function searchByISBN(isbn: string): Promise<OpenLibraryBook | null> {
   const cleanIsbn = isbn.replace(/[-\s]/g, '')
 
   try {
-    const response = await fetch(
-      `https://openlibrary.org/api/books?bibkeys=ISBN:${cleanIsbn}&format=json&jscmd=data`
-    )
-
+    const response = await fetch(`/api/books?type=isbn&q=${encodeURIComponent(cleanIsbn)}`)
     if (!response.ok) return null
 
     const data = await response.json()
-    const bookData = data[`ISBN:${cleanIsbn}`]
+    if (!data.found || !data.book) return null
 
-    if (!bookData) return null
-
-    const authors = bookData.authors as OpenLibraryAuthor[] | undefined
-    const publishers = bookData.publishers as OpenLibraryPublisher[] | undefined
-    const subjects = bookData.subjects as OpenLibrarySubject[] | undefined
+    const bookData = data.book
 
     return {
-      title: bookData.title || '',
-      authors: authors?.map(a => a.name) || [],
-      publishDate: bookData.publish_date || '',
-      publishers: publishers?.map(p => p.name) || [],
+      title: bookData.title ?? '',
+      authors: (bookData.authors ?? []).map((a: { name: string }) => a.name),
+      publishDate: bookData.publish_date ?? '',
+      publishers: (bookData.publishers ?? []).map((p: { name: string }) => p.name),
       isbn10: bookData.identifiers?.isbn_10?.[0],
       isbn13: bookData.identifiers?.isbn_13?.[0],
-      coverUrl: bookData.cover?.large || bookData.cover?.medium || bookData.cover?.small,
+      coverUrl: bookData.cover?.large ?? bookData.cover?.medium ?? bookData.cover?.small,
       pageCount: bookData.number_of_pages,
-      subjects: subjects?.map(s => s.name).slice(0, 5) || [],
+      subjects: (bookData.subjects ?? []).map((s: { name: string }) => s.name).slice(0, 5),
+      description: typeof bookData.description === 'string'
+        ? bookData.description
+        : bookData.description?.value,
     }
   } catch (error) {
-    console.error('Open Library API error:', error)
+    console.error('Open Library ISBN error:', error)
     return null
   }
 }
 
-// Suche nach Titel/Autor
+// Titel/Autor-Suche
 export async function searchBooks(query: string, limit = 10): Promise<OpenLibrarySearchResult[]> {
   try {
     const response = await fetch(
-      `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=${limit}`
+      `/api/books?type=search&q=${encodeURIComponent(query)}&limit=${limit}`
     )
-
     if (!response.ok) return []
 
     const data = await response.json()
-    return data.docs || []
+    return data.results ?? []
   } catch (error) {
     console.error('Open Library search error:', error)
     return []
   }
 }
 
-// Cover URL generieren
+// Cover-URL nach Cover-ID
 export function getCoverUrl(coverId: number, size: 'S' | 'M' | 'L' = 'M'): string {
   return `https://covers.openlibrary.org/b/id/${coverId}-${size}.jpg`
 }
 
-// ISBN Cover URL
+// Cover-URL nach ISBN
 export function getIsbnCoverUrl(isbn: string, size: 'S' | 'M' | 'L' = 'M'): string {
   return `https://covers.openlibrary.org/b/isbn/${isbn}-${size}.jpg`
 }
