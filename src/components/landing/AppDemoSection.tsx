@@ -32,12 +32,12 @@ export function AppDemoSection() {
   }, [paused, next])
 
   return (
-    <section className="relative py-32 bg-slate-950 overflow-hidden">
+    <section className="relative py-20 sm:py-32 bg-slate-950 overflow-hidden">
       {/* Ambient center glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[#d4a038]/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-16 xl:gap-24 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 xl:gap-24 items-center">
 
           {/* Left: Text */}
           <motion.div
@@ -49,7 +49,7 @@ export function AppDemoSection() {
             <span className="text-xs font-semibold uppercase tracking-widest text-[#d4a038] mb-4 block">
               App-Vorschau
             </span>
-            <h2 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-6 leading-tight">
+            <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-6 leading-tight">
               So sieht dein<br />Sammel&#8209;HQ aus
             </h2>
             <p className="text-white/50 text-lg leading-relaxed mb-10">

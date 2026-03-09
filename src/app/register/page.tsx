@@ -43,7 +43,6 @@ export default function RegisterPage() {
       })
 
       if (error) {
-        // Provide more user-friendly error messages
         if (error.message.includes('email')) {
           setError('Fehler beim Senden der Bestätigungs-E-Mail. Bitte überprüfe deine E-Mail-Adresse oder versuche es später erneut.')
         } else if (error.message.includes('password')) {
@@ -67,16 +66,17 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4">
-        <div className="w-full max-w-md text-center">
-          <div className="bg-white dark:bg-slate-800 card-padding sm:card-padding rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-            <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">✉️</div>
-            <h2 className="text-lg sm:text-xl font-bold mb-2 text-slate-900 dark:text-white">Bestätige deine E-Mail</h2>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mb-4">
-              Wir haben dir eine E-Mail an <strong>{email}</strong> geschickt.
+      <div className="relative min-h-screen flex items-center justify-center bg-slate-950 p-4 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#d4a038]/8 rounded-full blur-[100px] pointer-events-none" />
+        <div className="relative w-full max-w-md text-center">
+          <div className="bg-slate-900/70 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+            <div className="text-4xl sm:text-5xl mb-4">✉️</div>
+            <h2 className="text-lg sm:text-xl font-bold mb-2 text-white">Bestätige deine E-Mail</h2>
+            <p className="text-sm sm:text-base text-white/45 mb-6">
+              Wir haben dir eine E-Mail an <strong className="text-white/70">{email}</strong> geschickt.
               Klicke auf den Link in der E-Mail, um dein Konto zu aktivieren.
             </p>
-            <Link href="/login" className="text-sm sm:text-base text-blue-600 dark:text-blue-400 hover:underline">
+            <Link href="/login" className="text-sm text-[#d4a038] hover:text-[#e8b84a] transition-colors">
               Zurück zum Login
             </Link>
           </div>
@@ -86,29 +86,35 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
+    <div className="relative min-h-screen flex items-center justify-center bg-slate-950 p-4 overflow-hidden">
+      {/* Gold ambient glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#d4a038]/8 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="relative w-full max-w-md">
+        <div className="text-center mb-8">
           <Image
-            src="/icons/icon-512.png"
+            src="/brand/collectr-hero.png"
             alt="CollectR Logo"
-            width={96}
-            height={96}
-            className="mx-auto mb-3 sm:mb-4 rounded-[22%] shadow-lg"
+            width={72}
+            height={72}
+            className="mx-auto mb-4 rounded-2xl shadow-[0_0_30px_rgba(212,160,56,0.25)]"
           />
-          <h1 className="text-2xl sm:text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">CollectR</h1>
-          <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mt-2">Erstelle ein Konto</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">CollectR</h1>
+          <p className="text-sm sm:text-base text-white/45 mt-2">Erstelle ein Konto</p>
         </div>
 
-        <form onSubmit={handleRegister} className="bg-white dark:bg-slate-800 card-padding sm:card-padding rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+        <form
+          onSubmit={handleRegister}
+          className="bg-slate-900/70 backdrop-blur-xl border border-white/10 p-6 sm:p-8 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] space-y-4"
+        >
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
+            <div className="bg-red-900/20 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-white/60 mb-1.5">
               E-Mail
             </label>
             <input
@@ -116,13 +122,13 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-white/10 rounded-xl bg-slate-800/60 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-[#d4a038]/60 focus:border-[#d4a038]/60 transition-all"
               placeholder="deine@email.de"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-white/60 mb-1.5">
               Passwort
             </label>
             <input
@@ -130,13 +136,13 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-white/10 rounded-xl bg-slate-800/60 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-[#d4a038]/60 focus:border-[#d4a038]/60 transition-all"
               placeholder="Mindestens 6 Zeichen"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-white/60 mb-1.5">
               Passwort bestätigen
             </label>
             <input
@@ -144,7 +150,7 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-white/10 rounded-xl bg-slate-800/60 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-[#d4a038]/60 focus:border-[#d4a038]/60 transition-all"
               placeholder="Passwort wiederholen"
             />
           </div>
@@ -152,14 +158,14 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50"
+            className="w-full bg-[#d4a038] hover:bg-[#e8b84a] text-slate-950 py-3 rounded-xl font-semibold transition-all duration-200 shadow-[0_0_20px_rgba(212,160,56,0.4)] hover:shadow-[0_0_35px_rgba(212,160,56,0.6)] disabled:opacity-50"
           >
             {loading ? 'Wird registriert...' : 'Registrieren'}
           </button>
 
-          <p className="text-center text-sm text-slate-600 dark:text-slate-400">
+          <p className="text-center text-sm text-white/40">
             Bereits ein Konto?{' '}
-            <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <Link href="/login" className="text-[#d4a038] hover:text-[#e8b84a] transition-colors">
               Anmelden
             </Link>
           </p>

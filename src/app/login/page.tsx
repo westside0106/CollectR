@@ -29,7 +29,6 @@ export default function LoginPage() {
         setError(error.message)
         setLoading(false)
       } else {
-        // Hard reload to ensure auth state is properly loaded
         window.location.href = '/'
       }
     } catch (err) {
@@ -39,29 +38,35 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-6 sm:mb-8">
+    <div className="relative min-h-screen flex items-center justify-center bg-slate-950 p-4 overflow-hidden">
+      {/* Gold ambient glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#d4a038]/8 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="relative w-full max-w-md">
+        <div className="text-center mb-8">
           <Image
-            src="/icons/icon-512.png"
+            src="/brand/collectr-hero.png"
             alt="CollectR Logo"
-            width={96}
-            height={96}
-            className="mx-auto mb-3 sm:mb-4 rounded-[22%] shadow-lg"
+            width={72}
+            height={72}
+            className="mx-auto mb-4 rounded-2xl shadow-[0_0_30px_rgba(212,160,56,0.25)]"
           />
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">CollectR</h1>
-          <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 mt-2">Melde dich an</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">CollectR</h1>
+          <p className="text-sm sm:text-base text-white/45 mt-2">Melde dich an</p>
         </div>
 
-        <form onSubmit={handleLogin} className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+        <form
+          onSubmit={handleLogin}
+          className="bg-slate-900/70 backdrop-blur-xl border border-white/10 p-6 sm:p-8 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)] space-y-4"
+        >
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm">
+            <div className="bg-red-900/20 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-white/60 mb-1.5">
               E-Mail
             </label>
             <input
@@ -69,13 +74,13 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-white/10 rounded-xl bg-slate-800/60 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-[#d4a038]/60 focus:border-[#d4a038]/60 transition-all"
               placeholder="deine@email.de"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className="block text-sm font-medium text-white/60 mb-1.5">
               Passwort
             </label>
             <input
@@ -83,7 +88,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2.5 border border-white/10 rounded-xl bg-slate-800/60 text-white placeholder-white/25 focus:outline-none focus:ring-2 focus:ring-[#d4a038]/60 focus:border-[#d4a038]/60 transition-all"
               placeholder="••••••••"
             />
           </div>
@@ -91,14 +96,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-50"
+            className="w-full bg-[#d4a038] hover:bg-[#e8b84a] text-slate-950 py-3 rounded-xl font-semibold transition-all duration-200 shadow-[0_0_20px_rgba(212,160,56,0.4)] hover:shadow-[0_0_35px_rgba(212,160,56,0.6)] disabled:opacity-50"
           >
             {loading ? 'Wird angemeldet...' : 'Anmelden'}
           </button>
 
-          <p className="text-center text-sm text-slate-700 dark:text-slate-300">
+          <p className="text-center text-sm text-white/40">
             Noch kein Konto?{' '}
-            <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:underline">
+            <Link href="/register" className="text-[#d4a038] hover:text-[#e8b84a] transition-colors">
               Registrieren
             </Link>
           </p>
