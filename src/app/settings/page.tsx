@@ -283,7 +283,7 @@ export default function SettingsPage() {
                 avatarUrl={profile?.avatar_url}
                 collectionsCount={stats.collections}
                 itemsCount={stats.items}
-                accentColor={ACCENT_COLORS.find(c => c.value === accentColor)?.color ?? '#3b82f6'}
+                userId={user?.id}
                 className="w-full max-w-xs"
               />
             </div>
