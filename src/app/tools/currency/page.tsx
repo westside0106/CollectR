@@ -70,7 +70,7 @@ export default function CurrencyPage() {
   const toSymbol = SUPPORTED_CURRENCIES.find(c => c.code === to)?.symbol ?? to
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen">
       {/* Gradient Hero */}
       <div className="bg-gradient-to-br from-blue-600 via-cyan-600 to-blue-700 dark:from-blue-700 dark:via-cyan-700 dark:to-blue-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">

@@ -81,7 +81,7 @@ export default function VinylLookupPage() {
     amount.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen">
       {/* Gradient Hero */}
       <div className="bg-gradient-to-br from-orange-500 via-amber-500 to-yellow-500 dark:from-orange-700 dark:via-amber-700 dark:to-yellow-700">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
