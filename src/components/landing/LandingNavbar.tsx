@@ -24,14 +24,14 @@ export function LandingNavbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-12 lg:h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <Image
               src="/brand/collectr-hero.png"
               alt="Collectorssphere"
-              width={36}
-              height={36}
+              width={28}
+              height={28}
               className="rounded-xl group-hover:scale-105 transition-transform duration-200"
             />
             <span className="font-bold text-white text-lg hidden sm:block tracking-tight">
@@ -44,13 +44,13 @@ export function LandingNavbar() {
             <ThemeToggle variant="header" />
             <Link
               href="/login"
-              className="px-5 py-2.5 text-sm font-medium text-white/70 hover:text-white border border-white/15 hover:border-white/35 rounded-xl transition-all duration-200 hover:bg-white/5"
+              className="px-4 py-2 text-sm font-medium text-white/70 hover:text-white border border-white/15 hover:border-white/35 rounded-xl transition-all duration-200 hover:bg-white/5"
             >
               Anmelden
             </Link>
             <Link
               href="/register"
-              className="px-5 py-2.5 text-sm font-semibold bg-[#d4a038] hover:bg-[#e8b84a] text-slate-950 rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(212,160,56,0.35)] hover:shadow-[0_0_35px_rgba(212,160,56,0.55)]"
+              className="px-4 py-2 text-sm font-semibold bg-[#d4a038] hover:bg-[#e8b84a] text-slate-950 rounded-xl transition-all duration-200 shadow-[0_0_20px_rgba(212,160,56,0.35)] hover:shadow-[0_0_35px_rgba(212,160,56,0.55)]"
             >
               Kostenlos starten
             </Link>

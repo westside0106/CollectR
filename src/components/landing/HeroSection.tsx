@@ -53,7 +53,7 @@ export function HeroSection() {
 
       {/* Content */}
       <motion.div
-        className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-28 pb-20"
+        className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20 sm:pt-28 pb-14 sm:pb-20"
         variants={containerVariants}
         initial="hidden"
         animate="show"
@@ -69,7 +69,7 @@ export function HeroSection() {
         {/* H1 */}
         <motion.h1
           variants={itemVariants}
-          className="text-5xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-bold tracking-tight leading-[0.93] mb-6"
+          className="text-4xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] font-bold tracking-tight leading-[0.93] mb-6"
         >
           <span className="block text-white">Deine Sammlung.</span>
           <span
@@ -88,7 +88,7 @@ export function HeroSection() {
         {/* Subline */}
         <motion.p
           variants={itemVariants}
-          className="text-lg sm:text-xl text-white/55 max-w-2xl mx-auto mb-10 leading-relaxed"
+          className="text-base sm:text-xl text-white/55 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed"
         >
           Hot Wheels, Pokémon-Karten, Vinyl — alles an einem Ort.
           <br className="hidden sm:block" />
@@ -98,7 +98,7 @@ export function HeroSection() {
         {/* CTA Buttons */}
         <motion.div
           variants={itemVariants}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 sm:mb-16"
         >
           <Link
             href="/register"

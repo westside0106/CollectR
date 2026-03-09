@@ -3,26 +3,17 @@
 import { motion } from 'framer-motion'
 
 const collections = [
-  { emoji: '🚗', label: 'Hot Wheels', wide: true },
-  { emoji: '🃏', label: 'Trading Cards' },
-  { emoji: '🪙', label: 'Münzen' },
+  { emoji: '🚗', label: 'Diecast / Hot Wheels', wide: true },
   { emoji: '💿', label: 'Vinyl' },
-  { emoji: '📚', label: 'Bücher' },
-  { emoji: '🎮', label: 'Gaming', wide: true },
-  { emoji: '🏆', label: 'LEGO' },
   { emoji: '📷', label: 'Kameras' },
   { emoji: '📮', label: 'Briefmarken' },
-  { emoji: '🌍', label: 'Geo-Objekte' },
-  { emoji: '🎲', label: 'Brettspiele' },
-  { emoji: '🧸', label: 'Spielzeug', wide: true },
-  { emoji: '⌚', label: 'Uhren' },
-  { emoji: '👟', label: 'Sneakers' },
-  { emoji: '🍷', label: 'Wein' },
+  { emoji: '🃏', label: 'Trading Cards' },
+  { emoji: '🏆', label: 'LEGO' },
 ]
 
 export function CollectionTypesGrid() {
   return (
-    <section className="relative py-32 bg-slate-900 overflow-hidden">
+    <section className="relative py-20 sm:py-32 bg-slate-900 overflow-hidden">
       {/* Grid texture */}
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.06] pointer-events-none" />
 
@@ -36,7 +27,7 @@ export function CollectionTypesGrid() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.7 }}
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
         >
           <span className="text-xs font-semibold uppercase tracking-widest text-[#d4a038] mb-4 block">
             50+ Kategorien
@@ -46,6 +37,9 @@ export function CollectionTypesGrid() {
           </h2>
           <p className="mt-5 text-white/45 text-lg max-w-md mx-auto">
             Von Hot Wheels bis Briefmarken — Collectorssphere passt sich deiner Leidenschaft an.
+          </p>
+          <p className="mt-4 text-white/20 text-xs tracking-wide">
+            + Münzen · Sneakers · Gaming · Bücher · Uhren · Spielzeug · Wein · und vieles mehr
           </p>
         </motion.div>
 

@@ -43,7 +43,7 @@ const features = [
 
 export function FeatureShowcase() {
   return (
-    <section className="relative py-32 bg-slate-950 overflow-hidden">
+    <section className="relative py-20 sm:py-32 bg-slate-950 overflow-hidden">
       {/* Subtle grid texture */}
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.04] pointer-events-none" />
 
@@ -57,12 +57,12 @@ export function FeatureShowcase() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-20"
         >
           <span className="text-xs font-semibold uppercase tracking-widest text-[#d4a038] mb-4 block">
             Warum Collectorssphere
           </span>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
             Alles was Sammler<br className="hidden sm:block" /> wirklich brauchen
           </h2>
           <p className="mt-5 text-lg text-white/45 max-w-xl mx-auto leading-relaxed">
@@ -71,7 +71,7 @@ export function FeatureShowcase() {
         </motion.div>
 
         {/* Feature grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5">
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}
@@ -79,18 +79,18 @@ export function FeatureShowcase() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.6, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className={`group relative p-8 rounded-3xl border ${feature.border} ${feature.hoverBorder} bg-gradient-to-br ${feature.gradient} backdrop-blur-sm transition-all duration-500 ${feature.accentGlow} cursor-default`}
+              className={`group relative p-4 sm:p-8 rounded-2xl sm:rounded-3xl border ${feature.border} ${feature.hoverBorder} bg-gradient-to-br ${feature.gradient} backdrop-blur-sm transition-all duration-500 ${feature.accentGlow} cursor-default`}
             >
               {/* Icon */}
-              <div className="text-4xl mb-5 select-none">{feature.icon}</div>
+              <div className="text-2xl sm:text-4xl mb-3 sm:mb-5 select-none">{feature.icon}</div>
 
               {/* Title */}
-              <h3 className="text-xl font-semibold text-white mb-3 tracking-tight">
+              <h3 className="text-sm sm:text-xl font-semibold text-white mb-1.5 sm:mb-3 tracking-tight leading-snug">
                 {feature.title}
               </h3>
 
               {/* Description */}
-              <p className="text-white/50 leading-relaxed text-[15px]">{feature.desc}</p>
+              <p className="text-white/50 leading-relaxed text-[11px] sm:text-[15px]">{feature.desc}</p>
 
               {/* Gold hover shimmer */}
               <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 bg-gradient-to-br from-[#d4a038]/6 via-transparent to-transparent transition-opacity duration-500 pointer-events-none" />
