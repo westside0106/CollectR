@@ -89,7 +89,7 @@ export default function NewsPage() {
         <div className="bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 h-32" />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-24 bg-white dark:bg-slate-800 rounded-2xl animate-pulse" />
+            <div key={i} className="h-24 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl animate-pulse" />
           ))}
         </div>
       </div>
@@ -136,7 +136,7 @@ export default function NewsPage() {
 
         {/* Kategorie-Einstellungen */}
         {showSettings && (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-5">
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-5">
             <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Meine Sammelgebiete</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
               Wähle die Kategorien, die du als Schnelltabs sehen möchtest:
@@ -174,7 +174,7 @@ export default function NewsPage() {
                   className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                     activeCategory === cat && !searchQuery
                       ? 'bg-violet-600 text-white shadow-sm'
-                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:border-violet-300 dark:hover:border-violet-600'
+                      : 'bg-white/70 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:border-violet-300 dark:hover:border-violet-600'
                   }`}
                 >
                   {info.icon} {info.label}
@@ -213,7 +213,7 @@ export default function NewsPage() {
         {loading ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 dark:border-slate-700 animate-pulse">
+              <div key={i} className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 dark:border-slate-700 animate-pulse">
                 <div className="flex gap-4">
                   <div className="w-20 h-20 bg-slate-200 dark:bg-slate-700 rounded-xl flex-shrink-0" />
                   <div className="flex-1 space-y-2">
@@ -226,7 +226,7 @@ export default function NewsPage() {
             ))}
           </div>
         ) : articles.length === 0 ? (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-12 shadow-sm border border-slate-200 dark:border-slate-700 text-center">
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-12 shadow-sm border border-slate-200 dark:border-slate-700 text-center">
             <div className="text-4xl mb-3">📭</div>
             <p className="text-slate-500 dark:text-slate-400 font-medium">Keine News gefunden</p>
             {selectedCategories.length === 0 && (
@@ -246,7 +246,7 @@ export default function NewsPage() {
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex gap-4 bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-violet-200 dark:hover:border-violet-700 transition-all group"
+                className="flex gap-4 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 dark:border-slate-700 hover:shadow-md hover:border-violet-200 dark:hover:border-violet-700 transition-all group"
               >
                 {article.image ? (
                   <img

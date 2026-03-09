@@ -145,7 +145,7 @@ export default function MarketPage() {
           )}
 
           {loading && quotes.length === 0 ? (
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
               <div className="space-y-0">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="animate-pulse flex justify-between items-center p-4 border-b border-slate-100 dark:border-slate-700 last:border-0">
@@ -165,11 +165,11 @@ export default function MarketPage() {
               </div>
             </div>
           ) : filteredQuotes.length === 0 ? (
-            <div className="bg-white dark:bg-slate-800 rounded-xl p-12 shadow-sm border border-slate-200 dark:border-slate-700 text-center">
+            <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-xl p-12 shadow-sm border border-slate-200 dark:border-slate-700 text-center">
               <p className="text-slate-500 dark:text-slate-400">Keine Marktdaten verfügbar</p>
             </div>
           ) : (
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
               {filteredQuotes.map((quote, index) => {
                 const change = formatChange(quote.change24h, quote.changePercent24h)
                 return (

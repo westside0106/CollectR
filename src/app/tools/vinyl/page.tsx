@@ -98,7 +98,7 @@ export default function VinylLookupPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-4">
 
         {/* Suchmaske */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6">
+        <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6">
           <form onSubmit={handleSearch} className="space-y-4">
             {/* Such-Typ Toggle */}
             <div className="flex gap-2">
@@ -151,7 +151,7 @@ export default function VinylLookupPage() {
 
         {/* Suchergebnisse */}
         {searchResults.length > 0 && (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div className="px-4 sm:px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
               <h2 className="font-semibold text-slate-900 dark:text-white text-sm">
                 {searchResults.length} Ergebnisse
@@ -200,7 +200,7 @@ export default function VinylLookupPage() {
 
         {/* Loading Skeleton */}
         {loading && !release && (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 animate-pulse">
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 animate-pulse">
             <div className="flex gap-6">
               <div className="w-48 h-48 bg-slate-200 dark:bg-slate-700 rounded-xl flex-shrink-0" />
               <div className="flex-1 space-y-3">
@@ -214,7 +214,7 @@ export default function VinylLookupPage() {
 
         {/* Release Detail */}
         {release && (
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div className="px-4 sm:px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
               <h2 className="font-semibold text-slate-900 dark:text-white text-sm">Release-Details</h2>
               <button onClick={resetSearch} className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">

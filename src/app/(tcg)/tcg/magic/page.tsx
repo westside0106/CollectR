@@ -282,12 +282,20 @@ export default function MagicCollectionPage() {
                 Gather Your Spells - Deine Magic: The Gathering Sammlung
               </p>
             </div>
-            <Link
-              href="/tcg"
-              className="button-responsive bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors w-full sm:w-auto text-center whitespace-nowrap"
-            >
-              ← Zurück zu TCG
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Link
+                href="/tcg/magic/cards"
+                className="button-responsive bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg text-white rounded-lg transition-all w-full sm:w-auto text-center whitespace-nowrap font-semibold"
+              >
+                🔍 Karten suchen (Scryfall)
+              </Link>
+              <Link
+                href="/tcg"
+                className="button-responsive bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors w-full sm:w-auto text-center whitespace-nowrap"
+              >
+                ← Zurück zu TCG
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -498,7 +506,7 @@ export default function MagicCollectionPage() {
               Füge deine ersten Magic: The Gathering Karten hinzu
             </p>
             <Link
-              href="/tcg/prices"
+              href="/tcg/magic/cards"
               className="inline-block button-responsive bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all"
             >
               🔍 Karten suchen
