@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-const DISCOGS_USER_AGENT = 'CollectR/1.0 +https://collectr.app'
+const DISCOGS_USER_AGENT = 'CollectorssphereApp/1.0 +https://collectorssphere.com'
 const DISCOGS_TOKEN = process.env.DISCOGS_TOKEN || ''
 
 export async function GET(
