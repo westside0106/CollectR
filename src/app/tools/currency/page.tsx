@@ -88,7 +88,7 @@ export default function CurrencyPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
           {/* Hauptrechner */}
-          <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6 space-y-5">
+          <div className="lg:col-span-2 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6 space-y-5">
 
             {/* Betrag */}
             <div>
@@ -181,7 +181,7 @@ export default function CurrencyPage() {
 
           {/* Favoriten + Info */}
           <div className="space-y-4">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-5">
+            <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-5">
               <h3 className="font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                 <span>⭐</span> Favoriten
               </h3>
@@ -223,7 +223,7 @@ export default function CurrencyPage() {
 
         {/* Alle Paare Übersicht */}
         {result !== null && (
-          <div className="mt-6 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6">
+          <div className="mt-6 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6">
             <h3 className="font-semibold text-slate-900 dark:text-white mb-4 text-sm">
               {formatCurrency(amount, from)} in allen Währungen
             </h3>
