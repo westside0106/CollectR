@@ -28,11 +28,11 @@ export function LandingNavbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
             <Image
-              src="/brand/collectr-hero.png"
+              src="/brand/collectr-r.png"
               alt="Collectorssphere"
-              width={28}
-              height={28}
-              className="rounded-xl group-hover:scale-105 transition-transform duration-200"
+              width={32}
+              height={32}
+              className="rounded-full group-hover:scale-105 transition-transform duration-200 drop-shadow-[0_0_6px_rgba(212,160,56,0.5)]"
             />
             <span className="font-bold text-white text-lg hidden sm:block tracking-tight">
               Collectors<span className="text-[#d4a038]">sphere</span>
