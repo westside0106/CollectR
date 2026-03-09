@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import Image from 'next/image'
+import { motion, useAnimation } from 'framer-motion'
 
 function WaxLogoFilter() {
   return (
@@ -28,6 +29,20 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [totalRotation, setTotalRotation] = useState(0)
+  const [glowing, setGlowing] = useState(false)
+  const rotateControls = useAnimation()
+  const scaleControls = useAnimation()
+
+  function handleSealClick() {
+    if (glowing) return
+    const newRot = totalRotation + 360
+    setTotalRotation(newRot)
+    setGlowing(true)
+    rotateControls.start({ rotate: newRot, transition: { type: 'spring', stiffness: 55, damping: 9 } })
+    scaleControls.start({ scale: [1, 1.15, 0.95, 1.05, 1], transition: { duration: 0.7, times: [0, 0.25, 0.55, 0.8, 1] } })
+    setTimeout(() => setGlowing(false), 900)
+  }
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
@@ -107,16 +122,20 @@ export default function RegisterPage() {
 
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
-          <Image
-            src="/brand/collectr-r.png"
-            alt="CollectR Logo"
-            width={88}
-            height={88}
-            className="mx-auto mb-4"
-            style={{
-              filter: 'url(#wax-remove-white) drop-shadow(0 0 22px rgba(212,160,56,0.75))',
-            }}
-          />
+          <motion.div animate={scaleControls} className="inline-block mb-5 cursor-pointer select-none" onClick={handleSealClick} title="Klick mich 👀">
+            <motion.div
+              initial={{ rotate: -30 }}
+              animate={rotateControls}
+              style={{
+                filter: glowing
+                  ? 'drop-shadow(0 0 28px rgba(212,160,56,1)) drop-shadow(0 0 60px rgba(212,160,56,0.55))'
+                  : 'drop-shadow(0 0 18px rgba(212,160,56,0.7))',
+                transition: 'filter 0.3s ease',
+              }}
+            >
+              <Image src="/brand/collectr-r.png" alt="CollectR" width={88} height={88} style={{ filter: 'url(#wax-remove-white)', display: 'block' }} />
+            </motion.div>
+          </motion.div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white">CollectR</h1>
           <p className="text-sm sm:text-base text-white/45 mt-2">Erstelle ein Konto</p>
         </div>
