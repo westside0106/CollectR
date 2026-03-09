@@ -10,7 +10,7 @@ interface TagSectionProps {
 
 export function TagSection({ itemId, userId }: TagSectionProps) {
   return (
-    <CollapsibleSection title="Tags">
+    <CollapsibleSection title="Tags" defaultOpen={false}>
       <TagInput itemId={itemId} userId={userId} />
     </CollapsibleSection>
   )

@@ -383,7 +383,7 @@ function DashboardContent() {
       case 'tcg_highlights':
         return <TCGHighlightsTile />
       case 'favorites':
-        return <FavoritesTile />
+        return null // TODO: Favoriten-Kachel — geplant für Landingpage-Redesign
       case 'chart_category':
         return chartData.categoryDistribution.length > 0 ? (
           <DashboardCharts
