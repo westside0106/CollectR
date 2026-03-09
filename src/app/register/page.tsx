@@ -1,13 +1,27 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import Image from 'next/image'
+import { motion, useAnimation } from 'framer-motion'
+
+function WaxLogoFilter() {
+  return (
+    <svg style={{ display: 'none' }} aria-hidden>
+      <defs>
+        <filter id="wax-remove-white" colorInterpolationFilters="sRGB">
+          <feColorMatrix
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -0.9 -0.9 -0.9 0 2.7"
+          />
+        </filter>
+      </defs>
+    </svg>
+  )
+}
 
 export default function RegisterPage() {
-  const router = useRouter()
   const supabase = createClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -15,6 +29,20 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [totalRotation, setTotalRotation] = useState(0)
+  const [glowing, setGlowing] = useState(false)
+  const rotateControls = useAnimation()
+  const scaleControls = useAnimation()
+
+  function handleSealClick() {
+    if (glowing) return
+    const newRot = totalRotation + 360
+    setTotalRotation(newRot)
+    setGlowing(true)
+    rotateControls.start({ rotate: newRot, transition: { type: 'spring', stiffness: 55, damping: 9 } })
+    scaleControls.start({ scale: [1, 1.15, 0.95, 1.05, 1], transition: { duration: 0.7, times: [0, 0.25, 0.55, 0.8, 1] } })
+    setTimeout(() => setGlowing(false), 900)
+  }
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
@@ -67,6 +95,7 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div className="relative min-h-screen flex items-center justify-center bg-slate-950 p-4 overflow-hidden">
+        <WaxLogoFilter />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#d4a038]/8 rounded-full blur-[100px] pointer-events-none" />
         <div className="relative w-full max-w-md text-center">
           <div className="bg-slate-900/70 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
@@ -87,18 +116,26 @@ export default function RegisterPage() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-slate-950 p-4 overflow-hidden">
+      <WaxLogoFilter />
       {/* Gold ambient glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-[#d4a038]/8 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
-          <Image
-            src="/brand/collectr-r.png"
-            alt="CollectR Logo"
-            width={88}
-            height={88}
-            className="mx-auto mb-4 drop-shadow-[0_0_20px_rgba(212,160,56,0.5)]"
-          />
+          <motion.div animate={scaleControls} className="inline-block mb-5 cursor-pointer select-none" onClick={handleSealClick} title="Klick mich 👀">
+            <motion.div
+              initial={{ rotate: -30 }}
+              animate={rotateControls}
+              style={{
+                filter: glowing
+                  ? 'drop-shadow(0 0 28px rgba(212,160,56,1)) drop-shadow(0 0 60px rgba(212,160,56,0.55))'
+                  : 'drop-shadow(0 0 18px rgba(212,160,56,0.7))',
+                transition: 'filter 0.3s ease',
+              }}
+            >
+              <Image src="/brand/collectr-r.png" alt="CollectR" width={88} height={88} style={{ filter: 'url(#wax-remove-white)', display: 'block' }} />
+            </motion.div>
+          </motion.div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white">CollectR</h1>
           <p className="text-sm sm:text-base text-white/45 mt-2">Erstelle ein Konto</p>
         </div>
