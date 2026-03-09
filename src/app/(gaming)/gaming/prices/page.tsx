@@ -87,7 +87,7 @@ export default function GamingPricesPage() {
                   px-6 py-3 rounded-xl transition-all duration-200 font-semibold
                   ${selectedPlatform === platform.id
                     ? 'bg-purple-600 text-white ring-4 ring-purple-500/50'
-                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                   }
                 `}
               >
@@ -99,7 +99,7 @@ export default function GamingPricesPage() {
         </div>
 
         {/* Search Bar */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
           <div className="flex gap-3 sm:gap-4">
             <input
               type="text"
@@ -107,7 +107,7 @@ export default function GamingPricesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1 px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
             <button
               onClick={handleSearch}
@@ -127,7 +127,7 @@ export default function GamingPricesPage() {
                   setSearchQuery(term)
                   handleSearch()
                 }}
-                className="px-3 py-1 rounded-lg bg-slate-700/50 text-slate-300 text-sm hover:bg-slate-700 transition-all"
+                className="px-3 py-1 rounded-lg bg-slate-700 text-slate-300 text-sm hover:bg-slate-700 transition-all"
               >
                 {term}
               </button>
@@ -137,20 +137,20 @@ export default function GamingPricesPage() {
 
         {/* Search Results */}
         {searchResults.length > 0 && (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
             <h2 className="text-2xl font-bold text-white mb-4">Preisvergleich</h2>
             {/* Results would go here */}
           </div>
         )}
 
         {/* Trending Games */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">🔥 Trending Spiele</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {trendingGames.map((game, index) => (
               <div
                 key={index}
-                className="p-4 rounded-lg bg-slate-900/50 border border-slate-600 hover:border-purple-500/50 transition-all cursor-pointer"
+                className="p-4 rounded-lg bg-slate-900 border border-slate-600 hover:border-purple-500/50 transition-all cursor-pointer"
               >
                 <div className="text-sm text-slate-400 mb-1">{game.platform}</div>
                 <h3 className="font-semibold text-white mb-2 text-sm">{game.name}</h3>
@@ -172,7 +172,7 @@ export default function GamingPricesPage() {
         {/* Retailers */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6 sm:mb-8">
           {['Amazon', 'MediaMarkt', 'GameStop', 'Steam'].map((retailer) => (
-            <div key={retailer} className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+            <div key={retailer} className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
               <div className="text-4xl mb-3">🏪</div>
               <h3 className="font-semibold text-white">{retailer}</h3>
               <p className="text-xs text-slate-400 mt-1">Preise werden verglichen</p>
@@ -182,7 +182,7 @@ export default function GamingPricesPage() {
 
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-4xl mb-3">📊</div>
             <h3 className="font-semibold text-white mb-2">Echtzeit-Preise</h3>
             <p className="text-sm text-slate-400">
@@ -190,7 +190,7 @@ export default function GamingPricesPage() {
             </p>
           </div>
 
-          <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-4xl mb-3">📈</div>
             <h3 className="font-semibold text-white mb-2">Preisverlauf</h3>
             <p className="text-sm text-slate-400">
@@ -198,7 +198,7 @@ export default function GamingPricesPage() {
             </p>
           </div>
 
-          <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-4xl mb-3">🔔</div>
             <h3 className="font-semibold text-white mb-2">Preis-Alerts</h3>
             <p className="text-sm text-slate-400">

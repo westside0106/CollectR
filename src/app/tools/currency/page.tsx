@@ -194,7 +194,7 @@ export default function CurrencyPage() {
                   {favorites.map((fav, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer group transition"
+                      className="flex items-center justify-between px-3 py-2.5 bg-slate-50 dark:bg-slate-700 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer group transition"
                       onClick={() => { setFrom(fav.from); setTo(fav.to) }}
                     >
                       <span className="font-medium text-slate-700 dark:text-slate-200 text-sm">
@@ -212,7 +212,7 @@ export default function CurrencyPage() {
               )}
             </div>
 
-            <div className="bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
+            <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 <span className="font-semibold text-slate-700 dark:text-slate-300">Powered by frankfurter.app</span><br />
                 Europäische Zentralbank · Kein API-Key · 100% kostenlos
@@ -235,7 +235,7 @@ export default function CurrencyPage() {
                   className={`p-3 rounded-xl text-left transition border ${
                     to === c.code
                       ? 'border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 bg-slate-50 dark:bg-slate-700/30'
+                      : 'border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600 bg-slate-50 dark:bg-slate-700'
                   }`}
                 >
                   <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">{c.symbol} {c.code}</div>

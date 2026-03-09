@@ -160,7 +160,7 @@ function TCGPricesContent() {
                   px-3 sm:px-6 py-2 sm:py-3 rounded-xl transition-all duration-200 font-semibold text-sm sm:text-base
                   ${selectedGame === game.id
                     ? 'bg-green-600 text-white ring-2 sm:ring-4 ring-green-500/50'
-                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                   }
                 `}
               >
@@ -173,7 +173,7 @@ function TCGPricesContent() {
         </div>
 
         {/* Search Bar */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 sm:card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-2xl p-4 sm:card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 sm:gap-4">
             <input
               type="text"
@@ -181,7 +181,7 @@ function TCGPricesContent() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              className="flex-1 px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
+              className="flex-1 px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base"
             />
             <button
               onClick={handleSearch}
@@ -201,7 +201,7 @@ function TCGPricesContent() {
                   setSearchQuery(term)
                   setTimeout(() => handleSearch(), 100)
                 }}
-                className="px-3 py-1 rounded-lg bg-slate-700/50 text-slate-300 text-sm hover:bg-slate-700 transition-all"
+                className="px-3 py-1 rounded-lg bg-slate-700 text-slate-300 text-sm hover:bg-slate-700 transition-all"
               >
                 {term}
               </button>
@@ -213,7 +213,7 @@ function TCGPricesContent() {
                   setSearchQuery(term)
                   setTimeout(() => handleSearch(), 100)
                 }}
-                className="px-3 py-1 rounded-lg bg-slate-700/50 text-slate-300 text-sm hover:bg-slate-700 transition-all"
+                className="px-3 py-1 rounded-lg bg-slate-700 text-slate-300 text-sm hover:bg-slate-700 transition-all"
               >
                 {term}
               </button>
@@ -225,7 +225,7 @@ function TCGPricesContent() {
                   setSearchQuery(term)
                   setTimeout(() => handleSearch(), 100)
                 }}
-                className="px-3 py-1 rounded-lg bg-slate-700/50 text-slate-300 text-sm hover:bg-slate-700 transition-all"
+                className="px-3 py-1 rounded-lg bg-slate-700 text-slate-300 text-sm hover:bg-slate-700 transition-all"
               >
                 {term}
               </button>
@@ -235,13 +235,13 @@ function TCGPricesContent() {
 
         {/* Search Results */}
         {searchResults.length > 0 ? (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 sm:card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-2xl p-4 sm:card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">Suchergebnisse</h2>
             <div className="space-y-3 sm:space-y-4">
               {searchResults.map((result, index) => (
                 <div
                   key={index}
-                  className="p-4 sm:card-padding rounded-lg bg-slate-900/50 border border-slate-600"
+                  className="p-4 sm:card-padding rounded-lg bg-slate-900 border border-slate-600"
                 >
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 sm:gap-4 mb-4">
                     {result.imageUrl && (
@@ -320,13 +320,13 @@ function TCGPricesContent() {
         ) : null}
 
         {/* Trending Cards */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-4 sm:card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-2xl p-4 sm:card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">🔥 Trending Cards</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3 sm:gap-4">
             {trendingCards.map((card, index) => (
               <div
                 key={index}
-                className="p-4 rounded-lg bg-slate-900/50 border border-slate-600 hover:border-green-500/50 transition-all cursor-pointer"
+                className="p-4 rounded-lg bg-slate-900 border border-slate-600 hover:border-green-500/50 transition-all cursor-pointer"
               >
                 <div className="text-sm text-slate-400 mb-1 capitalize">{card.game}</div>
                 <h3 className="font-semibold text-white mb-2">{card.name}</h3>
@@ -347,7 +347,7 @@ function TCGPricesContent() {
 
         {/* Features */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 sm:gap-6">
-          <div className="text-center p-4 sm:card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center p-4 sm:card-padding rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">📊</div>
             <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Live Pricing</h3>
             <p className="text-xs sm:text-sm text-slate-400">
@@ -355,7 +355,7 @@ function TCGPricesContent() {
             </p>
           </div>
 
-          <div className="text-center p-4 sm:card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center p-4 sm:card-padding rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">📈</div>
             <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Price History</h3>
             <p className="text-xs sm:text-sm text-slate-400">
@@ -363,7 +363,7 @@ function TCGPricesContent() {
             </p>
           </div>
 
-          <div className="text-center p-4 sm:card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center p-4 sm:card-padding rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🔔</div>
             <h3 className="font-semibold text-white mb-2 text-sm sm:text-base">Price Alerts</h3>
             <p className="text-sm text-slate-400">

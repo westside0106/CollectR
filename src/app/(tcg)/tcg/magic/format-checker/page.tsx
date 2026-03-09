@@ -159,7 +159,7 @@ export default function MagicFormatCheckerPage() {
         </div>
 
         {/* Format Details */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 mb-8">
           <div className="flex items-center gap-4 mb-6">
             <div className="text-6xl">{currentFormat.icon}</div>
             <div className="flex-1">
@@ -173,11 +173,11 @@ export default function MagicFormatCheckerPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="p-4 rounded-lg bg-slate-900/50">
+            <div className="p-4 rounded-lg bg-slate-900">
               <h3 className="text-sm font-semibold text-purple-300 mb-2">📚 Card Pool</h3>
               <p className="text-slate-300 text-sm">{currentFormat.cardPool}</p>
             </div>
-            <div className="p-4 rounded-lg bg-slate-900/50">
+            <div className="p-4 rounded-lg bg-slate-900">
               <h3 className="text-sm font-semibold text-purple-300 mb-2">📦 Deck Size</h3>
               <p className="text-slate-300 text-sm">{currentFormat.deckSize}</p>
             </div>
@@ -205,7 +205,7 @@ export default function MagicFormatCheckerPage() {
         </div>
 
         {/* Card Checker */}
-        <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 mb-8">
+        <div className="bg-slate-800 backdrop-blur-lg rounded-2xl p-8 border border-slate-700 mb-8">
           <h2 className="text-2xl font-bold text-white mb-4">🔍 Karten-Legalität Prüfen</h2>
           <p className="text-slate-400 mb-4 text-sm">
             Gib einen Kartennamen ein um zu prüfen ob er im gewählten Format legal ist
@@ -218,7 +218,7 @@ export default function MagicFormatCheckerPage() {
               value={cardToCheck}
               onChange={(e) => setCardToCheck(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && checkCardLegality()}
-              className="flex-1 px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="flex-1 px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
             <button
               onClick={checkCardLegality}
@@ -232,7 +232,7 @@ export default function MagicFormatCheckerPage() {
 
         {/* Format Comparison */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center p-6 rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-4xl mb-3">⚡</div>
             <h3 className="font-semibold text-white mb-2">Schnellste Formate</h3>
             <p className="text-sm text-slate-400">
@@ -240,7 +240,7 @@ export default function MagicFormatCheckerPage() {
             </p>
           </div>
 
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center p-6 rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-4xl mb-3">👥</div>
             <h3 className="font-semibold text-white mb-2">Beliebteste Formate</h3>
             <p className="text-sm text-slate-400">
@@ -248,7 +248,7 @@ export default function MagicFormatCheckerPage() {
             </p>
           </div>
 
-          <div className="text-center p-6 rounded-xl bg-slate-800/30 border border-slate-700">
+          <div className="text-center p-6 rounded-xl bg-slate-800 border border-slate-700">
             <div className="text-4xl mb-3">💰</div>
             <h3 className="font-semibold text-white mb-2">Budget-Friendly</h3>
             <p className="text-sm text-slate-400">

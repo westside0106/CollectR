@@ -167,23 +167,23 @@ export default function GeoLocationsPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
             <div className="text-3xl font-bold text-emerald-400">{locations.length}</div>
             <div className="text-sm text-slate-400">Fundorte</div>
           </div>
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
             <div className="text-3xl font-bold text-blue-400">
               {locations.reduce((sum, loc) => sum + loc.specimens, 0)}
             </div>
             <div className="text-sm text-slate-400">Specimens</div>
           </div>
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
             <div className="text-3xl font-bold text-purple-400">
               {new Set(locations.map(l => l.category)).size}
             </div>
             <div className="text-sm text-slate-400">Kategorien</div>
           </div>
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
             <div className="text-3xl font-bold text-amber-400">
               {locations.filter(l => new Date(l.date) > new Date(Date.now() - 30*24*60*60*1000)).length}
             </div>
@@ -206,7 +206,7 @@ export default function GeoLocationsPage() {
           {locations.map((location) => (
             <div
               key={location.id}
-              className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 hover:border-emerald-500/50 transition-all"
+              className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 hover:border-emerald-500/50 transition-all"
             >
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
@@ -236,7 +236,7 @@ export default function GeoLocationsPage() {
                   </div>
 
                   {location.notes && (
-                    <div className="bg-slate-900/50 rounded-lg p-3 mb-4">
+                    <div className="bg-slate-900 rounded-lg p-3 mb-4">
                       <div className="text-xs text-slate-500 mb-1">Notizen</div>
                       <p className="text-sm text-slate-300">{location.notes}</p>
                     </div>
@@ -293,7 +293,7 @@ export default function GeoLocationsPage() {
                     type="text"
                     value={newLocation.name}
                     onChange={(e) => setNewLocation({ ...newLocation, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     placeholder="z.B. Steinbruch Mühlheim"
                   />
                 </div>
@@ -305,7 +305,7 @@ export default function GeoLocationsPage() {
                   <select
                     value={newLocation.category}
                     onChange={(e) => setNewLocation({ ...newLocation, category: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     <option value="minerals">💎 Mineralien</option>
                     <option value="fossils">🦴 Fossilien</option>
@@ -348,7 +348,7 @@ export default function GeoLocationsPage() {
                   <textarea
                     value={newLocation.notes}
                     onChange={(e) => setNewLocation({ ...newLocation, notes: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     rows={3}
                     placeholder="Beschreibung, Besonderheiten, Zugang..."
                   />

@@ -411,7 +411,7 @@ export function AddToCollectionModal({
                 )}
 
                 {/* Preview */}
-                <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4">
+                <div className="bg-gray-50 dark:bg-slate-700 rounded-lg p-4">
                   <p className="text-xs text-gray-500 dark:text-gray-400 uppercase mb-2">Wird hinzugefügt:</p>
                   <div className="flex gap-3">
                     {itemData.coverUrl && (

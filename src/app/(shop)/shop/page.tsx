@@ -119,7 +119,7 @@ export default function ShopLandingPage() {
               <button
                 key={action.title}
                 onClick={action.action}
-                className="group p-4 sm:p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-green-500/50 transition-all duration-200 text-left"
+                className="group p-4 sm:p-6 rounded-xl bg-slate-800 hover:bg-slate-800 border border-slate-700 hover:border-green-500/50 transition-all duration-200 text-left"
               >
                 <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{action.icon}</div>
                 <h3 className="text-sm sm:text-base font-semibold text-white mb-1 group-hover:text-green-400 transition-colors">
@@ -131,14 +131,14 @@ export default function ShopLandingPage() {
           </div>
 
           {/* Platform Integrations Preview */}
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-8 sm:mb-10 md:mb-12">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-8 sm:mb-10 md:mb-12">
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Plattform-Integrationen</h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {platforms.map((platform) => (
                 <div
                   key={platform.name}
-                  className="p-4 sm:p-6 rounded-xl bg-slate-700/50 border border-slate-600 text-center"
+                  className="p-4 sm:p-6 rounded-xl bg-slate-700 border border-slate-600 text-center"
                 >
                   <div className="text-4xl mb-2">{platform.icon}</div>
                   <div className="text-sm sm:text-base font-semibold text-white mb-1">{platform.name}</div>
@@ -187,7 +187,7 @@ export default function ShopLandingPage() {
                     }
                   `}
                   style={{
-                    background: `linear-gradient(135deg, ${selectedFeature === feature.id ? 'rgba(255,255,255,0.1)' : 'rgba(30,41,59,0.5)'} 0%, rgba(15,23,42,0.8) 100%)`
+                    background: `linear-gradient(135deg, ${selectedFeature === feature.id ? 'rgba(255,255,255,0.1)' : 'rgba(30,41,59,1)'} 0%, rgba(15,23,42,1) 100%)`
                   }}
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-10 rounded-2xl`}></div>
@@ -231,7 +231,7 @@ export default function ShopLandingPage() {
           </div>
 
           {/* Stats Dashboard Preview */}
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Quick Stats</h2>
 
             {loading ? (

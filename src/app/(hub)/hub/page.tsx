@@ -127,7 +127,7 @@ export default function HubLandingPage() {
               <button
                 key={action.title}
                 onClick={action.action}
-                className="group p-4 sm:p-6 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 transition-all duration-200 text-left"
+                className="group p-4 sm:p-6 rounded-xl bg-slate-800 hover:bg-slate-800 border border-slate-700 hover:border-slate-500 transition-all duration-200 text-left"
               >
                 <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{action.icon}</div>
                 <h3 className="text-sm sm:text-base font-semibold text-white mb-1 group-hover:text-slate-200 transition-colors">
@@ -149,7 +149,7 @@ export default function HubLandingPage() {
                 <Link
                   key={sphere.id}
                   href={sphere.link}
-                  className="group relative p-6 sm:p-8 rounded-xl sm:rounded-2xl transition-all duration-300 transform hover:scale-105 bg-slate-800/30 border border-slate-700 hover:border-slate-500"
+                  className="group relative p-6 sm:p-8 rounded-xl sm:rounded-2xl transition-all duration-300 transform hover:scale-105 bg-slate-800 border border-slate-700 hover:border-slate-500"
                 >
                   <div className={`absolute inset-0 bg-gradient-to-br ${sphere.darkColors.gradient} opacity-5 group-hover:opacity-10 rounded-xl sm:rounded-2xl transition-opacity`}></div>
 
@@ -177,7 +177,7 @@ export default function HubLandingPage() {
           </div>
 
           {/* Features */}
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-8 sm:mb-12 md:mb-16">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-8 sm:mb-12 md:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-8 sm:mb-10 md:mb-12">
               Warum CollectR HUB?
             </h2>
@@ -194,7 +194,7 @@ export default function HubLandingPage() {
           </div>
 
           {/* Stats Preview */}
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
             <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Quick Stats</h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">

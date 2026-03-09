@@ -253,7 +253,7 @@ export default function VinylLookupPage() {
                       release.country && { label: 'Land', value: release.country },
                       release.format?.length && { label: 'Format', value: release.format.join(', ') },
                     ].filter(Boolean).map((item, i) => item && (
-                      <div key={i} className="bg-slate-50 dark:bg-slate-700/50 rounded-xl px-3 py-2">
+                      <div key={i} className="bg-slate-50 dark:bg-slate-700 rounded-xl px-3 py-2">
                         <div className="text-xs text-slate-500 dark:text-slate-400">{item.label}</div>
                         <div className="font-medium text-slate-900 dark:text-white text-sm">{item.value}</div>
                       </div>
@@ -331,7 +331,7 @@ export default function VinylLookupPage() {
               {release.tracklist && release.tracklist.length > 0 && (
                 <div className="mt-5 pt-5 border-t border-slate-100 dark:border-slate-700">
                   <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Tracklist</h4>
-                  <div className="bg-slate-50 dark:bg-slate-700/30 rounded-xl overflow-hidden max-h-64 overflow-y-auto">
+                  <div className="bg-slate-50 dark:bg-slate-700 rounded-xl overflow-hidden max-h-64 overflow-y-auto">
                     <table className="w-full text-sm">
                       <tbody>
                         {release.tracklist.map((track, i) => (

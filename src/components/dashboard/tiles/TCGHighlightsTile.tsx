@@ -230,7 +230,7 @@ export function TCGHighlightsTile() {
         <Link
           key={card.id}
           href={`/collections/${card.collection_id}/items/${card.id}`}
-          className="flex gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-600"
+          className="flex gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-600"
         >
           {/* Rank Badge */}
           <div className="flex-shrink-0 flex items-center justify-center w-6">

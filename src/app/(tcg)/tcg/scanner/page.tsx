@@ -141,7 +141,7 @@ export default function TCGScannerPage() {
                       p-3 sm:p-4 rounded-lg sm:rounded-xl transition-all duration-200
                       ${selectedGame === game.id
                         ? 'ring-2 sm:ring-4 ring-red-500/50 bg-red-500/20 border-2 border-red-500'
-                        : 'bg-slate-800/50 border-2 border-slate-700 hover:border-slate-600'
+                        : 'bg-slate-800 border-2 border-slate-700 hover:border-slate-600'
                       }
                     `}
                   >
@@ -160,7 +160,7 @@ export default function TCGScannerPage() {
                   <button
                     key={mode.id}
                     onClick={() => startScanning(mode.id)}
-                    className="card-padding rounded-xl transition-all duration-200 text-left bg-slate-800/50 border-2 border-slate-700 hover:border-red-500/50 hover:bg-slate-800"
+                    className="card-padding rounded-xl transition-all duration-200 text-left bg-slate-800 border-2 border-slate-700 hover:border-red-500/50 hover:bg-slate-800"
                   >
                     <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{mode.icon}</div>
                     <h3 className="text-sm sm:text-base font-semibold text-white mb-1">{mode.title}</h3>
@@ -174,7 +174,7 @@ export default function TCGScannerPage() {
 
         {/* Active Scanner */}
         {selectedMode && (selectedMode === 'camera' || selectedMode === 'upload') && (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
             <TCGCardScanner
               mode={selectedMode}
               game={selectedGame}
@@ -225,7 +225,7 @@ export default function TCGScannerPage() {
         {!selectedMode && !showBarcodeScanner && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 sm:gap-6 mb-4 sm:mb-6 sm:mb-4 sm:mb-6 sm:mb-8">
-              <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+              <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
                 <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">🤖</div>
                 <h3 className="text-sm sm:text-base font-semibold text-white mb-2">AI Recognition</h3>
                 <p className="text-xs sm:text-sm text-slate-400">
@@ -233,7 +233,7 @@ export default function TCGScannerPage() {
                 </p>
               </div>
 
-              <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+              <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
                 <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">💰</div>
                 <h3 className="text-sm sm:text-base font-semibold text-white mb-2">Live Pricing</h3>
                 <p className="text-xs sm:text-sm text-slate-400">
@@ -241,7 +241,7 @@ export default function TCGScannerPage() {
                 </p>
               </div>
 
-              <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+              <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
                 <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">📦</div>
                 <h3 className="text-sm sm:text-base font-semibold text-white mb-2">Quick Add</h3>
                 <p className="text-xs sm:text-sm text-slate-400">

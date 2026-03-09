@@ -154,23 +154,23 @@ export default function GeoLabDataPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
             <div className="text-3xl font-bold text-emerald-400">{reports.length}</div>
             <div className="text-sm text-slate-400">Berichte</div>
           </div>
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
             <div className="text-3xl font-bold text-blue-400">
               {reports.filter(r => r.certified).length}
             </div>
             <div className="text-sm text-slate-400">Zertifiziert</div>
           </div>
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
             <div className="text-3xl font-bold text-purple-400">
               {new Set(reports.map(r => r.reportType)).size}
             </div>
             <div className="text-sm text-slate-400">Analysearten</div>
           </div>
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 text-center">
             <div className="text-3xl font-bold text-amber-400">
               {new Set(reports.map(r => r.labName)).size}
             </div>
@@ -195,7 +195,7 @@ export default function GeoLabDataPage() {
             return (
               <div
                 key={report.id}
-                className="bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700 hover:border-emerald-500/50 transition-all"
+                className="bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700 hover:border-emerald-500/50 transition-all"
               >
                 <div className="flex flex-col sm:flex-row gap-4 mb-4">
                   <div className={`text-5xl flex-shrink-0`}>{type.icon}</div>
@@ -221,7 +221,7 @@ export default function GeoLabDataPage() {
                 </div>
 
                 {/* Results */}
-                <div className="bg-slate-900/50 rounded-lg p-4 mb-4">
+                <div className="bg-slate-900 rounded-lg p-4 mb-4">
                   <h4 className="font-semibold text-white mb-3 text-sm">Analyseergebnisse:</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {Object.entries(report.results).map(([key, value]) => (
@@ -290,7 +290,7 @@ export default function GeoLabDataPage() {
                     type="text"
                     value={newReport.specimenName}
                     onChange={(e) => setNewReport({ ...newReport, specimenName: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     placeholder="z.B. Meteorit Fragment #42"
                   />
                 </div>
@@ -302,7 +302,7 @@ export default function GeoLabDataPage() {
                   <select
                     value={newReport.reportType}
                     onChange={(e) => setNewReport({ ...newReport, reportType: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   >
                     {Object.entries(reportTypes).map(([key, type]) => (
                       <option key={key} value={key}>
@@ -320,7 +320,7 @@ export default function GeoLabDataPage() {
                     type="text"
                     value={newReport.labName}
                     onChange={(e) => setNewReport({ ...newReport, labName: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     placeholder="z.B. Max-Planck-Institut für Chemie"
                   />
                 </div>
@@ -332,7 +332,7 @@ export default function GeoLabDataPage() {
                   <textarea
                     value={newReport.results}
                     onChange={(e) => setNewReport({ ...newReport, results: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm"
+                    className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm"
                     rows={8}
                     placeholder={`Nickel-Gehalt: 8.2%
 Eisen-Gehalt: 89.1%
@@ -364,11 +364,11 @@ Authentizität: Bestätigt`}
         )}
 
         {/* Report Types Info */}
-        <div className="mt-8 bg-slate-800/30 backdrop-blur-lg rounded-xl card-padding border border-slate-700">
+        <div className="mt-8 bg-slate-800 backdrop-blur-lg rounded-xl card-padding border border-slate-700">
           <h3 className="text-lg font-semibold text-white mb-4">Verfügbare Analysearten</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.entries(reportTypes).map(([key, type]) => (
-              <div key={key} className="flex items-center gap-3 p-3 bg-slate-900/30 rounded-lg">
+              <div key={key} className="flex items-center gap-3 p-3 bg-slate-900 rounded-lg">
                 <span className="text-3xl">{type.icon}</span>
                 <span className="text-sm text-slate-300">{type.name}</span>
               </div>

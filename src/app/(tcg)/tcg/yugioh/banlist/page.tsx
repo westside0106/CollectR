@@ -156,7 +156,7 @@ export default function YuGiOhBanlistPage() {
                   px-6 py-3 rounded-xl transition-all duration-200 font-semibold
                   ${selectedStatus === status
                     ? 'bg-purple-600 text-white ring-4 ring-purple-500/50'
-                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                   }
                 `}
               >
@@ -172,7 +172,7 @@ export default function YuGiOhBanlistPage() {
               placeholder="Kartenname suchen..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-3 rounded-lg bg-slate-900 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
         </div>

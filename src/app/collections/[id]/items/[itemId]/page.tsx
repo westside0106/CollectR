@@ -165,7 +165,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
               {/* Marge/Gewinn Anzeige */}
               {item.purchase_price !== null && item._computed_value !== null &&
                item.purchase_price !== undefined && item._computed_value !== undefined && (
-                <div className="col-span-2 mt-2 p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                <div className="col-span-2 mt-2 p-4 rounded-lg bg-slate-50 dark:bg-slate-700">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Marge / Gewinn</p>
@@ -281,7 +281,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
           )}
 
           {/* Metadata */}
-          <section className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+          <section className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
               {item.created_at && (
                 <div>

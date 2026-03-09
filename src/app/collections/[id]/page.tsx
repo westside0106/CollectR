@@ -1057,7 +1057,7 @@ function ItemRow({ item, collectionId, bulkEditMode, isSelected, onToggleSelect 
   }
 
   return (
-    <tr className={`transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
+    <tr className={`transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
       {bulkEditMode && (
         <td className="px-4 py-3">
           <input
