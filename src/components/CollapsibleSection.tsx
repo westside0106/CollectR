@@ -7,7 +7,8 @@ interface Props {
   defaultOpen?: boolean
   children: ReactNode
   className?: string
-  headerExtra?: ReactNode
+  /** Rendered in the header only when the section is collapsed */
+  closedPreview?: ReactNode
 }
 
 export function CollapsibleSection({
@@ -15,7 +16,7 @@ export function CollapsibleSection({
   defaultOpen = true,
   children,
   className = '',
-  headerExtra,
+  closedPreview,
 }: Props) {
   const [open, setOpen] = useState(defaultOpen)
 
@@ -27,9 +28,11 @@ export function CollapsibleSection({
         className="w-full flex items-center justify-between gap-2 text-left"
         aria-expanded={open}
       >
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white">{title}</h2>
-          {headerExtra}
+        <div className="flex items-center gap-2 flex-1 min-w-0 overflow-hidden">
+          <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white flex-shrink-0">{title}</h2>
+          {!open && closedPreview && (
+            <div className="flex items-center gap-2 overflow-hidden">{closedPreview}</div>
+          )}
         </div>
         <svg
           className={`w-4 h-4 text-slate-400 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}

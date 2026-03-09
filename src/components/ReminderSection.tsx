@@ -122,7 +122,7 @@ export function ReminderSection({ itemId, itemName }: ReminderSectionProps) {
 
   const activeReminders = reminders.filter(r => !r.is_completed)
   const overdueReminders = activeReminders.filter(r => isOverdue(r.reminder_date))
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   return (
     <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">

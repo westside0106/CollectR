@@ -136,7 +136,24 @@ export default async function ItemDetailPage({ params }: PageProps) {
           <ReminderSection itemId={itemId} itemName={item.name} />
 
           {/* Purchase Info & Value */}
-          <CollapsibleSection title="Kauf-Informationen">
+          <CollapsibleSection
+            title="Kauf-Informationen"
+            defaultOpen={false}
+            closedPreview={
+              <>
+                {item.purchase_price != null && (
+                  <span className="text-sm font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                    {item.purchase_price.toLocaleString('de-DE', { style: 'currency', currency: item.purchase_currency || 'EUR' })} EK
+                  </span>
+                )}
+                {item._computed_value != null && (
+                  <span className="text-sm font-bold text-purple-600 dark:text-purple-400 whitespace-nowrap">
+                    {item._computed_value.toLocaleString('de-DE', { style: 'currency', currency: item._value_currency || 'EUR' })} VK
+                  </span>
+                )}
+              </>
+            }
+          >
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {item.purchase_price !== null && item.purchase_price !== undefined && (
                 <div>
