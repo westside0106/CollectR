@@ -93,11 +93,11 @@ export default function RegisterPage() {
       <div className="relative w-full max-w-md">
         <div className="text-center mb-8">
           <Image
-            src="/brand/collectr-hero.png"
+            src="/brand/collectr-r.png"
             alt="CollectR Logo"
-            width={72}
-            height={72}
-            className="mx-auto mb-4 rounded-2xl shadow-[0_0_30px_rgba(212,160,56,0.25)]"
+            width={88}
+            height={88}
+            className="mx-auto mb-4 drop-shadow-[0_0_20px_rgba(212,160,56,0.5)]"
           />
           <h1 className="text-2xl sm:text-3xl font-bold text-white">CollectR</h1>
           <p className="text-sm sm:text-base text-white/45 mt-2">Erstelle ein Konto</p>

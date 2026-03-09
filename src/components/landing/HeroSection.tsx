@@ -9,16 +9,16 @@ const Dither = dynamic(() => import('@/components/Dither'), { ssr: false })
 const containerVariants = {
   hidden: {},
   show: {
-    transition: { staggerChildren: 0.1, delayChildren: 0.25 },
+    transition: { staggerChildren: 0.08, delayChildren: 0.15 },
   },
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 24 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   },
 }
 

@@ -26,7 +26,7 @@ export function CollectionTypesGrid() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mb-10 sm:mb-16"
         >
           <span className="text-xs font-semibold uppercase tracking-widest text-[#d4a038] mb-4 block">
@@ -48,13 +48,13 @@ export function CollectionTypesGrid() {
           {collections.map((col, i) => (
             <motion.div
               key={col.label}
-              initial={{ opacity: 0, scale: 0.82, y: 20 }}
-              whileInView={{ opacity: 1, scale: 1, y: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-20px' }}
               transition={{
-                duration: 0.45,
-                delay: i * 0.04,
-                ease: [0.25, 0.46, 0.45, 0.94],
+                duration: 0.4,
+                delay: i * 0.05,
+                ease: [0.22, 1, 0.36, 1],
               }}
               className={col.wide ? 'col-span-2' : ''}
             >
