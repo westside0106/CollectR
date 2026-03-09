@@ -256,7 +256,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
 
           {/* Dynamic Attributes */}
           {item.attributes && Object.keys(item.attributes).length > 0 && (
-            <CollapsibleSection title="Attribute">
+            <CollapsibleSection title="Merkmale">
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {Object.entries(item.attributes).map(([key, value]) => (
                   <div key={key}>

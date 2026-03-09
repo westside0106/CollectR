@@ -95,7 +95,7 @@ export function AIResultModal({ result, onApply, onClose }: AIResultModalProps) 
           {result.attributes && Object.keys(result.attributes).length > 0 && (
             <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Attribute</span>
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Merkmale</span>
                 <button
                   onClick={() => handleApplyField('attributes')}
                   className="text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400"
