@@ -99,15 +99,15 @@ export function FavoritesTile() {
   }
 
   return (
-    <div className="relative h-[600px] w-full flex items-center justify-center">
+    <div className="relative h-[340px] sm:h-[500px] w-full flex items-center justify-center overflow-hidden">
       <CardSwap
-        width={300}
-        height={380}
-        cardDistance={50}
-        verticalDistance={60}
+        width={240}
+        height={300}
+        cardDistance={30}
+        verticalDistance={40}
         delay={4000}
         pauseOnHover={true}
-        skewAmount={4}
+        skewAmount={3}
         easing="elastic"
       >
         {favorites.map((collection) => (

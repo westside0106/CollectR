@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -34,6 +34,8 @@ export default function CollectionDetailPage({ params }: PageProps) {
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [showMenu, setShowMenu] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 })
   const [showShareModal, setShowShareModal] = useState(false)
   const [showAIBatchUpload, setShowAIBatchUpload] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
@@ -471,12 +473,17 @@ export default function CollectionDetailPage({ params }: PageProps) {
           </button>
 
           {/* More Menu */}
-          <div className="relative flex-shrink-0">
+          <div className="flex-shrink-0">
             <button
+              ref={menuButtonRef}
               type="button"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
+                if (menuButtonRef.current) {
+                  const r = menuButtonRef.current.getBoundingClientRect()
+                  setMenuPos({ top: r.bottom + 8, right: window.innerWidth - r.right })
+                }
                 setShowMenu(!showMenu)
               }}
               className="px-3 sm:px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 transition-colors text-slate-700 dark:text-slate-200 text-sm touch-manipulation"
@@ -488,13 +495,16 @@ export default function CollectionDetailPage({ params }: PageProps) {
             {showMenu && (
               <>
                 <div
-                  className="fixed inset-0 z-40"
+                  className="fixed inset-0 z-[150]"
                   onClick={(e) => {
                     e.stopPropagation()
                     setShowMenu(false)
                   }}
                 />
-                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 py-1 overflow-hidden">
+                <div
+                  className="fixed w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-[200] py-1 overflow-hidden"
+                  style={{ top: menuPos.top, right: menuPos.right }}
+                >
                   <Link
                     href={`/collections/${id}/import`}
                     className="block px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 text-sm text-slate-700 dark:text-slate-200 transition-colors touch-manipulation"
