@@ -44,16 +44,16 @@ function parseRssXml(xml: string): NewsArticle[] {
   for (const match of itemMatches) {
     const item = match[1]
 
-    const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/s)?.[1]
-      ?? item.match(/<title>(.*?)<\/title>/s)?.[1]
+    const title = item.match(/<title><!\[CDATA\[([\s\S]*?)\]\]><\/title>/)?.[1]
+      ?? item.match(/<title>([\s\S]*?)<\/title>/)?.[1]
       ?? ''
 
-    const link = item.match(/<link>(.*?)<\/link>/s)?.[1]
+    const link = item.match(/<link>([\s\S]*?)<\/link>/)?.[1]
       ?? item.match(/<guid[^>]*>(https?:\/\/[^<]+)<\/guid>/)?.[1]
       ?? ''
 
     const description = item.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/)?.[1]
-      ?? item.match(/<description>([\s\S]*?)<\/description>/s)?.[1]
+      ?? item.match(/<description>([\s\S]*?)<\/description>/)?.[1]
       ?? ''
 
     const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] ?? ''
