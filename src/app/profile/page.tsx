@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { UserCometCard } from '@/components/UserCometCard'
 
 interface Profile {
   id: string
@@ -156,6 +157,24 @@ export default function ProfilePage() {
             <div className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
               <div className="text-3xl sm:text-4xl font-bold text-green-600 dark:text-green-400 mb-1 sm:mb-2">{stats.sharedWithMe}</div>
               <div className="text-sm sm:text-base text-slate-700 dark:text-slate-300">Geteilt</div>
+            </div>
+          </div>
+
+          {/* Collector Card */}
+          <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 dark:border-slate-700">
+              <h2 className="text-base sm:text-lg font-semibold dark:text-white">Meine Sammler-Karte</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">So siehst du für andere Nutzer aus</p>
+            </div>
+            <div className="p-6 sm:p-8 flex justify-center bg-slate-100 dark:bg-slate-900/50">
+              <UserCometCard
+                name={displayName}
+                avatarUrl={profile?.avatar_url}
+                collectionsCount={stats.collections}
+                itemsCount={stats.items}
+                userId={user?.id}
+                className="w-full max-w-xs"
+              />
             </div>
           </div>
 
