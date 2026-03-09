@@ -29,13 +29,13 @@ export function TopHeader() {
     }
   }, [isMobileMenuOpen])
 
-  // Nicht auf Login/Register Seiten zeigen
-  if (pathname === '/login' || pathname === '/register') {
+  // Nicht auf Login/Register/Landing zeigen
+  if (pathname === '/login' || pathname === '/register' || pathname === '/') {
     return null
   }
 
   const mainLinks = [
-    { href: '/', label: 'Dashboard', icon: '📊' },
+    { href: '/dashboard', label: 'Dashboard', icon: '📊' },
     { href: '/collections', label: 'Sammlungen', icon: '📦' },
   ]
 
@@ -55,7 +55,7 @@ export function TopHeader() {
       >
         <div className="h-16 px-4 lg:px-6 flex items-center justify-between gap-4">
           {/* Logo - Links */}
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
+          <Link href="/dashboard" className="flex items-center gap-3 flex-shrink-0">
             <Image
               src="/brand/collectr-hero.png"
               alt="CollectR"

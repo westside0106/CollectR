@@ -452,12 +452,12 @@ export default function NewItemPage({ params }: PageProps) {
           </div>
         </CollapsibleSection>
 
-        {/* KI-generierte Attribute (falls vorhanden) */}
+        {/* KI-generierte Merkmale (falls vorhanden) */}
         {aiApplied && aiResult?.attributes && Object.keys(aiResult.attributes).length > 0 && (
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl card-padding shadow-sm border border-purple-200 dark:border-purple-800">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <span className="text-lg">✨</span>
-              <h2 className="font-semibold dark:text-white">KI-erkannte Attribute</h2>
+              <h2 className="font-semibold dark:text-white">KI-erkannte Merkmale</h2>
               <span className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full">
                 Automatisch erkannt
               </span>

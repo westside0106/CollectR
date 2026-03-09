@@ -591,7 +591,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
           ← Zurück zur Sammlung
         </Link>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Kategorien verwalten</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm sm:text-base">Erstelle Kategorien und definiere ihre Attribute</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm sm:text-base">Erstelle Kategorien und definiere ihre Merkmale</p>
       </div>
 
       {/* Error/Success Messages */}
@@ -867,7 +867,7 @@ export default function CategoriesPage({ params }: { params: Promise<{ id: strin
         <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-base sm:text-lg font-semibold dark:text-white">
-              {selectedCategory ? `Attribute: ${selectedCategory.name}` : 'Attribute'}
+              {selectedCategory ? `Merkmale: ${selectedCategory.name}` : 'Merkmale'}
             </h2>
             {selectedCategory && (
               <div className="flex gap-2">
