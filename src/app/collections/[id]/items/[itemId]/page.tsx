@@ -9,6 +9,7 @@ import { ReminderSection } from '@/components/ReminderSection'
 import { TCGPriceRefreshButton } from '@/components/TCGPriceRefreshButton'
 import { PriceHistoryChart } from '@/components/PriceHistoryChart'
 import { PriceAlertManager } from '@/components/PriceAlertManager'
+import { CollapsibleSection } from '@/components/CollapsibleSection'
 
 interface PageProps {
   params: Promise<{ id: string; itemId: string }>
@@ -123,10 +124,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
         <div className="space-y-6">
           {/* Description */}
           {item.description && (
-            <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold mb-3 text-slate-900 dark:text-white">Beschreibung</h2>
+            <CollapsibleSection title="Beschreibung">
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{item.description}</p>
-            </section>
+            </CollapsibleSection>
           )}
 
           {/* Tags */}
@@ -136,8 +136,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
           <ReminderSection itemId={itemId} itemName={item.name} />
 
           {/* Purchase Info & Value */}
-          <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
-            <h2 className="text-lg font-semibold mb-3 sm:mb-4 text-slate-900 dark:text-white">Kauf-Informationen</h2>
+          <CollapsibleSection title="Kauf-Informationen">
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {item.purchase_price !== null && item.purchase_price !== undefined && (
                 <div>
@@ -236,12 +235,11 @@ export default async function ItemDetailPage({ params }: PageProps) {
               attributes={item.attributes || {}}
               currentValue={item._computed_value}
             />
-          </section>
+          </CollapsibleSection>
 
           {/* Dynamic Attributes */}
           {item.attributes && Object.keys(item.attributes).length > 0 && (
-            <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold mb-3 sm:mb-4 text-slate-900 dark:text-white">Attribute</h2>
+            <CollapsibleSection title="Attribute">
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {Object.entries(item.attributes).map(([key, value]) => (
                   <div key={key}>
@@ -258,7 +256,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
                   </div>
                 ))}
               </div>
-            </section>
+            </CollapsibleSection>
           )}
 
           {/* Price History - nur für Items mit Preisdaten */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/Toast'
 import { ReminderModal } from '@/components/ReminderModal'
@@ -122,18 +122,26 @@ export function ReminderSection({ itemId, itemName }: ReminderSectionProps) {
 
   const activeReminders = reminders.filter(r => !r.is_completed)
   const overdueReminders = activeReminders.filter(r => isOverdue(r.reminder_date))
+  const [open, setOpen] = useState(true)
 
   return (
     <section className="bg-white dark:bg-slate-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setOpen(o => !o)}
+          className="flex items-center gap-2 flex-1 min-w-0 text-left"
+        >
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Erinnerungen</h2>
           {overdueReminders.length > 0 && (
             <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 text-xs font-medium rounded-full">
               {overdueReminders.length} überfällig
             </span>
           )}
-        </div>
+          <svg className={`w-4 h-4 text-slate-400 ml-1 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
         <button
           onClick={() => setShowModal(true)}
           className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
@@ -141,9 +149,11 @@ export function ReminderSection({ itemId, itemName }: ReminderSectionProps) {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Hinzufügen
+          + Hinzufügen
         </button>
       </div>
+
+      {open && <div className="mt-4">
 
       {loading ? (
         <div className="text-center py-4">
@@ -226,6 +236,7 @@ export function ReminderSection({ itemId, itemName }: ReminderSectionProps) {
           ))}
         </div>
       )}
+      </div>}
 
       {/* Modal */}
       {showModal && (
