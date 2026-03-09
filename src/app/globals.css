@@ -263,3 +263,43 @@ html {
     @apply !max-w-full !m-4 !rounded-2xl;
   }
 }
+
+/* ========================================
+   LANDING PAGE — GOLD DESIGN TOKENS
+   ======================================== */
+
+/* Gold glow shadows */
+.shadow-gold {
+  box-shadow:
+    0 0 20px rgba(212, 160, 56, 0.30),
+    0 0 60px rgba(212, 160, 56, 0.12);
+}
+
+.shadow-gold-lg {
+  box-shadow:
+    0 0 40px rgba(212, 160, 56, 0.45),
+    0 0 100px rgba(212, 160, 56, 0.18);
+}
+
+/* Gold gradient text */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #f5d98e 0%, #d4a038 50%, #b8892a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Landing glassmorphism card */
+.card-glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card-glass:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 160, 56, 0.30);
+  box-shadow: 0 0 30px rgba(212, 160, 56, 0.10);
+}
