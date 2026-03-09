@@ -33,3 +33,8 @@ tsconfig.tsbuildinfo
 
 # Supabase local temp files
 supabase/.temp/
+
+# Memory vault (private git submodule – tracked separately in westside0106/collectr_memory)
+# Uninitialized submodule shows as untracked folder; gitignore prevents noise.
+# Remove this line after running: git submodule add https://github.com/westside0106/collectr_memory.git memory
+memory/
