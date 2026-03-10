@@ -1,583 +1,533 @@
 'use client'
 
-import { useEffect, useState, Suspense, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { useRef } from 'react'
 import Link from 'next/link'
-import DashboardCharts, { CHART_COLORS } from '@/components/DashboardCharts'
-import { useRealtimeRefresh, usePullToRefresh } from '@/hooks'
-import { useDashboardConfig } from '@/hooks/useDashboardConfig'
-import { DashboardSkeleton } from '@/components/Skeleton'
-import {
-  DashboardTile,
-  TileSkeleton,
-  DashboardSettings,
-  StatsTile,
-  QuickActionsTile,
-  RemindersTile,
-  RecentItemsTile,
-  TopItemsTile,
-  CollectionListTile,
-  TCGHighlightsTile,
-  SpheresTile,
-} from '@/components/dashboard'
-import { FavoritesTile } from '@/components/dashboard/tiles/FavoritesTile'
-import Dither from '@/components/Dither'
+import Image from 'next/image'
+import { motion, useInView } from 'framer-motion'
+import { Aurora } from '@/components/Aurora'
+import { Starfield } from '@/components/landing/Starfield'
+import { NumberTicker } from '@/components/landing/NumberTicker'
 
-interface ChartData {
-  categoryDistribution: { label: string; value: number; color: string }[]
-  collectionValues: { label: string; value: number; color: string }[]
-  topItems: {
-    id: string
-    name: string
-    collection_id: string
-    collection_name: string
-    purchase_price: number
-    image_url?: string
-  }[]
-  statusDistribution: { label: string; value: number; color: string }[]
-  collectionFinancials: {
-    name: string
-    spent: number
-    value: number
-    profit: number
-    itemCount: number
-  }[]
+// ---- Animation helpers ----
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
 }
 
-interface RecentItem {
-  id: string
-  name: string
-  collection_id: string
-  collection_name: string
-  thumbnail: string | null
-  purchase_price: number | null
-  created_at: string
+const stagger = {
+  visible: { transition: { staggerChildren: 0.1 } },
 }
 
-function DashboardContent() {
-  const router = useRouter()
-  const supabase = createClient()
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
-  const [showSettings, setShowSettings] = useState(false)
-  const [stats, setStats] = useState({
-    totalCollections: 0,
-    totalItems: 0,
-    totalValue: 0,
-    recentItems: [] as RecentItem[]
-  })
-  const [chartData, setChartData] = useState<ChartData>({
-    categoryDistribution: [],
-    collectionValues: [],
-    topItems: [],
-    statusDistribution: [],
-    collectionFinancials: [],
-  })
+// ---- Data ----
+const spheres = [
+  { name: 'Hot Wheels', icon: '🏎️', desc: 'Diecast & Modellautos', color: 'from-red-500/20 to-orange-500/20 border-red-500/15 hover:border-red-500/30 hover:shadow-red-500/5' },
+  { name: 'Trading Cards', icon: '🃏', desc: 'Pokémon, Yu-Gi-Oh! & mehr', color: 'from-blue-500/20 to-indigo-500/20 border-blue-500/15 hover:border-blue-500/30 hover:shadow-blue-500/5' },
+  { name: 'Vinyl', icon: '💿', desc: 'Schallplatten & Raritäten', color: 'from-emerald-500/20 to-teal-500/20 border-emerald-500/15 hover:border-emerald-500/30 hover:shadow-emerald-500/5' },
+  { name: 'Gaming', icon: '🎮', desc: 'Retro Games & Konsolen', color: 'from-violet-500/20 to-fuchsia-500/20 border-violet-500/15 hover:border-violet-500/30 hover:shadow-violet-500/5' },
+  { name: 'Geologie', icon: '💎', desc: 'Mineralien & Edelsteine', color: 'from-amber-500/20 to-yellow-500/20 border-amber-500/15 hover:border-amber-500/30 hover:shadow-amber-500/5' },
+  { name: 'Und mehr...', icon: '✨', desc: 'Erstelle eigene Sphären', color: 'from-pink-500/20 to-rose-500/20 border-pink-500/15 hover:border-pink-500/30 hover:shadow-pink-500/5' },
+]
 
-  // Dashboard config hook
-  const {
-    visibleTiles,
-    hiddenTiles,
-    toggleTile,
-    updateTileSize,
-    reorderTiles,
-    resetConfig,
-    isLoaded: configLoaded,
-  } = useDashboardConfig()
+const stats = [
+  { value: 500, suffix: '+', label: 'Sammler' },
+  { value: 12000, suffix: '+', label: 'Items erfasst' },
+  { value: 150, suffix: 'k€', label: 'Sammlungswert' },
+  { value: 6, suffix: '', label: 'Sphären' },
+]
 
-  const refreshData = useCallback(async () => {
-    if (!user) return
-    await Promise.all([
-      loadDashboardStats(user.id),
-      loadChartData(user.id)
-    ])
-  }, [user])
+// ================================================================
+//  SECTIONS
+// ================================================================
 
-  useEffect(() => {
-    checkUserAndLoadData()
-  }, [])
-
-  // Realtime: Live-Updates für Dashboard-Stats
-  useRealtimeRefresh('items', refreshData)
-  useRealtimeRefresh('collections', refreshData)
-
-  // Pull-to-Refresh
-  const { isRefreshing: isPullRefreshing, isPulling, pullDistance, shouldRefresh } = usePullToRefresh({
-    onRefresh: async () => {
-      if (user) {
-        await Promise.all([
-          loadDashboardStats(user.id),
-          loadChartData(user.id)
-        ])
-      }
-    },
-    threshold: 80
-  })
-
-  async function checkUserAndLoadData() {
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      router.push('/login')
-      return
-    }
-
-    setUser(user)
-    await Promise.all([
-      loadDashboardStats(user.id),
-      loadChartData(user.id)
-    ])
-    setLoading(false)
-  }
-
-  async function loadChartData(userId: string) {
-    try {
-      // Get user's collections
-      const { data: collections } = await supabase
-        .from('collections')
-        .select('id, name')
-        .eq('owner_id', userId)
-
-      if (!collections || collections.length === 0) return
-
-      const collectionIds = collections.map(c => c.id)
-      const collectionMap = new Map(collections.map(c => [c.id, c.name]))
-
-      // Get all items with categories for charts
-      const { data: items } = await supabase
-        .from('items')
-        .select(`
-          id,
-          name,
-          collection_id,
-          category_id,
-          purchase_price,
-          estimated_value,
-          status,
-          categories(name)
-        `)
-        .in('collection_id', collectionIds)
-
-      if (!items || items.length === 0) return
-
-      // Category distribution
-      const categoryCount = new Map<string, number>()
-      items.forEach(item => {
-        const catName = (item.categories as any)?.name || 'Ohne Kategorie'
-        categoryCount.set(catName, (categoryCount.get(catName) || 0) + 1)
-      })
-
-      const categoryDistribution = Array.from(categoryCount.entries())
-        .map(([label, value], index) => ({
-          label,
-          value,
-          color: CHART_COLORS[index % CHART_COLORS.length]
-        }))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 8)
-
-      // Status distribution
-      const STATUS_LABELS: Record<string, string> = {
-        'in_collection': 'In Sammlung',
-        'sold': 'Verkauft',
-        'lent': 'Verliehen',
-        'wishlist': 'Wunschliste',
-      }
-      const STATUS_COLORS: Record<string, string> = {
-        'in_collection': '#10B981',
-        'sold': '#EF4444',
-        'lent': '#F59E0B',
-        'wishlist': '#8B5CF6',
-      }
-      const statusCount = new Map<string, number>()
-      items.forEach(item => {
-        const status = item.status || 'in_collection'
-        statusCount.set(status, (statusCount.get(status) || 0) + 1)
-      })
-
-      const statusDistribution = Array.from(statusCount.entries())
-        .map(([status, value]) => ({
-          label: STATUS_LABELS[status] || status,
-          value,
-          color: STATUS_COLORS[status] || '#6B7280'
-        }))
-
-      // Value by collection
-      const collectionValueMap = new Map<string, number>()
-      items.forEach(item => {
-        if (item.purchase_price) {
-          const current = collectionValueMap.get(item.collection_id) || 0
-          collectionValueMap.set(item.collection_id, current + item.purchase_price)
-        }
-      })
-
-      const collectionValues = Array.from(collectionValueMap.entries())
-        .map(([collId, value], index) => ({
-          label: collectionMap.get(collId) || 'Unbekannt',
-          value,
-          color: CHART_COLORS[index % CHART_COLORS.length]
-        }))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 6)
-
-      // Collection Financials (Ausgaben / Wert / Gewinn pro Sammlung)
-      const financialsMap = new Map<string, { spent: number; value: number; itemCount: number }>()
-      items.forEach(item => {
-        const current = financialsMap.get(item.collection_id) || { spent: 0, value: 0, itemCount: 0 }
-        financialsMap.set(item.collection_id, {
-          spent: current.spent + (item.purchase_price || 0),
-          value: current.value + ((item as any).estimated_value || item.purchase_price || 0),
-          itemCount: current.itemCount + 1,
-        })
-      })
-
-      const collectionFinancials = Array.from(financialsMap.entries())
-        .map(([collId, data]) => ({
-          name: collectionMap.get(collId) || 'Unbekannt',
-          spent: data.spent,
-          value: data.value,
-          profit: data.value - data.spent,
-          itemCount: data.itemCount,
-        }))
-        .sort((a, b) => b.spent - a.spent)
-        .slice(0, 6)
-
-      // Top 5 valuable items
-      const { data: topItemsData } = await supabase
-        .from('items')
-        .select(`
-          id,
-          name,
-          collection_id,
-          purchase_price,
-          collections(name)
-        `)
-        .in('collection_id', collectionIds)
-        .not('purchase_price', 'is', null)
-        .order('purchase_price', { ascending: false })
-        .limit(5)
-
-      // Get images for top items
-      let topItems: ChartData['topItems'] = []
-      if (topItemsData && topItemsData.length > 0) {
-        const itemIds = topItemsData.map(i => i.id)
-        const { data: images } = await supabase
-          .from('item_images')
-          .select('item_id, url')
-          .in('item_id', itemIds)
-          .order('sort_order')
-
-        const imageMap = new Map<string, string>()
-        images?.forEach(img => {
-          if (!imageMap.has(img.item_id)) {
-            imageMap.set(img.item_id, img.url)
-          }
-        })
-
-        topItems = topItemsData.map(item => ({
-          id: item.id,
-          name: item.name,
-          collection_id: item.collection_id,
-          collection_name: (item.collections as any)?.name || 'Unbekannt',
-          purchase_price: item.purchase_price,
-          image_url: imageMap.get(item.id)
-        }))
-      }
-
-      setChartData({
-        categoryDistribution,
-        collectionValues,
-        topItems,
-        statusDistribution,
-        collectionFinancials,
-      })
-    } catch (error) {
-      console.error('Error loading chart data:', error)
-    }
-  }
-
-  async function loadDashboardStats(userId: string) {
-    const { count: collectionsCount } = await supabase
-      .from('collections')
-      .select('*', { count: 'exact', head: true })
-      .eq('owner_id', userId)
-
-    const { data: collections } = await supabase
-      .from('collections')
-      .select('id')
-      .eq('owner_id', userId)
-
-    let totalItems = 0
-    let totalValue = 0
-    let recentItems: RecentItem[] = []
-
-    if (collections && collections.length > 0) {
-      const collectionIds = collections.map(c => c.id)
-
-      const { count: itemsCount } = await supabase
-        .from('items')
-        .select('*', { count: 'exact', head: true })
-        .in('collection_id', collectionIds)
-
-      totalItems = itemsCount || 0
-
-      const { data: itemsWithValue } = await supabase
-        .from('items')
-        .select('purchase_price')
-        .in('collection_id', collectionIds)
-        .not('purchase_price', 'is', null)
-
-      if (itemsWithValue) {
-        totalValue = itemsWithValue.reduce((sum, item) => sum + (item.purchase_price || 0), 0)
-      }
-
-      const { data: recent } = await supabase
-        .from('items')
-        .select('id, name, collection_id, thumbnail, purchase_price, created_at, collections(name)')
-        .in('collection_id', collectionIds)
-        .order('created_at', { ascending: false })
-        .limit(5)
-
-      recentItems = (recent || []).map(item => ({
-        id: item.id,
-        name: item.name,
-        collection_id: item.collection_id,
-        collection_name: (item.collections as any)?.name || 'Unbekannt',
-        thumbnail: item.thumbnail,
-        purchase_price: item.purchase_price,
-        created_at: item.created_at,
-      }))
-    }
-
-    setStats({
-      totalCollections: collectionsCount || 0,
-      totalItems,
-      totalValue,
-      recentItems
-    })
-  }
-
-  // Render tile content based on type
-  function renderTileContent(tileType: string) {
-    switch (tileType) {
-      case 'stats':
-        return (
-          <StatsTile
-            totalCollections={stats.totalCollections}
-            totalItems={stats.totalItems}
-            totalValue={stats.totalValue}
-          />
-        )
-      case 'spheres':
-        return <SpheresTile />
-      case 'quick_actions':
-        return <QuickActionsTile />
-      case 'reminders':
-        return <RemindersTile />
-      case 'recent_items':
-        return <RecentItemsTile items={stats.recentItems} />
-      case 'top_items':
-        return <TopItemsTile items={chartData.topItems} />
-      case 'collection_list':
-        return <CollectionListTile />
-      case 'tcg_highlights':
-        return <TCGHighlightsTile />
-      case 'favorites':
-        return <FavoritesTile />
-      case 'chart_category':
-        return chartData.categoryDistribution.length > 0 ? (
-          <DashboardCharts
-            compact
-            categoryDistribution={chartData.categoryDistribution}
-            collectionValues={[]}
-            topItems={[]}
-            statusDistribution={[]}
-            collectionFinancials={[]}
-          />
-        ) : (
-          <div className="text-center py-6 text-gray-500 dark:text-gray-400">
-            Keine Kategorien vorhanden
-          </div>
-        )
-      case 'chart_status':
-        return chartData.statusDistribution.length > 0 ? (
-          <DashboardCharts
-            compact
-            categoryDistribution={[]}
-            collectionValues={[]}
-            topItems={[]}
-            statusDistribution={chartData.statusDistribution}
-            collectionFinancials={[]}
-          />
-        ) : (
-          <div className="text-center py-6 text-gray-500 dark:text-gray-400">
-            Keine Status-Daten vorhanden
-          </div>
-        )
-      case 'chart_financial':
-        return chartData.collectionFinancials.length > 0 ? (
-          <DashboardCharts
-            compact
-            categoryDistribution={[]}
-            collectionValues={[]}
-            topItems={[]}
-            statusDistribution={[]}
-            collectionFinancials={chartData.collectionFinancials}
-          />
-        ) : (
-          <div className="text-center py-6 text-gray-500 dark:text-gray-400">
-            Keine Finanzdaten vorhanden
-          </div>
-        )
-      default:
-        return null
-    }
-  }
-
-  if (loading || !configLoaded) {
-    return <DashboardSkeleton />
-  }
-
+function LandingNav() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors relative" data-pull-refresh>
-      {/* Dither Background */}
-      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20 pointer-events-none">
-        <Dither
-          waveColor={[0.3, 0.4, 0.6]}
-          colorNum={4}
-          waveAmplitude={0.3}
-          waveFrequency={3}
-          waveSpeed={0.05}
-          enableMouseInteraction={true}
-          mouseRadius={0.3}
-          disableAnimation={false}
-          pixelSize={2}
-        />
-      </div>
-
-      {/* Pull-to-Refresh Indicator */}
-      {(isPulling || isPullRefreshing) && (
-        <div
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center transition-all duration-300 pointer-events-none"
-          style={{
-            transform: `translateY(${isPullRefreshing ? '60px' : Math.min(pullDistance, 80)}px)`,
-            opacity: isPullRefreshing ? 1 : pullDistance / 80
-          }}
-        >
-          <div className={`bg-white dark:bg-slate-800 rounded-full p-3 shadow-lg border-2 ${
-            shouldRefresh || isPullRefreshing
-              ? 'border-blue-500 dark:border-blue-400'
-              : 'border-slate-300 dark:border-slate-600'
-          }`}>
-            <svg
-              className={`w-6 h-6 ${
-                isPullRefreshing ? 'animate-spin text-blue-600 dark:text-blue-400' : 'text-slate-600 dark:text-slate-400'
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </div>
-        </div>
-      )}
-
-      {/* Header */}
-      <header className="bg-white dark:bg-slate-800 shadow-sm border-b dark:border-slate-700 relative z-10">
-        <div className="max-w-7xl mx-auto container-responsive py-3 sm:py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-              <span className="text-blue-600 dark:text-blue-400">Collectors</span>phere
-            </h1>
-            <span className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full">
-              HUB
+    <nav className="fixed top-0 left-0 right-0 z-50">
+      {/* Glass bar that's always visible */}
+      <div className="bg-[#030014]/60 backdrop-blur-xl border-b border-white/[0.04]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-18 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <Image
+              src="/icons/icon-96.png"
+              alt="CollectR"
+              width={28}
+              height={28}
+              className="rounded-lg"
+            />
+            <span className="font-display text-lg font-bold tracking-tight">
+              Collect<span className="text-indigo-400">R</span>
             </span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <button
-              onClick={() => setShowSettings(true)}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200
-                         rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition"
-              title="Dashboard anpassen"
+          </Link>
+
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link
+              href="/login"
+              className="text-sm text-white/50 hover:text-white transition-colors hidden sm:block"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-              </svg>
-            </button>
-            <span className="text-sm text-gray-600 dark:text-gray-300 hidden sm:block">{user?.email}</span>
-            <button
-              onClick={async () => {
-                await supabase.auth.signOut()
-                router.push('/login')
-              }}
-              className="text-xs sm:text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+              Anmelden
+            </Link>
+            <Link
+              href="/register"
+              className="text-sm font-medium px-4 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.12] border border-white/[0.08] hover:border-white/[0.15] transition-all"
             >
-              <span className="hidden sm:inline">Abmelden</span>
-              <span className="sm:hidden">Aus</span>
-            </button>
+              Kostenlos starten
+            </Link>
           </div>
         </div>
-      </header>
-
-      {/* Main Content - Tile Grid */}
-      <main className="max-w-7xl mx-auto container-responsive py-4 sm:py-6 md:py-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {visibleTiles.map(tile => (
-            <DashboardTile
-              key={tile.id}
-              tile={tile}
-            >
-              {renderTileContent(tile.type)}
-            </DashboardTile>
-          ))}
-        </div>
-
-        {visibleTiles.length === 0 && (
-          <div className="text-center py-12 sm:py-16">
-            <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">🎨</div>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Dashboard ist leer
-            </h3>
-            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-4 px-4">
-              Alle Kacheln sind ausgeblendet
-            </p>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="px-4 py-2 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              Dashboard anpassen
-            </button>
-          </div>
-        )}
-      </main>
-
-      {/* Settings Modal */}
-      <DashboardSettings
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        visibleTiles={visibleTiles}
-        hiddenTiles={hiddenTiles}
-        onToggleTile={toggleTile}
-        onUpdateSize={updateTileSize}
-        onReorder={reorderTiles}
-        onReset={resetConfig}
-      />
-    </div>
+      </div>
+    </nav>
   )
 }
 
-export default function HomePage() {
+function HeroSection() {
   return (
-    <Suspense fallback={<DashboardSkeleton />}>
-      <DashboardContent />
-    </Suspense>
+    <section className="relative min-h-[100dvh] flex items-center justify-center px-4 overflow-hidden">
+      {/* Background layers */}
+      <div className="absolute inset-0">
+        <Starfield />
+        <Aurora
+          colorStops={['#4338ca', '#6d28d9', '#312e81', '#1e1b4b', '#030014']}
+          amplitude={0.15}
+          blend={0.1}
+        />
+        {/* Vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_40%,transparent_0%,#030014_75%)]" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-4xl mx-auto text-center pt-20">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={stagger}
+          className="space-y-6 sm:space-y-8"
+        >
+          {/* Beta badge */}
+          <motion.div variants={fadeUp} transition={{ duration: 0.6 }}>
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs sm:text-sm font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" />
+              </span>
+              Jetzt in der Beta
+            </span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            variants={fadeUp}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="font-display text-[2.75rem] leading-[1] sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight"
+          >
+            Deine Sammlung.
+            <br />
+            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+              Dein Universum.
+            </span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            variants={fadeUp}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-base sm:text-lg md:text-xl text-white/40 max-w-lg mx-auto leading-relaxed"
+          >
+            Organisiere, bewerte und teile deine Schätze —
+            alles an einem Ort.
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2"
+          >
+            <Link
+              href="/register"
+              className="group relative inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5 overflow-hidden"
+            >
+              <span className="relative z-10">Kostenlos starten</span>
+              <svg className="relative z-10 w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              {/* Shimmer */}
+              <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+            </Link>
+            <Link
+              href="/login"
+              className="text-sm text-white/40 hover:text-white/70 transition-colors sm:hidden"
+            >
+              Bereits registriert? Anmelden
+            </Link>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <svg className="w-5 h-5 text-white/15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      </motion.div>
+    </section>
+  )
+}
+
+function SpheresSection() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
+
+  return (
+    <section ref={ref} className="relative py-24 sm:py-32 px-4">
+      {/* Subtle separator glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent" />
+
+      <div className="max-w-5xl mx-auto">
+        <motion.div
+          initial="hidden"
+          animate={isInView ? 'visible' : 'hidden'}
+          variants={stagger}
+          className="text-center mb-14 sm:mb-16"
+        >
+          <motion.p
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="text-indigo-400 text-xs sm:text-sm font-medium tracking-[0.2em] uppercase mb-4"
+          >
+            Sphären
+          </motion.p>
+          <motion.h2
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
+          >
+            Eine App. Jede{' '}
+            <span className="bg-gradient-to-r from-amber-300 to-orange-400 bg-clip-text text-transparent">
+              Leidenschaft.
+            </span>
+          </motion.h2>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate={isInView ? 'visible' : 'hidden'}
+          variants={stagger}
+          className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+        >
+          {spheres.map((sphere, i) => (
+            <motion.div
+              key={sphere.name}
+              variants={fadeUp}
+              transition={{ duration: 0.5, delay: i * 0.07 }}
+              className={`group relative p-5 sm:p-7 rounded-2xl bg-gradient-to-br ${sphere.color} border backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-default`}
+            >
+              <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 transition-transform duration-300 group-hover:scale-110">
+                {sphere.icon}
+              </div>
+              <h3 className="font-display font-semibold text-white text-sm sm:text-base mb-1">
+                {sphere.name}
+              </h3>
+              <p className="text-white/35 text-xs sm:text-sm leading-relaxed">
+                {sphere.desc}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+function FeaturesSection() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
+
+  return (
+    <section ref={ref} className="relative py-24 sm:py-32 px-4">
+      <div className="max-w-5xl mx-auto">
+        <motion.div
+          initial="hidden"
+          animate={isInView ? 'visible' : 'hidden'}
+          variants={stagger}
+          className="text-center mb-14 sm:mb-16"
+        >
+          <motion.p
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="text-indigo-400 text-xs sm:text-sm font-medium tracking-[0.2em] uppercase mb-4"
+          >
+            Features
+          </motion.p>
+          <motion.h2
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight"
+          >
+            Alles{' '}
+            <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              im Griff.
+            </span>
+          </motion.h2>
+        </motion.div>
+
+        {/* Bento Grid */}
+        <motion.div
+          initial="hidden"
+          animate={isInView ? 'visible' : 'hidden'}
+          variants={stagger}
+          className="grid grid-cols-1 md:grid-cols-6 gap-4"
+        >
+          {/* Dashboard — large card, spans 4 cols */}
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: 0.5 }}
+            className="md:col-span-4 group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6 sm:p-8 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-500"
+          >
+            <div className="relative z-10">
+              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4">
+                <svg className="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                </svg>
+              </div>
+              <h3 className="font-display text-lg sm:text-xl font-semibold mb-2">Dashboard</h3>
+              <p className="text-white/35 text-sm leading-relaxed max-w-sm">
+                Alles auf einen Blick. Werte, Trends und deine neuesten Schätze — übersichtlich und live.
+              </p>
+            </div>
+            {/* Mock dashboard tiles */}
+            <div className="mt-6 grid grid-cols-4 gap-2 opacity-30 group-hover:opacity-50 transition-opacity duration-500">
+              <div className="col-span-2 h-20 rounded-lg bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border border-white/[0.04]" />
+              <div className="h-20 rounded-lg bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-white/[0.04]" />
+              <div className="h-20 rounded-lg bg-gradient-to-br from-violet-500/10 to-violet-500/5 border border-white/[0.04]" />
+              <div className="h-14 rounded-lg bg-gradient-to-br from-amber-500/10 to-amber-500/5 border border-white/[0.04]" />
+              <div className="col-span-2 h-14 rounded-lg bg-gradient-to-br from-pink-500/10 to-pink-500/5 border border-white/[0.04]" />
+              <div className="h-14 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-white/[0.04]" />
+            </div>
+          </motion.div>
+
+          {/* Value tracking — spans 2 cols */}
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: 0.5, delay: 0.08 }}
+            className="md:col-span-2 group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6 sm:p-8 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-500"
+          >
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+              <svg className="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <h3 className="font-display text-lg sm:text-xl font-semibold mb-2">Wert-Tracking</h3>
+            <p className="text-white/35 text-sm leading-relaxed">
+              Kaufpreis, Marktwert, Gewinn — für jedes Stück.
+            </p>
+            {/* Mini chart */}
+            <div className="mt-6 flex items-end gap-1 h-20 opacity-30 group-hover:opacity-50 transition-opacity duration-500">
+              {[35, 50, 30, 55, 40, 65, 45, 75, 55, 85, 65, 90].map((h, i) => (
+                <div
+                  key={i}
+                  className="flex-1 rounded-t-sm bg-gradient-to-t from-emerald-500/40 to-emerald-500/10"
+                  style={{ height: `${h}%` }}
+                />
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Multi-Sphere — spans 2 cols */}
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: 0.5, delay: 0.16 }}
+            className="md:col-span-2 group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6 sm:p-8 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-500"
+          >
+            <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mb-4">
+              <svg className="w-5 h-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+            </div>
+            <h3 className="font-display text-lg sm:text-xl font-semibold mb-2">Multi-Sphere</h3>
+            <p className="text-white/35 text-sm leading-relaxed">
+              Hot Wheels heute, Vinyl morgen. Eine App für alles.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2 opacity-30 group-hover:opacity-50 transition-opacity duration-500">
+              {['🏎️', '🃏', '💿', '🎮', '💎', '🏺'].map((icon, i) => (
+                <div key={i} className="w-10 h-10 rounded-lg bg-white/[0.05] border border-white/[0.04] flex items-center justify-center text-lg">
+                  {icon}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Mobile / PWA — spans 2 cols */}
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: 0.5, delay: 0.24 }}
+            className="md:col-span-2 group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6 sm:p-8 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-500"
+          >
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-4">
+              <svg className="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="font-display text-lg sm:text-xl font-semibold mb-2">Mobile First</h3>
+            <p className="text-white/35 text-sm leading-relaxed">
+              Installierbar als PWA. Deine Sammlung immer dabei — auch offline.
+            </p>
+          </motion.div>
+
+          {/* Community — spans 2 cols */}
+          <motion.div
+            variants={fadeUp}
+            transition={{ duration: 0.5, delay: 0.32 }}
+            className="md:col-span-2 group relative overflow-hidden rounded-2xl bg-white/[0.02] border border-white/[0.05] p-6 sm:p-8 hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-500"
+          >
+            <div className="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-4">
+              <svg className="w-5 h-5 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h3 className="font-display text-lg sm:text-xl font-semibold mb-2">Community</h3>
+            <p className="text-white/35 text-sm leading-relaxed">
+              Teile Sammlungen und entdecke andere Sammler.
+            </p>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+function StatsSection() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
+
+  return (
+    <section ref={ref} className="relative py-24 sm:py-32 px-4">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-950/15 to-transparent pointer-events-none" />
+
+      <div className="relative max-w-4xl mx-auto">
+        <motion.div
+          initial="hidden"
+          animate={isInView ? 'visible' : 'hidden'}
+          variants={stagger}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10"
+        >
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              variants={fadeUp}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="text-center"
+            >
+              <div className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight tabular-nums">
+                {isInView && (
+                  <NumberTicker
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    delay={0.3 + i * 0.12}
+                  />
+                )}
+              </div>
+              <p className="text-white/30 text-sm mt-2 tracking-wide">{stat.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+function CTASection() {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: '-80px' })
+
+  return (
+    <section ref={ref} className="relative py-28 sm:py-36 px-4">
+      {/* Glow */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[350px] bg-indigo-600/15 rounded-full blur-[120px] pointer-events-none" />
+
+      <motion.div
+        initial="hidden"
+        animate={isInView ? 'visible' : 'hidden'}
+        variants={stagger}
+        className="relative max-w-2xl mx-auto text-center"
+      >
+        <motion.h2
+          variants={fadeUp}
+          transition={{ duration: 0.6 }}
+          className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-6"
+        >
+          Bereit für dein{' '}
+          <br className="sm:hidden" />
+          <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Sammler-Universum?
+          </span>
+        </motion.h2>
+
+        <motion.p
+          variants={fadeUp}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-white/40 text-base sm:text-lg mb-10"
+        >
+          Kostenlos starten. Keine Kreditkarte nötig.
+        </motion.p>
+
+        <motion.div variants={fadeUp} transition={{ duration: 0.6, delay: 0.2 }}>
+          <Link
+            href="/register"
+            className="group relative inline-flex items-center gap-2.5 px-10 py-4 rounded-full bg-white text-[#030014] font-semibold text-base sm:text-lg transition-all duration-300 hover:shadow-2xl hover:shadow-white/10 hover:-translate-y-0.5"
+          >
+            Jetzt starten
+            <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
+        </motion.div>
+      </motion.div>
+    </section>
+  )
+}
+
+function Footer() {
+  return (
+    <footer className="relative py-10 sm:py-12 px-4 border-t border-white/[0.04]">
+      <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2.5">
+          <Image
+            src="/icons/icon-96.png"
+            alt="CollectR"
+            width={20}
+            height={20}
+            className="rounded-md opacity-50"
+          />
+          <span className="text-white/25 text-sm">
+            CollectR &copy; {new Date().getFullYear()}
+          </span>
+        </div>
+        <p className="text-white/15 text-sm">
+          Made with &#9825; for Sammler
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+// ================================================================
+//  MAIN
+// ================================================================
+
+export default function LandingPage() {
+  return (
+    <div className="bg-[#030014] text-white min-h-[100dvh] overflow-x-hidden">
+      <LandingNav />
+      <HeroSection />
+      <SpheresSection />
+      <FeaturesSection />
+      <StatsSection />
+      <CTASection />
+      <Footer />
+    </div>
   )
 }

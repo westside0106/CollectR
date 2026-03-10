@@ -33,17 +33,21 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Eingeloggte User auf Landing Page → weiter zum Dashboard
+  if (user && request.nextUrl.pathname === '/') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    return NextResponse.redirect(url)
+  }
+
   // Geschützte Routen - wenn nicht eingeloggt, redirect zu Login
-  const protectedPaths = ['/', '/collections']
-  const isProtectedPath = protectedPaths.some(path => 
-    request.nextUrl.pathname === path || 
-    request.nextUrl.pathname.startsWith('/collections/')
+  const protectedPaths = ['/dashboard', '/collections']
+  const isProtectedPath = protectedPaths.some(path =>
+    request.nextUrl.pathname === path ||
+    request.nextUrl.pathname.startsWith(path + '/')
   )
-  
-  // Ausnahme: Tools-Bereich ist öffentlich
-  const isToolsPath = request.nextUrl.pathname.startsWith('/tools')
-  
-  if (isProtectedPath && !isToolsPath && !user) {
+
+  if (isProtectedPath && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
@@ -52,7 +56,7 @@ export async function middleware(request: NextRequest) {
   // Wenn eingeloggt und auf Login/Register -> redirect zu Dashboard
   if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
     const url = request.nextUrl.clone()
-    url.pathname = '/'
+    url.pathname = '/dashboard'
     return NextResponse.redirect(url)
   }
 

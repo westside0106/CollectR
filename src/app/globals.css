@@ -263,3 +263,24 @@ html {
     @apply !max-w-full !m-4 !rounded-2xl;
   }
 }
+
+/* ========================================
+   LANDING PAGE
+   ======================================== */
+
+.font-display {
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}

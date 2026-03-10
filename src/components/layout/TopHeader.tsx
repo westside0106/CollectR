@@ -29,13 +29,13 @@ export function TopHeader() {
     }
   }, [isMobileMenuOpen])
 
-  // Nicht auf Login/Register Seiten zeigen
-  if (pathname === '/login' || pathname === '/register') {
+  // Nicht auf Login/Register/Landing Seiten zeigen
+  if (pathname === '/login' || pathname === '/register' || pathname === '/') {
     return null
   }
 
   const mainLinks = [
-    { href: '/', label: 'Dashboard', icon: '📊' },
+    { href: '/dashboard', label: 'Dashboard', icon: '📊' },
     { href: '/collections', label: 'Sammlungen', icon: '📦' },
   ]
 
