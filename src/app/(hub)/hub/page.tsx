@@ -19,7 +19,7 @@ export default function HubLandingPage() {
       icon: '📊',
       title: 'Dashboard',
       description: 'Übersicht aller Sammlungen',
-      action: () => router.push('/')
+      action: () => router.push('/dashboard')
     },
     {
       icon: '📦',
@@ -31,7 +31,7 @@ export default function HubLandingPage() {
       icon: '📈',
       title: 'Statistiken',
       description: 'Werte & Trends',
-      action: () => router.push('/')
+      action: () => router.push('/dashboard')
     }
   ]
 
@@ -242,7 +242,7 @@ export default function HubLandingPage() {
                 Erste Sammlung Erstellen
               </button>
               <button
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/dashboard')}
                 className="px-6 sm:px-8 py-3 sm:py-4 bg-slate-700 text-white rounded-lg font-semibold text-base sm:text-lg hover:bg-slate-600 transition-all"
               >
                 Zum Dashboard
