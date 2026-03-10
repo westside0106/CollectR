@@ -32,6 +32,8 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Eingeloggte User auf Landing Page → weiter zum Dashboard
+  if (user && request.nextUrl.pathname === '/') {
   const { pathname } = request.nextUrl
 
   // / ist öffentlich (Landing Page) — eingeloggte User → Dashboard
@@ -41,6 +43,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Geschützte Routen - wenn nicht eingeloggt, redirect zu Login
+  const protectedPaths = ['/dashboard', '/collections']
+  const isProtectedPath = protectedPaths.some(path =>
+    request.nextUrl.pathname === path ||
+    request.nextUrl.pathname.startsWith(path + '/')
+  )
+
+  if (isProtectedPath && !user) {
   // Geschützte Routen
   const protectedPaths = ['/dashboard', '/collections']
   const isProtectedPath = protectedPaths.some(path =>

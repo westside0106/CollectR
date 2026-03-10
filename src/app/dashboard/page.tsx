@@ -22,6 +22,7 @@ import {
   SpheresTile,
 } from '@/components/dashboard'
 import { FavoritesTile } from '@/components/dashboard/tiles/FavoritesTile'
+import Dither from '@/components/Dither'
 
 interface ChartData {
   categoryDistribution: { label: string; value: number; color: string }[]
@@ -383,6 +384,7 @@ function DashboardContent() {
       case 'tcg_highlights':
         return <TCGHighlightsTile />
       case 'favorites':
+        return <FavoritesTile />
         return null // TODO: Favoriten-Kachel — geplant für Landingpage-Redesign
       case 'chart_category':
         return chartData.categoryDistribution.length > 0 ? (
@@ -439,6 +441,22 @@ function DashboardContent() {
   }
 
   return (
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 transition-colors relative" data-pull-refresh>
+      {/* Dither Background */}
+      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20 pointer-events-none">
+        <Dither
+          waveColor={[0.3, 0.4, 0.6]}
+          colorNum={4}
+          waveAmplitude={0.3}
+          waveFrequency={3}
+          waveSpeed={0.05}
+          enableMouseInteraction={true}
+          mouseRadius={0.3}
+          disableAnimation={false}
+          pixelSize={2}
+        />
+      </div>
+
     <div className="min-h-screen transition-colors relative" data-pull-refresh>
       {/* Grid Background overlay like other pages */}
       <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-5 dark:opacity-10 pointer-events-none z-0" aria-hidden="true" />
@@ -560,6 +578,7 @@ function DashboardContent() {
   )
 }
 
+export default function DashboardPage() {
 export default function HomePage() {
   return (
     <Suspense fallback={<DashboardSkeleton />}>

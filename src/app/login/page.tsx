@@ -83,7 +83,8 @@ export default function LoginPage() {
         setError(error.message)
         setLoading(false)
       } else {
-        window.location.href = '/'
+        // Hard reload to ensure auth state is properly loaded
+        window.location.href = '/dashboard'
       }
     } catch {
       setError('Ein unerwarteter Fehler ist aufgetreten')
