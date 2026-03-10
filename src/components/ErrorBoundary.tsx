@@ -121,7 +121,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 🔄 Erneut versuchen
               </button>
               <button
-                onClick={() => window.location.href = '/'}
+                onClick={() => window.location.href = '/dashboard'}
                 className="flex-1 px-6 py-3 bg-gray-200 dark:bg-slate-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors font-medium"
               >
                 🏠 Zur Startseite
