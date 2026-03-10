@@ -176,7 +176,7 @@ export function CollectionFolderCard({
           </div>
 
           {/* Collection Info */}
-          <div className="text-center relative z-10 px-2 py-2 rounded-lg bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+          <div className="text-center relative z-10 px-2 py-2 rounded-lg bg-white dark:bg-slate-900">
             <h3 className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 dark:text-white mb-1">
               {collection.name}
             </h3>

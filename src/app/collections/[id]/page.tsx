@@ -14,7 +14,6 @@ import { AIBatchUpload } from '@/components/AIBatchUpload'
 import { useToast } from '@/components/Toast'
 import { ItemCardSkeleton } from '@/components/Skeleton'
 import { TCGBulkPriceUpdate } from '@/components/TCGBulkPriceUpdate'
-import Dither from '@/components/Dither'
 
 type ViewMode = 'grid' | 'list'
 type TabMode = 'items' | 'goals'
@@ -411,21 +410,6 @@ export default function CollectionDetailPage({ params }: PageProps) {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 dark:bg-slate-900 min-h-screen relative" data-pull-refresh>
-      {/* Dither Background */}
-      <div className="fixed inset-0 z-0 opacity-30 dark:opacity-20 pointer-events-none">
-        <Dither
-          waveColor={[0.3, 0.4, 0.6]}
-          colorNum={4}
-          waveAmplitude={0.3}
-          waveFrequency={3}
-          waveSpeed={0.05}
-          enableMouseInteraction={true}
-          mouseRadius={0.3}
-          disableAnimation={false}
-          pixelSize={2}
-        />
-      </div>
-
       {/* Pull-to-Refresh Indicator */}
       {(isPulling || isPullRefreshing) && (
         <div
@@ -487,68 +471,61 @@ export default function CollectionDetailPage({ params }: PageProps) {
           </button>
 
           {/* More Menu */}
-          <div className="relative flex-shrink-0">
+          <div className="flex-shrink-0">
             <button
               type="button"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setShowMenu(!showMenu)
-              }}
+              onClick={() => setShowMenu(true)}
               className="px-3 sm:px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 transition-colors text-slate-700 dark:text-slate-200 text-sm touch-manipulation"
               style={{ WebkitTapHighlightColor: 'transparent' }}
               aria-label="Mehr Optionen"
             >
               ⋯
             </button>
-            {showMenu && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setShowMenu(false)
-                  }}
-                />
-                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 py-1 overflow-hidden">
-                  <Link
-                    href={`/collections/${id}/import`}
-                    className="block px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 text-sm text-slate-700 dark:text-slate-200 transition-colors touch-manipulation"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowMenu(false)
-                    }}
-                    style={{ WebkitTapHighlightColor: 'transparent' }}
-                  >
-                    📥 Import (CSV/JSON)
-                  </Link>
-                  <Link
-                    href={`/collections/${id}/export`}
-                    className="block px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 text-sm text-slate-700 dark:text-slate-200 transition-colors touch-manipulation"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowMenu(false)
-                    }}
-                    style={{ WebkitTapHighlightColor: 'transparent' }}
-                  >
-                    📤 Export
-                  </Link>
-                  <hr className="my-1 border-slate-200 dark:border-slate-700" />
-                  <Link
-                    href={`/collections/${id}/categories`}
-                    className="block px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 active:bg-slate-100 dark:active:bg-slate-600 text-sm text-slate-700 dark:text-slate-200 transition-colors touch-manipulation"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowMenu(false)
-                    }}
-                    style={{ WebkitTapHighlightColor: 'transparent' }}
-                  >
-                    🏷️ Kategorien verwalten
-                  </Link>
-                </div>
-              </>
-            )}
           </div>
+
+          {/* Bottom Sheet Menu (mobile-safe, kein z-index Problem) */}
+          {showMenu && (
+            <>
+              <div
+                className="fixed inset-0 z-[300] bg-black/40"
+                onClick={() => setShowMenu(false)}
+              />
+              <div className="fixed bottom-0 left-0 right-0 z-[301] bg-white dark:bg-slate-800 rounded-t-2xl shadow-2xl border-t border-slate-200 dark:border-slate-700">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-700">
+                  <span className="font-semibold text-slate-900 dark:text-white">Optionen</span>
+                  <button
+                    onClick={() => setShowMenu(false)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <Link
+                  href={`/collections/${id}/import`}
+                  className="flex items-center gap-3 px-5 py-4 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-base transition"
+                  onClick={() => setShowMenu(false)}
+                >
+                  <span className="text-xl">📥</span> Import (CSV/JSON)
+                </Link>
+                <Link
+                  href={`/collections/${id}/export`}
+                  className="flex items-center gap-3 px-5 py-4 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-base transition"
+                  onClick={() => setShowMenu(false)}
+                >
+                  <span className="text-xl">📤</span> Export
+                </Link>
+                <div className="h-px bg-slate-100 dark:bg-slate-700 mx-5" />
+                <Link
+                  href={`/collections/${id}/categories`}
+                  className="flex items-center gap-3 px-5 py-4 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-base transition"
+                  onClick={() => setShowMenu(false)}
+                >
+                  <span className="text-xl">🏷️</span> Kategorien verwalten
+                </Link>
+                <div className="pb-8" />
+              </div>
+            </>
+          )}
 
           <Link
             href={`/collections/${id}/scan`}
@@ -1073,7 +1050,7 @@ function ItemRow({ item, collectionId, bulkEditMode, isSelected, onToggleSelect 
   }
 
   return (
-    <tr className={`transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}>
+    <tr className={`transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
       {bulkEditMode && (
         <td className="px-4 py-3">
           <input

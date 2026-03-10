@@ -33,18 +33,21 @@ interface GNewsResponse {
 }
 
 export const COLLECTION_KEYWORDS = {
-  'hot-wheels': 'Hot Wheels collectible',
-  'antiques': 'antiques auction',
-  'art': 'art auction',
-  'coins': 'rare coins numismatic',
-  'stamps': 'stamp collecting',
-  'watches': 'luxury watches',
-  'toys': 'vintage toys',
-  'comics': 'comic books',
-  'vinyl': 'vinyl records',
-  'furniture': 'antique furniture',
-  'jewelry': 'jewelry auction',
-  'general': 'collectibles auction',
+  'hot-wheels': 'Hot Wheels Sammlung',
+  'antiques': 'Antiquitäten Auktion',
+  'art': 'Kunst Auktion',
+  'coins': 'Münzen Numismatik',
+  'stamps': 'Briefmarken Sammlung',
+  'watches': 'Luxusuhren',
+  'toys': 'Vintage Spielzeug',
+  'comics': 'Comic Sammlung',
+  'vinyl': 'Vinyl Schallplatten',
+  'furniture': 'Antike Möbel',
+  'jewelry': 'Schmuck Auktion',
+  'general': 'Sammlerstücke Auktion',
+  'tcg': 'Trading Card Pokémon',
+  'gaming': 'Retro Gaming Sammlung',
+  'market': 'Aktien Markt Krypto',
 } as const
 
 export type CollectionCategory = keyof typeof COLLECTION_KEYWORDS
@@ -55,7 +58,7 @@ const CACHE_DURATION = 15 * 60 * 1000
 export async function getCollectionNews(
   category: CollectionCategory = 'general',
   limit: number = 10,
-  language: string = 'en'
+  language: string = 'de'
 ): Promise<NewsArticle[]> {
   const cacheKey = `${category}-${limit}-${language}`
 
@@ -102,13 +105,13 @@ export async function searchNews(
 
 function getMockNews(): NewsArticle[] {
   return [{
-    title: '💡 Aktiviere die News-Funktion!',
-    description: 'Registriere dich kostenlos auf gnews.io und erhalte Echtzeit-News.',
-    content: 'Gehe zu https://gnews.io/register und hole dir deinen kostenlosen API Key.',
-    url: 'https://gnews.io/register',
+    title: 'News momentan nicht verfügbar',
+    description: 'Google News konnte nicht erreicht werden. Bitte später erneut versuchen.',
+    content: '',
+    url: '#',
     image: null,
     publishedAt: new Date().toISOString(),
-    source: { name: 'CollectR Setup', url: '' }
+    source: { name: 'CollectR', url: '' }
   }]
 }
 

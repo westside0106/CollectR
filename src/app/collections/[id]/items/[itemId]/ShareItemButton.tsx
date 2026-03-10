@@ -108,7 +108,7 @@ export function ShareItemButton({ itemId, itemName, collectionId }: ShareItemBut
             </div>
 
             {/* URL Preview */}
-            <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+            <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
               <p className="text-xs text-slate-500 dark:text-slate-400 break-all font-mono">
                 {itemUrl}
               </p>

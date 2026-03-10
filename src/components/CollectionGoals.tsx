@@ -228,7 +228,7 @@ function GoalItem({
           ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
           : isOverdue
           ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-          : 'bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600'
+          : 'bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600'
       }`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}

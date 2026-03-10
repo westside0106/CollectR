@@ -80,7 +80,7 @@ export default function GamingWishlistPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-4 py-2 rounded-lg bg-slate-800 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="release">Nach Release-Datum</option>
               <option value="price">Nach Preis</option>
@@ -95,7 +95,7 @@ export default function GamingWishlistPage() {
 
         {/* Wishlist */}
         {wishlistItems.length === 0 ? (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl p-12 border border-slate-700 text-center">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-2xl p-12 border border-slate-700 text-center">
             <div className="text-6xl mb-4">🎮</div>
             <h2 className="text-2xl font-bold text-white mb-2">
               Deine Wishlist ist leer
@@ -123,7 +123,7 @@ export default function GamingWishlistPage() {
 
         {/* Stats */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">📋</div>
             <div className="text-3xl font-bold text-purple-400 mb-1">
               {loading ? '...' : wishlistItems.length}
@@ -131,7 +131,7 @@ export default function GamingWishlistPage() {
             <div className="text-sm text-slate-400">Spiele auf Wishlist</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">💰</div>
             <div className="text-3xl font-bold text-green-400 mb-1">
               {loading ? '...' : `${totalValue.toFixed(2)} €`}
@@ -139,7 +139,7 @@ export default function GamingWishlistPage() {
             <div className="text-sm text-slate-400">Sammlungswert (Gaming)</div>
           </div>
 
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-xl p-6 border border-slate-700">
             <div className="text-4xl mb-3">🔔</div>
             <div className="text-3xl font-bold text-amber-400 mb-1">
               {loading ? '...' : wishlistItems.filter(i => i.priceAlert).length}

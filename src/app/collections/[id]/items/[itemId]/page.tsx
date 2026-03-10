@@ -9,6 +9,7 @@ import { ReminderSection } from '@/components/ReminderSection'
 import { TCGPriceRefreshButton } from '@/components/TCGPriceRefreshButton'
 import { PriceHistoryChart } from '@/components/PriceHistoryChart'
 import { PriceAlertManager } from '@/components/PriceAlertManager'
+import { CollapsibleSection } from '@/components/CollapsibleSection'
 
 interface PageProps {
   params: Promise<{ id: string; itemId: string }>
@@ -123,10 +124,9 @@ export default async function ItemDetailPage({ params }: PageProps) {
         <div className="space-y-6">
           {/* Description */}
           {item.description && (
-            <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold mb-3 text-slate-900 dark:text-white">Beschreibung</h2>
+            <CollapsibleSection title="Beschreibung">
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{item.description}</p>
-            </section>
+            </CollapsibleSection>
           )}
 
           {/* Tags */}
@@ -136,8 +136,24 @@ export default async function ItemDetailPage({ params }: PageProps) {
           <ReminderSection itemId={itemId} itemName={item.name} />
 
           {/* Purchase Info & Value */}
-          <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
-            <h2 className="text-lg font-semibold mb-3 sm:mb-4 text-slate-900 dark:text-white">Kauf-Informationen</h2>
+          <CollapsibleSection
+            title="Kauf-Informationen"
+            defaultOpen={false}
+            closedPreview={
+              <>
+                {item.purchase_price != null && (
+                  <span className="text-sm font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                    {item.purchase_price.toLocaleString('de-DE', { style: 'currency', currency: item.purchase_currency || 'EUR' })} EK
+                  </span>
+                )}
+                {item._computed_value != null && (
+                  <span className="text-sm font-bold text-purple-600 dark:text-purple-400 whitespace-nowrap">
+                    {item._computed_value.toLocaleString('de-DE', { style: 'currency', currency: item._value_currency || 'EUR' })} VK
+                  </span>
+                )}
+              </>
+            }
+          >
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {item.purchase_price !== null && item.purchase_price !== undefined && (
                 <div>
@@ -165,7 +181,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
               {/* Marge/Gewinn Anzeige */}
               {item.purchase_price !== null && item._computed_value !== null &&
                item.purchase_price !== undefined && item._computed_value !== undefined && (
-                <div className="col-span-2 mt-2 p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50">
+                <div className="col-span-2 mt-2 p-4 rounded-lg bg-slate-50 dark:bg-slate-700">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-slate-500 dark:text-slate-400 text-sm mb-1">Marge / Gewinn</p>
@@ -236,12 +252,11 @@ export default async function ItemDetailPage({ params }: PageProps) {
               attributes={item.attributes || {}}
               currentValue={item._computed_value}
             />
-          </section>
+          </CollapsibleSection>
 
           {/* Dynamic Attributes */}
           {item.attributes && Object.keys(item.attributes).length > 0 && (
-            <section className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
-              <h2 className="text-lg font-semibold mb-3 sm:mb-4 text-slate-900 dark:text-white">Attribute</h2>
+            <CollapsibleSection title="Merkmale">
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 {Object.entries(item.attributes).map(([key, value]) => (
                   <div key={key}>
@@ -258,7 +273,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
                   </div>
                 ))}
               </div>
-            </section>
+            </CollapsibleSection>
           )}
 
           {/* Price History - nur für Items mit Preisdaten */}
@@ -281,7 +296,7 @@ export default async function ItemDetailPage({ params }: PageProps) {
           )}
 
           {/* Metadata */}
-          <section className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+          <section className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
             <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
               {item.created_at && (
                 <div>

@@ -14,6 +14,7 @@ import { DuplicateWarning } from '@/components/DuplicateWarning'
 import GradingInput, { type GradingValue } from '@/components/GradingInput'
 import { TCGPriceLookupButton, PriceResultDisplay } from '@/components/TCGPriceLookupButton'
 import { autoCreateAttributesWithMessage } from '@/lib/autoCreateAttributes'
+import { CollapsibleSection } from '@/components/CollapsibleSection'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -43,10 +44,6 @@ export default function NewItemPage({ params }: PageProps) {
   const [notes, setNotes] = useState('')
   const [attributeValues, setAttributeValues] = useState<Record<string, any>>({})
 
-  // Sphere-specific attributes
-  const [geoType, setGeoType] = useState('')
-  const [officialType, setOfficialType] = useState('')
-  
   // NEU: State für Bilder (vor dem Upload)
   const [pendingImages, setPendingImages] = useState<{ url: string; file?: File }[]>([])
 
@@ -183,15 +180,7 @@ export default function NewItemPage({ params }: PageProps) {
     setError(null)
 
     try {
-      // Sphere-specific attributes zusammenführen
       const finalAttributes = { ...attributeValues }
-      if (geoType) {
-        finalAttributes.geoType = geoType
-      }
-      if (officialType) {
-        finalAttributes.officialType = officialType
-        finalAttributes.documentType = officialType // Alias für compatibility
-      }
 
       // 1. Item erstellen
       const { data, error: insertError } = await supabase
@@ -310,9 +299,7 @@ export default function NewItemPage({ params }: PageProps) {
         </div>
 
         {/* Basis-Infos */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-3 sm:mb-4 dark:text-white">Basis-Informationen</h2>
-
+        <CollapsibleSection title="Basis-Informationen">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name *</label>
@@ -369,45 +356,6 @@ export default function NewItemPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Sphere-Spezifische Felder */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Geo Sphere Type <span className="text-xs text-slate-500">(optional)</span>
-                </label>
-                <select
-                  value={geoType}
-                  onChange={(e) => setGeoType(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                >
-                  <option value="">-- Keine Zuordnung --</option>
-                  <option value="minerals">💎 Mineralien</option>
-                  <option value="fossils">🦴 Fossilien</option>
-                  <option value="crystals">💠 Kristalle</option>
-                  <option value="meteorites">☄️ Meteoriten</option>
-                  <option value="artifacts">🏺 Artefakte</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                  Official Sphere Type <span className="text-xs text-slate-500">(optional)</span>
-                </label>
-                <select
-                  value={officialType}
-                  onChange={(e) => setOfficialType(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                >
-                  <option value="">-- Keine Zuordnung --</option>
-                  <option value="certificates">📜 Zertifikate</option>
-                  <option value="autographs">✍️ Autogramme</option>
-                  <option value="documents">📄 Dokumente</option>
-                  <option value="tickets">🎫 Tickets</option>
-                  <option value="memorabilia">🏆 Memorabilia</option>
-                </select>
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Barcode</label>
               <input
@@ -419,12 +367,10 @@ export default function NewItemPage({ params }: PageProps) {
               />
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
 
         {/* Kauf-Infos */}
-        <div className="bg-white dark:bg-slate-800 rounded-xl card-padding shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-3 sm:mb-4 dark:text-white">Kauf-Informationen</h2>
-
+        <CollapsibleSection title="Kauf-Informationen" defaultOpen={false}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Kaufpreis / EK (€)</label>
@@ -504,14 +450,14 @@ export default function NewItemPage({ params }: PageProps) {
               />
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
 
-        {/* KI-generierte Attribute (falls vorhanden) */}
+        {/* KI-generierte Merkmale (falls vorhanden) */}
         {aiApplied && aiResult?.attributes && Object.keys(aiResult.attributes).length > 0 && (
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-xl card-padding shadow-sm border border-purple-200 dark:border-purple-800">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <span className="text-lg">✨</span>
-              <h2 className="font-semibold dark:text-white">KI-erkannte Attribute</h2>
+              <h2 className="font-semibold dark:text-white">KI-erkannte Merkmale</h2>
               <span className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full">
                 Automatisch erkannt
               </span>

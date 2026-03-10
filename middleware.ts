@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -27,14 +27,17 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // WICHTIG: Diese Zeile MUSS hier stehen!
-  // Sie aktualisiert die Session bei jedem Request
+  // WICHTIG: Session bei jedem Request aktualisieren
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   // Eingeloggte User auf Landing Page → weiter zum Dashboard
   if (user && request.nextUrl.pathname === '/') {
+  const { pathname } = request.nextUrl
+
+  // / ist öffentlich (Landing Page) — eingeloggte User → Dashboard
+  if (pathname === '/' && user) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
@@ -48,13 +51,23 @@ export async function middleware(request: NextRequest) {
   )
 
   if (isProtectedPath && !user) {
+  // Geschützte Routen
+  const protectedPaths = ['/dashboard', '/collections']
+  const isProtectedPath = protectedPaths.some(path =>
+    pathname === path || pathname.startsWith(path + '/')
+  )
+
+  // Ausnahme: Tools-Bereich ist öffentlich
+  const isToolsPath = pathname.startsWith('/tools')
+
+  if (isProtectedPath && !isToolsPath && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Wenn eingeloggt und auf Login/Register -> redirect zu Dashboard
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
+  // Eingeloggt auf Login/Register → Dashboard
+  if (user && (pathname === '/login' || pathname === '/register')) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
@@ -65,13 +78,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public files (images, etc.)
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }

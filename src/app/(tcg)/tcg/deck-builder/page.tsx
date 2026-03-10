@@ -201,7 +201,7 @@ function DeckBuilderContent() {
                   px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-200 font-semibold text-sm sm:text-base
                   ${selectedGame === game.id
                     ? 'bg-purple-600 text-white ring-2 sm:ring-4 ring-purple-500/50'
-                    : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-800'
                   }
                 `}
               >
@@ -215,7 +215,7 @@ function DeckBuilderContent() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Card Search */}
           <div className="lg:col-span-1">
-            <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 lg:sticky lg:top-6">
+            <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700 lg:sticky lg:top-6">
               <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">🔍 Kartensuche</h2>
 
               <input
@@ -223,7 +223,7 @@ function DeckBuilderContent() {
                 placeholder="Kartenname suchen..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-sm sm:text-base placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3 sm:mb-4"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-slate-900 border border-slate-600 text-white text-sm sm:text-base placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3 sm:mb-4"
               />
 
               <div className="space-y-2 max-h-72 sm:max-h-96 overflow-y-auto">
@@ -237,7 +237,7 @@ function DeckBuilderContent() {
                     <button
                       key={card.id}
                       onClick={() => addCardToDeck(card)}
-                      className="w-full p-2 sm:p-3 rounded-lg bg-slate-900/50 hover:bg-slate-900 border border-slate-600 hover:border-purple-500 transition-all text-left group"
+                      className="w-full p-2 sm:p-3 rounded-lg bg-slate-900 hover:bg-slate-900 border border-slate-600 hover:border-purple-500 transition-all text-left group"
                     >
                       <div className="flex gap-2 sm:gap-3">
                         {card.imageUrl && (
@@ -277,7 +277,7 @@ function DeckBuilderContent() {
                       <>
                         <p className="text-red-400 font-semibold mb-2">Fehler</p>
                         <p className="text-sm text-slate-300">{searchError}</p>
-                        <div className="mt-4 text-xs text-slate-400 bg-slate-800/50 rounded-lg p-3">
+                        <div className="mt-4 text-xs text-slate-400 bg-slate-800 rounded-lg p-3">
                           <p className="font-semibold mb-2">Mögliche Ursachen:</p>
                           <ul className="text-left space-y-1">
                             <li>• API-Verbindung fehlgeschlagen</li>
@@ -307,13 +307,13 @@ function DeckBuilderContent() {
           {/* Deck Area */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Deck Info */}
-            <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
+            <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
               <input
                 type="text"
                 placeholder="Deck Name..."
                 value={deckName}
                 onChange={(e) => setDeckName(e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-slate-900/50 border border-slate-600 text-white text-lg sm:text-2xl font-bold placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3 sm:mb-4"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg bg-slate-900 border border-slate-600 text-white text-lg sm:text-2xl font-bold placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3 sm:mb-4"
               />
 
               <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm">
@@ -370,7 +370,7 @@ function DeckBuilderContent() {
             </div>
 
             {/* Main Deck */}
-            <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
+            <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
               <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">📦 Main Deck</h2>
 
               {mainDeck.length === 0 ? (
@@ -384,7 +384,7 @@ function DeckBuilderContent() {
                   {mainDeck.map((card) => (
                     <div
                       key={card.id}
-                      className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-slate-900/50 border border-slate-600"
+                      className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-slate-900 border border-slate-600"
                     >
                       <span className="text-white font-medium text-sm sm:text-base truncate">{card.name}</span>
                       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -404,7 +404,7 @@ function DeckBuilderContent() {
 
             {/* Side/Extra Deck */}
             {getCurrentConstraints().allowsExtraDeck && (
-              <div className="bg-slate-800/30 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
+              <div className="bg-slate-800 backdrop-blur-lg rounded-xl sm:rounded-2xl card-padding border border-slate-700">
                 <h2 className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4">⭐ Extra Deck</h2>
 
                 {sideDeck.length === 0 ? (
@@ -416,7 +416,7 @@ function DeckBuilderContent() {
                     {sideDeck.map((card) => (
                       <div
                         key={card.id}
-                        className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-slate-900/50 border border-slate-600"
+                        className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-slate-900 border border-slate-600"
                       >
                         <span className="text-white font-medium text-sm sm:text-base truncate">{card.name}</span>
                         <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">

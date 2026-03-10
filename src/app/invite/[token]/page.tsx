@@ -199,7 +199,7 @@ export default function InvitePage({ params }: PageProps) {
           </p>
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-4 sm:mb-6">
+        <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 mb-4 sm:mb-6">
           <div className="mb-3">
             <div className="text-sm text-slate-500 dark:text-slate-400">Sammlung</div>
             <div className="font-semibold text-slate-900 dark:text-white">

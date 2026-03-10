@@ -205,7 +205,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
               <p className="mb-4">{error}</p>
 
               {permissionDenied && (
-                <div className="text-sm text-slate-300 mb-4 text-left bg-slate-700/50 rounded-lg p-3">
+                <div className="text-sm text-slate-300 mb-4 text-left bg-slate-700 rounded-lg p-3">
                   <p className="font-medium mb-2">So erlaubst du den Kamera-Zugriff:</p>
                   <ul className="list-disc list-inside space-y-1 text-xs">
                     <li><strong>Safari (iOS):</strong> Einstellungen → Safari → Kamera → Erlauben</li>

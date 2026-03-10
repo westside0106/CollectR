@@ -385,6 +385,7 @@ function DashboardContent() {
         return <TCGHighlightsTile />
       case 'favorites':
         return <FavoritesTile />
+        return null // TODO: Favoriten-Kachel — geplant für Landingpage-Redesign
       case 'chart_category':
         return chartData.categoryDistribution.length > 0 ? (
           <DashboardCharts
@@ -456,6 +457,9 @@ function DashboardContent() {
         />
       </div>
 
+    <div className="min-h-screen transition-colors relative" data-pull-refresh>
+      {/* Grid Background overlay like other pages */}
+      <div className="fixed inset-0 bg-[url('/grid.svg')] opacity-5 dark:opacity-10 pointer-events-none z-0" aria-hidden="true" />
       {/* Pull-to-Refresh Indicator */}
       {(isPulling || isPullRefreshing) && (
         <div
@@ -575,6 +579,7 @@ function DashboardContent() {
 }
 
 export default function DashboardPage() {
+export default function HomePage() {
   return (
     <Suspense fallback={<DashboardSkeleton />}>
       <DashboardContent />

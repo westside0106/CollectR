@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext'
 import { ToastProvider } from '@/components/Toast'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Analytics } from '@vercel/analytics/next'
+import { GlobalDitherBackground } from '@/components/GlobalDitherBackground'
 
 const inter = Inter({ subsets: ['latin'] })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
@@ -143,9 +144,10 @@ export default function RootLayout({
         <ThemeProvider>
           <ToastProvider>
             <ErrorBoundary>
+              <GlobalDitherBackground />
               <ServiceWorkerRegistration />
               <TopHeader />
-              <main className="min-h-screen min-h-[100dvh]">
+              <main className="relative z-10 min-h-screen min-h-[100dvh]">
                 {children}
               </main>
               <InstallPrompt />

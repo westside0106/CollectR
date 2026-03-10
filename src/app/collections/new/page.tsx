@@ -388,7 +388,7 @@ export default function NewCollectionPage() {
           </div>
 
           {/* TCG Price Updates Option */}
-          <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 border border-slate-200 dark:border-slate-600">
+          <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 border border-slate-200 dark:border-slate-600">
             <label className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"

@@ -129,10 +129,10 @@ export function DashboardSettings({
                       onDragEnd={handleDragEnd}
                       className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all select-none ${
                         isDragging
-                          ? 'opacity-40 bg-gray-50 dark:bg-slate-700/50 border-dashed border-gray-300 dark:border-slate-600'
+                          ? 'opacity-40 bg-gray-50 dark:bg-slate-700 border-dashed border-gray-300 dark:border-slate-600'
                           : isOver
                           ? 'border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'bg-gray-50 dark:bg-slate-700/50 border-transparent hover:border-gray-200 dark:hover:border-slate-600'
+                          : 'bg-gray-50 dark:bg-slate-700 border-transparent hover:border-gray-200 dark:hover:border-slate-600'
                       }`}
                     >
                       {/* Drag Handle */}
@@ -201,7 +201,7 @@ export function DashboardSettings({
                   {hiddenTiles.map(tile => (
                     <div
                       key={tile.id}
-                      className="flex items-center gap-3 p-3 bg-gray-100 dark:bg-slate-700/30 rounded-xl opacity-60"
+                      className="flex items-center gap-3 p-3 bg-gray-100 dark:bg-slate-700 rounded-xl opacity-60"
                     >
                       <span className="text-xl grayscale flex-shrink-0">{getTileIcon(tile.type)}</span>
                       <div className="flex-1 min-w-0">
@@ -233,7 +233,7 @@ export function DashboardSettings({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
+          <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800">
             {showConfirmReset ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Wirklich zurücksetzen?</span>

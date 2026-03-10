@@ -177,7 +177,7 @@ export function PriceAlertManager({
 
       {/* Create Alert Form */}
       {showForm && (
-        <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg space-y-3">
+        <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg space-y-3">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
               Bedingung
@@ -242,8 +242,8 @@ export function PriceAlertManager({
                 alert.status === 'triggered'
                   ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
                   : alert.status === 'disabled'
-                  ? 'bg-slate-50 dark:bg-slate-700/30 border-slate-200 dark:border-slate-600 opacity-60'
-                  : 'bg-slate-50 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600'
+                  ? 'bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 opacity-60'
+                  : 'bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600'
               }`}
             >
               <div className="flex items-start justify-between gap-3">

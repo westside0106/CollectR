@@ -41,7 +41,7 @@ export function TopHeader() {
 
   const toolLinks = [
     { href: '/tools/currency', label: 'Währungsrechner', icon: '💱' },
-    { href: '/tools/market', label: 'Marktnews', icon: '📈' },
+    { href: '/tools/market', label: 'Markt & Portfolio', icon: '📈' },
     { href: '/tools/news', label: 'Sammler-News', icon: '📰' },
     { href: '/tools/books', label: 'Bücher-Suche', icon: '📚' },
     { href: '/tools/vinyl', label: 'Vinyl-Suche', icon: '💿' },
@@ -55,7 +55,7 @@ export function TopHeader() {
       >
         <div className="h-16 px-4 lg:px-6 flex items-center justify-between gap-4">
           {/* Logo - Links */}
-          <Link href="/" className="flex items-center gap-3 flex-shrink-0">
+          <Link href="/dashboard" className="flex items-center gap-3 flex-shrink-0">
             <Image
               src="/brand/collectr-hero.png"
               alt="CollectR"

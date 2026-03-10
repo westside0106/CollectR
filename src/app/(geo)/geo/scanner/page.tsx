@@ -158,7 +158,7 @@ export default function GeoScannerPage() {
                       p-4 rounded-xl transition-all duration-200
                       ${selectedCategory === category.id
                         ? `ring-4 ring-${category.color}-500/50 bg-${category.color}-500/20 border-2 border-${category.color}-500`
-                        : 'bg-slate-800/50 border-2 border-slate-700 hover:border-slate-600'
+                        : 'bg-slate-800 border-2 border-slate-700 hover:border-slate-600'
                       }
                     `}
                   >
@@ -177,7 +177,7 @@ export default function GeoScannerPage() {
                   <button
                     key={mode.id}
                     onClick={() => setSelectedMode(mode.id)}
-                    className="card-padding rounded-xl transition-all duration-200 text-left bg-slate-800/50 border-2 border-slate-700 hover:border-emerald-500/50 hover:bg-slate-800"
+                    className="card-padding rounded-xl transition-all duration-200 text-left bg-slate-800 border-2 border-slate-700 hover:border-emerald-500/50 hover:bg-slate-800"
                   >
                     <div className="text-4xl mb-3">{mode.icon}</div>
                     <h3 className="text-base font-semibold text-white mb-1">{mode.title}</h3>
@@ -191,7 +191,7 @@ export default function GeoScannerPage() {
 
         {/* Upload Interface */}
         {selectedMode === 'upload' && !imagePreview && (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-8">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-8">
             <label className="block">
               <div className="border-2 border-dashed border-slate-600 rounded-xl p-12 text-center hover:border-emerald-500 transition-colors cursor-pointer">
                 <div className="text-6xl mb-4">📁</div>
@@ -216,7 +216,7 @@ export default function GeoScannerPage() {
 
         {/* Image Preview & Analysis */}
         {imagePreview && (
-          <div className="bg-slate-800/30 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-8">
+          <div className="bg-slate-800 backdrop-blur-lg rounded-2xl card-padding border border-slate-700 mb-8">
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
                 <img
@@ -256,7 +256,7 @@ export default function GeoScannerPage() {
                     </div>
                   </div>
 
-                  <div className="bg-slate-900/50 rounded-lg p-4">
+                  <div className="bg-slate-900 rounded-lg p-4">
                     <h4 className="font-semibold text-white mb-3">Eigenschaften:</h4>
                     <div className="space-y-2">
                       {Object.entries(analysisResult.properties).map(([key, value]) => (
@@ -268,7 +268,7 @@ export default function GeoScannerPage() {
                     </div>
                   </div>
 
-                  <div className="bg-slate-900/50 rounded-lg p-4">
+                  <div className="bg-slate-900 rounded-lg p-4">
                     <p className="text-sm text-slate-300">{analysisResult.description}</p>
                   </div>
 
@@ -294,7 +294,7 @@ export default function GeoScannerPage() {
         {/* Features Info */}
         {!imagePreview && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8">
-            <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+            <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
               <div className="text-4xl mb-3">🤖</div>
               <h3 className="font-semibold text-white mb-2">AI Recognition</h3>
               <p className="text-sm text-slate-400">
@@ -302,7 +302,7 @@ export default function GeoScannerPage() {
               </p>
             </div>
 
-            <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+            <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
               <div className="text-4xl mb-3">🔬</div>
               <h3 className="font-semibold text-white mb-2">Wissenschaftlich</h3>
               <p className="text-sm text-slate-400">
@@ -310,7 +310,7 @@ export default function GeoScannerPage() {
               </p>
             </div>
 
-            <div className="text-center card-padding rounded-xl bg-slate-800/30 border border-slate-700">
+            <div className="text-center card-padding rounded-xl bg-slate-800 border border-slate-700">
               <div className="text-4xl mb-3">💰</div>
               <h3 className="font-semibold text-white mb-2">Wertschätzung</h3>
               <p className="text-sm text-slate-400">

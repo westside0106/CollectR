@@ -209,7 +209,7 @@ export function CategorySelect({
 
                 {/* Children */}
                 {children.length > 0 && (
-                  <div className="bg-slate-50 dark:bg-slate-700/50">
+                  <div className="bg-slate-50 dark:bg-slate-700">
                     {children.map(child => {
                       const isSelected = value === child.id
                       return (

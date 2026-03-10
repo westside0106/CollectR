@@ -1,8 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { searchByISBN, searchBooks, getIsbnCoverUrl, type OpenLibraryBook, type OpenLibrarySearchResult, getCoverUrl } from '@/services/openLibraryApi'
+import {
+  searchByISBN,
+  searchBooks,
+  getIsbnCoverUrl,
+  getCoverUrl,
+  type OpenLibraryBook,
+  type OpenLibrarySearchResult
+} from '@/services/openLibraryApi'
 import { AddToCollectionModal } from '@/components/AddToCollectionModal'
 
 export default function BooksLookupPage() {
@@ -39,9 +45,8 @@ export default function BooksLookupPage() {
           setError('Keine Bücher gefunden.')
         }
       }
-    } catch (err) {
-      setError('Fehler bei der Suche. Bitte versuchen Sie es erneut.')
-      console.error('Search error:', err)
+    } catch {
+      setError('Fehler bei der Suche. Bitte erneut versuchen.')
     } finally {
       setLoading(false)
     }
@@ -50,261 +55,255 @@ export default function BooksLookupPage() {
   async function handleSelectResult(result: OpenLibrarySearchResult) {
     if (result.isbn && result.isbn.length > 0) {
       setLoading(true)
-      const detailedBook = await searchByISBN(result.isbn[0])
+      setSearchResults([])
+      const detailed = await searchByISBN(result.isbn[0])
       setLoading(false)
-      if (detailedBook) {
-        setBook(detailedBook)
-        setSearchResults([])
-      }
+      if (detailed) setBook(detailed)
     }
   }
 
+  function resetSearch() {
+    setBook(null)
+    setSearchResults([])
+    setError(null)
+    setQuery('')
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 container-responsive">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <Link href="/" className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm mb-3 sm:mb-4 inline-block">
-            &larr; Zurück zum Dashboard
-          </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Bücher-Suche</h1>
-          <p className="text-gray-600 mt-2 text-sm sm:text-base">
-            Suche nach Büchern via Open Library - kostenlos und ohne API-Key
+    <div className="min-h-screen">
+      {/* Gradient Hero */}
+      <div className="bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-700 dark:via-teal-700 dark:to-cyan-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-8 sm:py-12">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="text-3xl">📚</span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Bücher-Suche</h1>
+          </div>
+          <p className="text-emerald-100 text-sm sm:text-base">
+            Open Library · 20+ Millionen Bücher · Komplett kostenlos, kein API-Key
           </p>
         </div>
+      </div>
 
-        {/* Search Form */}
-        <div className="bg-white rounded-xl shadow-sm card-padding mb-4 sm:mb-6">
-          <form onSubmit={handleSearch} className="space-y-3 sm:space-y-4">
-            {/* Search Type Toggle */}
-            <div className="flex flex-wrap gap-3 sm:gap-4 mb-4">
-              <button
-                type="button"
-                onClick={() => setSearchType('isbn')}
-                className={`px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg font-medium transition ${
-                  searchType === 'isbn'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                ISBN-Suche
-              </button>
-              <button
-                type="button"
-                onClick={() => setSearchType('text')}
-                className={`px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg font-medium transition ${
-                  searchType === 'text'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Titel/Autor-Suche
-              </button>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-8 space-y-4">
+
+        {/* Suchmaske */}
+        <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4 sm:p-6">
+          <form onSubmit={handleSearch} className="space-y-4">
+            <div className="flex gap-2">
+              {(['isbn', 'text'] as const).map(type => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => { setSearchType(type); setQuery('') }}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
+                    searchType === type
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                  }`}
+                >
+                  {type === 'isbn' ? '🔢 ISBN-Suche' : '🔍 Titel / Autor'}
+                </button>
+              ))}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={searchType === 'isbn' ? 'ISBN eingeben (z.B. 978-3-...)' : 'Titel oder Autor eingeben...'}
-                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  placeholder={searchType === 'isbn' ? 'ISBN eingeben (z.B. 978-3-...)' : 'Titel oder Autor eingeben...'}
+                  className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition"
+                />
+              </div>
               <button
                 type="submit"
                 disabled={loading || !query.trim()}
-                className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                className="px-5 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-medium text-sm transition"
               >
-                {loading ? 'Suche...' : 'Suchen'}
+                {loading ? '⟳' : 'Suchen'}
               </button>
             </div>
           </form>
         </div>
 
-        {/* Error Message */}
+        {/* Fehler */}
         {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-xl mb-6">
+          <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 p-4 rounded-2xl border border-red-100 dark:border-red-800 text-sm">
             {error}
           </div>
         )}
 
-        {/* Search Results List */}
+        {/* Suchergebnisse */}
         {searchResults.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm card-padding mb-4 sm:mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Suchergebnisse ({searchResults.length})</h2>
-            <div className="space-y-3">
-              {searchResults.map((result) => (
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="px-4 sm:px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+              <h2 className="font-semibold text-slate-900 dark:text-white text-sm">
+                {searchResults.length} Ergebnisse
+              </h2>
+              <button onClick={resetSearch} className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+                Zurücksetzen
+              </button>
+            </div>
+            <div className="divide-y divide-slate-100 dark:divide-slate-700">
+              {searchResults.map(result => (
                 <button
                   key={result.key}
                   onClick={() => handleSelectResult(result)}
-                  className="w-full flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition text-left border border-gray-200"
+                  className="w-full flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition text-left"
                 >
                   {result.cover_i ? (
                     <img
                       src={getCoverUrl(result.cover_i, 'S')}
                       alt={result.title}
-                      className="w-12 h-16 object-cover rounded"
+                      className="w-10 h-14 object-cover rounded-lg flex-shrink-0 shadow-sm"
                     />
                   ) : (
-                    <div className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center">
+                    <div className="w-10 h-14 bg-emerald-100 dark:bg-emerald-900/20 rounded-lg flex items-center justify-center flex-shrink-0 text-lg">
                       📚
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-900 truncate">{result.title}</div>
-                    <div className="text-sm text-gray-600 truncate">
+                    <div className="font-medium text-slate-900 dark:text-white truncate text-sm">{result.title}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
                       {result.author_name?.join(', ') || 'Unbekannter Autor'}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {result.first_publish_year && `Erschienen: ${result.first_publish_year}`}
-                      {result.publisher && result.publisher.length > 0 && ` | ${result.publisher[0]}`}
+                    <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 flex gap-2">
+                      {result.first_publish_year && <span>{result.first_publish_year}</span>}
+                      {result.publisher?.[0] && <span>· {result.publisher[0]}</span>}
                     </div>
                   </div>
-                  {result.isbn && result.isbn.length > 0 && (
-                    <div className="text-xs text-gray-400">
-                      ISBN: {result.isbn[0]}
+                  {result.isbn?.[0] && (
+                    <div className="text-xs text-slate-400 dark:text-slate-500 font-mono hidden sm:block">
+                      {result.isbn[0]}
                     </div>
                   )}
+                  <svg className="w-4 h-4 text-slate-300 dark:text-slate-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* Book Detail */}
-        {book && (
-          <div className="bg-white rounded-xl shadow-sm card-padding">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">Buch-Details</h2>
-            <div className="flex flex-col md:flex-row gap-6">
-              {/* Cover */}
-              <div className="flex-shrink-0">
-                {book.coverUrl ? (
-                  <img
-                    src={book.coverUrl}
-                    alt={book.title}
-                    className="w-48 h-auto rounded-lg shadow-md"
-                  />
-                ) : book.isbn13 || book.isbn10 ? (
-                  <img
-                    src={getIsbnCoverUrl(book.isbn13 || book.isbn10 || '', 'L')}
-                    alt={book.title}
-                    className="w-48 h-auto rounded-lg shadow-md"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none'
-                    }}
-                  />
-                ) : (
-                  <div className="w-48 h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <span className="text-6xl">📚</span>
-                  </div>
-                )}
+        {/* Loading Skeleton */}
+        {loading && !book && (
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 animate-pulse">
+            <div className="flex gap-6">
+              <div className="w-36 h-52 bg-slate-200 dark:bg-slate-700 rounded-xl flex-shrink-0" />
+              <div className="flex-1 space-y-3">
+                <div className="h-7 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+                <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3" />
+                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
               </div>
+            </div>
+          </div>
+        )}
 
-              {/* Details */}
-              <div className="flex-1 space-y-3 sm:space-y-4">
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-900">{book.title}</h3>
-                  <p className="text-lg text-gray-600">{book.authors.join(', ')}</p>
-                </div>
+        {/* Buch-Detail */}
+        {book && (
+          <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+            <div className="px-4 sm:px-5 py-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+              <h2 className="font-semibold text-slate-900 dark:text-white text-sm">Buch-Details</h2>
+              <button onClick={resetSearch} className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
+                Neue Suche
+              </button>
+            </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {book.isbn13 && (
-                    <div>
-                      <span className="text-sm text-gray-500">ISBN-13:</span>
-                      <p className="font-mono">{book.isbn13}</p>
-                    </div>
-                  )}
-                  {book.isbn10 && (
-                    <div>
-                      <span className="text-sm text-gray-500">ISBN-10:</span>
-                      <p className="font-mono">{book.isbn10}</p>
-                    </div>
-                  )}
-                  {book.publishDate && (
-                    <div>
-                      <span className="text-sm text-gray-500">Erscheinungsdatum:</span>
-                      <p>{book.publishDate}</p>
-                    </div>
-                  )}
-                  {book.publishers.length > 0 && (
-                    <div>
-                      <span className="text-sm text-gray-500">Verlag:</span>
-                      <p>{book.publishers.join(', ')}</p>
-                    </div>
-                  )}
-                  {book.pageCount && (
-                    <div>
-                      <span className="text-sm text-gray-500">Seiten:</span>
-                      <p>{book.pageCount}</p>
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col md:flex-row gap-5 sm:gap-6">
+                {/* Cover */}
+                <div className="flex-shrink-0">
+                  {book.coverUrl ? (
+                    <img src={book.coverUrl} alt={book.title} className="w-full md:w-40 h-auto rounded-xl shadow-md" />
+                  ) : (book.isbn13 || book.isbn10) ? (
+                    <img
+                      src={getIsbnCoverUrl((book.isbn13 || book.isbn10)!, 'L')}
+                      alt={book.title}
+                      className="w-full md:w-40 h-auto rounded-xl shadow-md"
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    />
+                  ) : (
+                    <div className="w-full md:w-40 h-56 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl flex items-center justify-center">
+                      <span className="text-6xl">📚</span>
                     </div>
                   )}
                 </div>
 
-                {book.subjects && book.subjects.length > 0 && (
+                {/* Details */}
+                <div className="flex-1 space-y-4">
                   <div>
-                    <span className="text-sm text-gray-500">Themen:</span>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {book.subjects.map((subject, index) => (
-                        <span
-                          key={index}
-                          className="px-2 py-1 bg-gray-100 rounded-full text-sm text-gray-700"
-                        >
+                    <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">{book.title}</h3>
+                    <p className="text-base text-slate-600 dark:text-slate-400 mt-1">{book.authors.join(', ')}</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      book.isbn13 && { label: 'ISBN-13', value: book.isbn13, mono: true },
+                      book.isbn10 && { label: 'ISBN-10', value: book.isbn10, mono: true },
+                      book.publishDate && { label: 'Erschienen', value: book.publishDate, mono: false },
+                      book.publishers.length > 0 && { label: 'Verlag', value: book.publishers.join(', '), mono: false },
+                      book.pageCount && { label: 'Seiten', value: String(book.pageCount), mono: false },
+                    ].filter(Boolean).map((item, i) => item && (
+                      <div key={i} className="bg-slate-50 dark:bg-slate-700 rounded-xl px-3 py-2">
+                        <div className="text-xs text-slate-500 dark:text-slate-400">{item.label}</div>
+                        <div className={`font-medium text-slate-900 dark:text-white text-sm mt-0.5 ${item.mono ? 'font-mono' : ''}`}>
+                          {item.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {book.subjects && book.subjects.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {book.subjects.map((subject, i) => (
+                        <span key={i} className="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-medium">
                           {subject}
                         </span>
                       ))}
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {book.description && (
-                  <div>
-                    <span className="text-sm text-gray-500">Beschreibung:</span>
-                    <p className="text-gray-700 mt-1">{book.description}</p>
-                  </div>
-                )}
+                  {book.description && (
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-4">
+                      {book.description}
+                    </p>
+                  )}
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-3 pt-4">
-                  <button
-                    onClick={() => setShowAddModal(true)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
-                  >
-                    + Zur Sammlung hinzufügen
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(JSON.stringify(book, null, 2))
-                      alert('Buchdaten in Zwischenablage kopiert!')
-                    }}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
-                  >
-                    Daten kopieren
-                  </button>
-                  <a
-                    href={`https://openlibrary.org/isbn/${book.isbn13 || book.isbn10}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
-                  >
-                    Auf Open Library ansehen
-                  </a>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-medium text-sm transition"
+                    >
+                      + Zur Sammlung
+                    </button>
+                    {(book.isbn13 || book.isbn10) && (
+                      <a
+                        href={`https://openlibrary.org/isbn/${book.isbn13 || book.isbn10}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-xl font-medium text-sm transition hover:bg-emerald-200 dark:hover:bg-emerald-900/50"
+                      >
+                        Open Library ansehen ↗
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Info Box */}
-        <div className="mt-8 bg-blue-50 rounded-xl card-padding">
-          <h3 className="font-semibold text-blue-900 mb-2">Über Open Library</h3>
-          <p className="text-blue-800 text-sm">
-            Open Library ist eine offene, editierbare Bibliotheksdatenbank mit über 20 Millionen Büchern.
-            Die API ist kostenlos und benötigt keinen API-Key. Perfekt für Buchsammler!
-          </p>
-        </div>
+        <p className="text-center text-xs text-slate-400 dark:text-slate-600">
+          Powered by Open Library · Internet Archive · Kein API-Key · Offen für alle
+        </p>
       </div>
 
-      {/* Add to Collection Modal */}
       {book && (
         <AddToCollectionModal
           isOpen={showAddModal}
@@ -328,7 +327,7 @@ export default function BooksLookupPage() {
               publishDate: book.publishDate,
               pageCount: book.pageCount,
               subjects: book.subjects,
-            }
+            },
           }}
         />
       )}
