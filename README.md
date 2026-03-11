@@ -287,6 +287,8 @@ npm run dev
 
 Öffne [http://localhost:3000](http://localhost:3000)
 
+> **Navigation:** `/` ist die öffentliche Landing Page. Eingeloggte User werden automatisch zu `/dashboard` weitergeleitet. Das Logo im App-Header führt ausgeloggte User zurück zur Landing Page, eingeloggte User zum Dashboard.
+
 ---
 
 ## 📁 Projektstruktur
@@ -320,9 +322,10 @@ CollectR/
 │   │   │   └── shop/page.tsx
 │   │   ├── collections/        # Universal Collections
 │   │   ├── api/                # API Routes
-│   │   └── page.tsx            # Dashboard
+│   │   └── page.tsx            # Landing Page (öffentlich, /)
 │   │
 │   ├── components/             # React Components
+│   │   ├── landing/            # Landing Page Sections
 │   │   ├── layout/
 │   │   ├── TCGCardScanner.tsx
 │   │   ├── BarcodeScanner.tsx
@@ -386,6 +389,8 @@ export const SPHERE_THEMES = {
 
 ### ✅ Phase 1: Core Platform (Erledigt)
 - [x] Multi-Sphere Architecture
+- [x] Landing Page (Marketing, Pricing, FAQ – öffentlich unter `/`)
+- [x] Auth-Flow: Logo-Navigation kontextabhängig (ausgeloggt → Landing, eingeloggt → Dashboard)
 - [x] Hub Landing Page
 - [x] TCG Sphere (Pokémon, Yu-Gi-Oh!, Magic)
 - [x] Gaming Sphere (PlayStation, Xbox, Nintendo, PC, Retro)
