@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
 import { LandingNavbar } from '@/components/landing/LandingNavbar'
 import { HeroSection } from '@/components/landing/HeroSection'
+import { HowItWorksSection } from '@/components/landing/HowItWorksSection'
 import { FeatureShowcase } from '@/components/landing/FeatureShowcase'
 import { CollectionTypesGrid } from '@/components/landing/CollectionTypesGrid'
+import { SocialProofSection } from '@/components/landing/SocialProofSection'
 import { AppDemoSection } from '@/components/landing/AppDemoSection'
+import { PricingSection } from '@/components/landing/PricingSection'
+import { FAQSection } from '@/components/landing/FAQSection'
 import { CTAFooterSection } from '@/components/landing/CTAFooterSection'
 
 export const dynamic = 'force-static'
@@ -25,9 +29,13 @@ export default function LandingPage() {
     <div className="bg-slate-950 text-white overflow-x-hidden">
       <LandingNavbar />
       <HeroSection />
+      <HowItWorksSection />
       <FeatureShowcase />
       <CollectionTypesGrid />
+      <SocialProofSection />
       <AppDemoSection />
+      <PricingSection />
+      <FAQSection />
       <CTAFooterSection />
     </div>
   )
