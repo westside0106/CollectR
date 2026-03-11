@@ -29,7 +29,7 @@ export function TopHeader() {
     }
   }, [isMobileMenuOpen])
 
-  // Nicht auf Login/Register/Landing zeigen
+  // Nicht auf Login/Register/Landing Seiten zeigen
   if (pathname === '/login' || pathname === '/register' || pathname === '/') {
     return null
   }

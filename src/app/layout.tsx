@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Space_Grotesk } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { TopHeader } from '@/components/layout/TopHeader'
@@ -12,6 +12,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { GlobalDitherBackground } from '@/components/GlobalDitherBackground'
 
 const inter = Inter({ subsets: ['latin'] })
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
 
 export const metadata: Metadata = {
   title: 'CollectR - Deine Sammlungen',
@@ -139,7 +140,7 @@ export default function RootLayout({
         {/* Theme initialization - prevents flash of unstyled content */}
         <Script src="/theme-init.js" strategy="beforeInteractive" />
       </head>
-      <body className={`${inter.className} bg-slate-50 dark:bg-slate-950 transition-colors`}>
+      <body className={`${inter.className} ${spaceGrotesk.variable} bg-slate-50 dark:bg-slate-950 transition-colors`}>
         <ThemeProvider>
           <ToastProvider>
             <ErrorBoundary>
