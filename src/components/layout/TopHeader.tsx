@@ -7,10 +7,24 @@ import { usePathname } from 'next/navigation'
 import { UserMenu } from '@/components/UserMenu'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { SphereNavigation } from '@/components/shared/SphereNavigation'
+import { createClient } from '@/lib/supabase/client'
 
 export function TopHeader() {
   const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  // Auth-State prüfen
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsAuthenticated(!!user)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsAuthenticated(!!session?.user)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   // Schließen wenn Route wechselt
   useEffect(() => {
@@ -55,7 +69,7 @@ export function TopHeader() {
       >
         <div className="h-16 px-4 lg:px-6 flex items-center justify-between gap-4">
           {/* Logo - Links */}
-          <Link href="/dashboard" className="flex items-center gap-3 flex-shrink-0">
+          <Link href={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-3 flex-shrink-0">
             <Image
               src="/brand/collectr-hero.png"
               alt="CollectR"
