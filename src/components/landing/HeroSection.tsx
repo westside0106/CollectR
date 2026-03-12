@@ -90,7 +90,7 @@ export function HeroSection() {
           variants={itemVariants}
           className="text-base sm:text-xl text-white/55 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed"
         >
-          Hot Wheels, Pokémon-Karten, Vinyl — alles an einem Ort.
+          Hot Wheels, Pokémon-Karten, Vinyl — alles an einem Ort.{' '}
           <br className="hidden sm:block" />
           Mit KI-Analyse, Live-Preisen und Teilen-Funktion.
         </motion.p>
