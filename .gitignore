@@ -34,5 +34,5 @@ tsconfig.tsbuildinfo
 # Supabase local temp files
 supabase/.temp/
 
-# Memory vault – direkt im Repo getrackt (kein Submodule mehr)
-# Obsidian Vault: ~/Downloads/CollectR_clean/memory → einfach git pull nach Merge
+# Memory vault
+memory/
