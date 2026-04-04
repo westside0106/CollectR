@@ -20,6 +20,7 @@ import {
   CollectionListTile,
   TCGHighlightsTile,
   SpheresTile,
+  Collection3DTile,
 } from '@/components/dashboard'
 import { FavoritesTile } from '@/components/dashboard/tiles/FavoritesTile'
 // Dither import removed — dashboard now uses grid background
@@ -385,7 +386,8 @@ function DashboardContent() {
         return <TCGHighlightsTile />
       case 'favorites':
         return <FavoritesTile />
-        return null // TODO: Favoriten-Kachel — geplant für Landingpage-Redesign
+      case 'collection_3d':
+        return <Collection3DTile />
       case 'chart_category':
         return chartData.categoryDistribution.length > 0 ? (
           <DashboardCharts

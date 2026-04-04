@@ -18,6 +18,7 @@ const DEFAULT_TILES: DashboardTile[] = [
   { id: 'top_items', type: 'top_items', title: 'Wertvollste Items', size: 'medium', position: 8, visible: true },
   { id: 'collection_list', type: 'collection_list', title: 'Sammlungen', size: 'large', position: 9, visible: true },
   { id: 'favorites', type: 'favorites', title: 'Favoriten', size: 'large', position: 10, visible: false },
+  { id: 'collection_3d', type: 'collection_3d', title: '3D Collection Graph', size: 'large', position: 11, visible: true },
 ]
 
 const DEFAULT_CONFIG: DashboardConfig = {
@@ -156,6 +157,7 @@ export function getTileIcon(type: TileType): string {
     collection_list: '📦',
     tcg_highlights: '🃏',
     favorites: '⭐',
+    collection_3d: '🧊',
   }
   return icons[type] || '📋'
 }
@@ -164,7 +166,7 @@ export function getTileIcon(type: TileType): string {
 export function getTileDescription(type: TileType): string {
   const descriptions: Record<TileType, string> = {
     stats: 'Zeigt Gesamtstatistiken: Sammlungen, Items, Wert',
-    spheres: 'Schnellzugriff auf alle 5 Spheres (TCG, Gaming, Official, Geo, Shop)',
+    spheres: 'Schnellzugriff auf Spheres und den Collection HUB',
     recent_items: 'Die zuletzt hinzugefügten Items',
     top_items: 'Die wertvollsten Items deiner Sammlung',
     chart_category: 'Verteilung der Items nach Kategorien',
@@ -175,6 +177,7 @@ export function getTileDescription(type: TileType): string {
     collection_list: 'Übersicht aller Sammlungen',
     tcg_highlights: 'Top Trading Cards nach Grading (PSA/BGS/CGC/SGC)',
     favorites: 'Deine Lieblings-Sammlungen mit animierten Karten',
+    collection_3d: 'Interaktiver 3D-Graph deiner Sammlungen',
   }
   return descriptions[type] || ''
 }

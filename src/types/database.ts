@@ -177,6 +177,7 @@ export type TileType =
   | 'collection_list' // Sammlungs-Übersicht
   | 'tcg_highlights'  // TCG Top-Karten nach Grade (Phase 5)
   | 'favorites'       // Favoriten / Benutzerdefinierte Kategorien
+  | 'collection_3d'   // 3D Collection Graph Visualisierung
 
 export type TileSize = 'small' | 'medium' | 'large' | 'full'
 
