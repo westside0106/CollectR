@@ -9,6 +9,7 @@ export interface SphereTheme {
   displayName: string
   emoji: string
   description: string
+  isLocked: boolean
   colors: {
     primary: string
     secondary: string
@@ -30,6 +31,7 @@ export const SPHERE_THEMES: Record<SphereType, SphereTheme> = {
     displayName: 'HUB',
     emoji: '🏠',
     description: 'Universal Collection Manager',
+    isLocked: false,
     colors: {
       primary: '#2563eb',      // Blue
       secondary: '#8b5cf6',    // Purple
@@ -50,6 +52,7 @@ export const SPHERE_THEMES: Record<SphereType, SphereTheme> = {
     displayName: 'TCG',
     emoji: '🎴',
     description: 'Trading Card Game Platform',
+    isLocked: true,
     colors: {
       primary: '#dc2626',      // Red
       secondary: '#f59e0b',    // Amber/Gold
@@ -70,6 +73,7 @@ export const SPHERE_THEMES: Record<SphereType, SphereTheme> = {
     displayName: 'Gaming',
     emoji: '🎮',
     description: 'Video Game Collection Manager',
+    isLocked: true,
     colors: {
       primary: '#7c3aed',      // Violet
       secondary: '#ec4899',    // Pink
@@ -90,6 +94,7 @@ export const SPHERE_THEMES: Record<SphereType, SphereTheme> = {
     displayName: 'Official',
     emoji: '📜',
     description: 'Documents & Certificates',
+    isLocked: true,
     colors: {
       primary: '#0891b2',      // Cyan
       secondary: '#059669',    // Emerald
@@ -110,6 +115,7 @@ export const SPHERE_THEMES: Record<SphereType, SphereTheme> = {
     displayName: 'Geo',
     emoji: '⛏️',
     description: 'Geology & Archaeology',
+    isLocked: true,
     colors: {
       primary: '#ca8a04',      // Yellow
       secondary: '#ea580c',    // Orange
@@ -130,6 +136,7 @@ export const SPHERE_THEMES: Record<SphereType, SphereTheme> = {
     displayName: 'Shop',
     emoji: '🛒',
     description: 'Marketplace & Sales',
+    isLocked: true,
     colors: {
       primary: '#059669',      // Emerald
       secondary: '#0891b2',    // Cyan
@@ -147,6 +154,10 @@ export const SPHERE_THEMES: Record<SphereType, SphereTheme> = {
 
 export function getSphereTheme(sphere: SphereType): SphereTheme {
   return SPHERE_THEMES[sphere]
+}
+
+export function isSphereLocked(sphere: SphereType): boolean {
+  return SPHERE_THEMES[sphere].isLocked
 }
 
 export function getSphereFromPath(pathname: string): SphereType {

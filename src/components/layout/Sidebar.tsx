@@ -41,11 +41,11 @@ export function Sidebar() {
   ]
 
   const sphereLinks = [
-    { href: '/tcg', label: 'TCG', icon: '🎴', description: 'Trading Cards', color: 'text-red-400' },
-    { href: '/gaming', label: 'Gaming', icon: '🎮', description: 'Video Games', color: 'text-purple-400' },
-    { href: '/official', label: 'Official', icon: '📜', description: 'Dokumente', color: 'text-cyan-400' },
-    { href: '/geo', label: 'Geo', icon: '⛏️', description: 'Geologie', color: 'text-emerald-400' },
-    { href: '/shop', label: 'Shop', icon: '🛒', description: 'Marketplace', color: 'text-green-400' },
+    { href: '/tcg', label: 'TCG', icon: '🎴', description: 'Trading Cards', color: 'text-red-400', locked: true },
+    { href: '/gaming', label: 'Gaming', icon: '🎮', description: 'Video Games', color: 'text-purple-400', locked: true },
+    { href: '/official', label: 'Official', icon: '📜', description: 'Dokumente', color: 'text-cyan-400', locked: true },
+    { href: '/geo', label: 'Geo', icon: '⛏️', description: 'Geologie', color: 'text-emerald-400', locked: true },
+    { href: '/shop', label: 'Shop', icon: '🛒', description: 'Marketplace', color: 'text-green-400', locked: true },
   ]
 
   const toolLinks = [
@@ -168,6 +168,25 @@ export function Sidebar() {
             </p>
             <ul className="space-y-1">
               {sphereLinks.map(link => {
+                if (link.locked) {
+                  return (
+                    <li key={link.href}>
+                      <div
+                        className="flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg opacity-40 cursor-not-allowed"
+                        title="Coming Soon"
+                      >
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <span className="text-base sm:text-lg">{link.icon}</span>
+                          <span className="font-medium text-sm sm:text-base">{link.label}</span>
+                        </div>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-700 text-slate-400">
+                          Soon
+                        </span>
+                      </div>
+                    </li>
+                  )
+                }
+
                 const isActive = pathname === link.href || pathname.startsWith(link.href + '/')
                 return (
                   <li key={link.href}>
