@@ -218,7 +218,7 @@ export default function MarketPage() {
           </div>
 
           <p className="text-xs text-slate-400 mt-4 text-center">
-            Powered by CoinGecko API (kostenlos, kein API-Key nötig)
+            Preise werden alle 5 Minuten aktualisiert
           </p>
         </>
       )}

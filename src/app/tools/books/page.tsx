@@ -79,7 +79,7 @@ export default function BooksLookupPage() {
             <h1 className="text-2xl sm:text-3xl font-bold text-white">Bücher-Suche</h1>
           </div>
           <p className="text-emerald-100 text-sm sm:text-base">
-            Open Library · 20+ Millionen Bücher · Komplett kostenlos, kein API-Key
+            Durchsuche ueber 20 Millionen Buecher per ISBN oder Titel
           </p>
         </div>
       </div>
@@ -300,7 +300,7 @@ export default function BooksLookupPage() {
         )}
 
         <p className="text-center text-xs text-slate-400 dark:text-slate-600">
-          Powered by Open Library · Internet Archive · Kein API-Key · Offen für alle
+          Buchdaten werden aus oeffentlichen Bibliothekskatalogen bezogen
         </p>
       </div>
 

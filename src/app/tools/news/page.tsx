@@ -31,6 +31,7 @@ const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
 export default function NewsPage() {
   const [articles, setArticles] = useState<NewsArticle[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<CollectionCategory[]>(['general', 'hot-wheels'])
@@ -53,11 +54,15 @@ export default function NewsPage() {
 
   const loadNews = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const news = searchQuery.trim()
         ? await searchNews(searchQuery, 15)
         : await getCollectionNews(activeCategory, 15)
       setArticles(news)
+    } catch {
+      setError('News konnten nicht geladen werden. Bitte spaeter nochmal versuchen.')
+      setArticles([])
     } finally {
       setLoading(false)
     }
@@ -108,7 +113,7 @@ export default function NewsPage() {
                 <h1 className="text-2xl sm:text-3xl font-bold text-white">Sammler-News</h1>
               </div>
               <p className="text-violet-100 text-sm sm:text-base">
-                Aktuelle Nachrichten aus der Sammlerwelt — Google News, kein API-Key
+                Aktuelle Nachrichten aus der Sammlerwelt
               </p>
             </div>
             <div className="flex items-center gap-2 mt-1">
@@ -209,8 +214,22 @@ export default function NewsPage() {
           </div>
         </form>
 
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 text-center">
+            <div className="text-3xl mb-2">⚠️</div>
+            <p className="text-red-600 dark:text-red-400 font-medium text-sm">{error}</p>
+            <button
+              onClick={loadNews}
+              className="mt-3 text-sm text-red-600 dark:text-red-400 hover:underline"
+            >
+              Erneut versuchen
+            </button>
+          </div>
+        )}
+
         {/* Artikel */}
-        {loading ? (
+        {!error && loading ? (
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 dark:border-slate-700 animate-pulse">
@@ -225,7 +244,7 @@ export default function NewsPage() {
               </div>
             ))}
           </div>
-        ) : articles.length === 0 ? (
+        ) : !error && articles.length === 0 ? (
           <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-12 shadow-sm border border-slate-200 dark:border-slate-700 text-center">
             <div className="text-4xl mb-3">📭</div>
             <p className="text-slate-500 dark:text-slate-400 font-medium">Keine News gefunden</p>
@@ -285,7 +304,7 @@ export default function NewsPage() {
 
         <div className="text-center">
           <p className="text-xs text-slate-400 dark:text-slate-600">
-            Powered by Google News RSS · 15 Minuten Cache · Kein API-Key erforderlich
+            News werden alle 15 Minuten aktualisiert
           </p>
         </div>
       </div>

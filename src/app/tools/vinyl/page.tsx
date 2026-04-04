@@ -90,7 +90,7 @@ export default function VinylLookupPage() {
             <h1 className="text-2xl sm:text-3xl font-bold text-white">Vinyl-Suche</h1>
           </div>
           <p className="text-orange-100 text-sm sm:text-base">
-            Discogs-Datenbank · Barcode oder Titel/Künstler · Kein API-Key nötig
+            Finde Vinyl-Releases per Barcode oder Titel/Kuenstler
           </p>
         </div>
       </div>
@@ -351,7 +351,7 @@ export default function VinylLookupPage() {
         )}
 
         <p className="text-center text-xs text-slate-400 dark:text-slate-600">
-          Powered by Discogs API · Weltweit größte Musikdatenbank · Kein API-Key nötig
+          Daten aus der weltweit groessten Musikdatenbank
         </p>
       </div>
 

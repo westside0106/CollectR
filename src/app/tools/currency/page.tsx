@@ -79,7 +79,7 @@ export default function CurrencyPage() {
             <h1 className="text-2xl sm:text-3xl font-bold text-white">Währungsrechner</h1>
           </div>
           <p className="text-blue-100 text-sm sm:text-base">
-            Rechne Kaufpreise blitzschnell um — EZB-Kurse, kostenlos & immer aktuell
+            Rechne Kaufpreise blitzschnell um — aktuelle Wechselkurse
           </p>
         </div>
       </div>
@@ -163,7 +163,7 @@ export default function CurrencyPage() {
                   {toSymbol}{result.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}
                 </div>
                 <div className="text-xs text-slate-400 dark:text-slate-500 mt-2">
-                  {loading ? 'Wird berechnet...' : `EZB-Kurs, stündlich aktualisiert`}
+                  {loading ? 'Wird berechnet...' : `Kurs wird stuendlich aktualisiert`}
                 </div>
               </div>
             ) : (
@@ -214,8 +214,7 @@ export default function CurrencyPage() {
 
             <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                <span className="font-semibold text-slate-700 dark:text-slate-300">Powered by frankfurter.app</span><br />
-                Europäische Zentralbank · Kein API-Key · 100% kostenlos
+                Wechselkurse basieren auf offiziellen Zentralbank-Daten und werden stuendlich aktualisiert.
               </p>
             </div>
           </div>
