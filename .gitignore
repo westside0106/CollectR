@@ -36,3 +36,17 @@ supabase/.temp/
 
 # Memory vault
 memory/
+
+# Internal documentation (sensitive — move to memory vault)
+AGENTS.md
+HANDOVER.md
+SUPABASE_SECURITY_FIXES.md
+DEPLOYMENT_CHECKLIST.md
+TCG_FEATURES_COMPLETE.md
+TCG_PRICE_API.md
+GRADING_FEATURE.md
+BRAND_VOICE.md
+
+# Internal scripts (sensitive)
+scripts/backup-database.sh
+scripts/setup-memory-vault.sh
