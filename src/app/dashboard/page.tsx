@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import DashboardCharts, { CHART_COLORS } from '@/components/DashboardCharts'
@@ -20,10 +21,28 @@ import {
   CollectionListTile,
   TCGHighlightsTile,
   SpheresTile,
-  Collection3DTile,
 } from '@/components/dashboard'
-import { FavoritesTile } from '@/components/dashboard/tiles/FavoritesTile'
-// Dither import removed — dashboard now uses grid background
+// FavoritesTile lazy loaden (enthaelt CardSwap mit GSAP)
+const FavoritesTile = dynamic(
+  () => import('@/components/dashboard/tiles/FavoritesTile').then(mod => ({ default: mod.FavoritesTile })),
+  { ssr: false }
+)
+
+// Schwere 3D-Komponente lazy loaden (Three.js ~500KB)
+const Collection3DTile = dynamic(
+  () => import('@/components/dashboard/tiles/Collection3DTile').then(mod => ({ default: mod.Collection3DTile })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-72 sm:h-80 rounded-xl bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-xs text-slate-400">3D Graph wird geladen...</p>
+        </div>
+      </div>
+    ),
+  }
+)
 
 interface ChartData {
   categoryDistribution: { label: string; value: number; color: string }[]
