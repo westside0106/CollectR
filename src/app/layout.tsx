@@ -10,7 +10,12 @@ import { ToastProvider } from '@/components/Toast'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import { GlobalDitherBackground } from '@/components/GlobalDitherBackground'
+import dynamic from 'next/dynamic'
+
+const GlobalDitherBackground = dynamic(
+  () => import('@/components/GlobalDitherBackground').then(mod => ({ default: mod.GlobalDitherBackground })),
+  { ssr: false }
+)
 
 const inter = Inter({ subsets: ['latin'] })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
