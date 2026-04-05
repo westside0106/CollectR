@@ -204,22 +204,24 @@ function ConnectionLines({ nodes, hoveredId }: { nodes: CollectionNode[]; hovere
     })
   })
 
+  const lineObjects = useMemo(() => {
+    return lines.map((line) => {
+      const geometry = new THREE.BufferGeometry().setFromPoints([line.from, line.to])
+      const material = new THREE.LineBasicMaterial({
+        color: '#4B9FFF',
+        transparent: true,
+        opacity: line.opacity,
+        depthWrite: false,
+      })
+      return new THREE.Line(geometry, material)
+    })
+  }, [lines])
+
   return (
     <group ref={linesRef}>
-      {lines.map((line, i) => {
-        const points = [line.from, line.to]
-        const geometry = new THREE.BufferGeometry().setFromPoints(points)
-        return (
-          <line key={i} geometry={geometry}>
-            <lineBasicMaterial
-              color="#4B9FFF"
-              transparent
-              opacity={line.opacity}
-              depthWrite={false}
-            />
-          </line>
-        )
-      })}
+      {lineObjects.map((obj, i) => (
+        <primitive key={i} object={obj} />
+      ))}
     </group>
   )
 }
