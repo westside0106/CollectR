@@ -2,7 +2,7 @@
 'use client'
 
 import { useRef, useState, useEffect, useMemo, useCallback } from 'react'
-import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { createClient } from '@/lib/supabase/client'
 
@@ -121,7 +121,7 @@ function CollectionNodeMesh({ node, onHover, hoveredId }: NodeProps) {
     meshRef.current.scale.multiplyScalar(pulse)
   })
 
-  const handlePointerOver = useCallback((e: ThreeEvent<PointerEvent>) => {
+  const handlePointerOver = useCallback((e: { stopPropagation: () => void }) => {
     e.stopPropagation()
     onHover(node)
     document.body.style.cursor = 'pointer'
