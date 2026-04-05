@@ -252,22 +252,15 @@ function ParticleField() {
     pointsRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.01) * 0.1
   })
 
+  const geometry = useMemo(() => {
+    const geo = new THREE.BufferGeometry()
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1))
+    return geo
+  }, [positions, sizes])
+
   return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-size"
-          count={sizes.length}
-          array={sizes}
-          itemSize={1}
-        />
-      </bufferGeometry>
+    <points ref={pointsRef} geometry={geometry}>
       <pointsMaterial
         size={0.03}
         color="#6B7280"
